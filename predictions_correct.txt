@@ -1,0 +1,387 @@
+AL-AIN B-LOC B-LOC
+, O O
+United B-LOC B-LOC
+Arab I-LOC I-LOC
+Emirates I-LOC I-LOC
+1996-12-06 O O
+
+But O O
+China B-LOC B-LOC
+saw O O
+their O O
+luck O O
+desert O O
+them O O
+in O O
+the O O
+second O O
+match O O
+of O O
+the O O
+group O O
+, O O
+crashing O O
+to O O
+a O O
+surprise O O
+2-0 O O
+defeat O O
+to O O
+newcomers O O
+Uzbekistan B-LOC B-LOC
+. O O
+
+It O O
+was O O
+the O O
+second O O
+costly O O
+blunder O O
+by O O
+Syria B-LOC B-LOC
+in O O
+four O O
+minutes O O
+. O O
+
+The O O
+Syrians B-MISC B-MISC
+scored O O
+early O O
+and O O
+then O O
+played O O
+defensively O O
+and O O
+adopted O O
+long O O
+balls O O
+which O O
+made O O
+it O O
+hard O O
+for O O
+us O O
+. O O
+' O O
+
+' O O
+
+All O O
+four O O
+teams O O
+are O O
+level O O
+with O O
+one O O
+point O O
+each O O
+from O O
+one O O
+game O O
+. O O
+
+AL-AIN B-LOC B-LOC
+, O O
+United B-LOC B-LOC
+Arab I-LOC I-LOC
+Emirates I-LOC I-LOC
+1996-12-06 O O
+
+It O O
+was O O
+the O O
+second O O
+Syrian B-MISC B-MISC
+defensive O O
+blunder O O
+in O O
+four O O
+minutes O O
+. O O
+
+Syria B-LOC B-LOC
+had O O
+taken O O
+the O O
+lead O O
+from O O
+their O O
+first O O
+serious O O
+attack O O
+in O O
+the O O
+seventh O O
+minute O O
+. O O
+
+freestyle O O
+skiing O O
+moguls O O
+competition O O
+on O O
+Friday O O
+: O O
+
+Men O O
+
+Women O O
+
+AL-AIN B-LOC B-LOC
+, O O
+United B-LOC B-LOC
+Arab I-LOC I-LOC
+Emirates I-LOC I-LOC
+1996-12-06 O O
+
+Scorers O O
+: O O
+
+Attendance O O
+: O O
+10,000 O O
+. O O
+
+China B-LOC B-LOC
+0 O O
+Uzbekistan B-LOC B-LOC
+2 O O
+( O O
+halftime O O
+0-0 O O
+) O O
+
+Attendence O O
+: O O
+3,000 O O
+
+Standings O O
+( O O
+tabulate O O
+under O O
+played O O
+, O O
+won O O
+, O O
+drawn O O
+, O O
+lost O O
+, O O
+goals O O
+
+for O O
+, O O
+goals O O
+against O O
+, O O
+points O O
+) O O
+: O O
+
+Uzbekistan B-LOC B-LOC
+1 O O
+1 O O
+0 O O
+0 O O
+2 O O
+0 O O
+3 O O
+
+Syria B-LOC B-LOC
+1 O O
+0 O O
+0 O O
+1 O O
+1 O O
+2 O O
+0 O O
+
+China B-LOC B-LOC
+1 O O
+0 O O
+0 O O
+1 O O
+0 O O
+2 O O
+0 O O
+
+Scoreboard O O
+in O O
+the O O
+second O O
+
+on O O
+Friday O O
+: O O
+
+Extras O O
+( O O
+lb-8 O O
+nb-2 O O
+w-14 O O
+) O O
+24 O O
+
+Total O O
+( O O
+for O O
+9 O O
+wickets O O
+in O O
+47 O O
+overs O O
+) O O
+277 O O
+
+Fall O O
+of O O
+wicket O O
+: O O
+1-177 O O
+( O O
+corrects O O
+from O O
+1-178 O O
+) O O
+2-225 O O
+3-240 O O
+4-247 O O
+5-252 O O
+6-260 O O
+7-261 O O
+8-269 O O
+9-276 O O
+
+Extras O O
+( O O
+b-9 O O
+lb-3 O O
+w-12 O O
+nb-2 O O
+) O O
+26 O O
+
+Total O O
+( O O
+all O O
+out O O
+in O O
+42.1 O O
+overs O O
+) O O
+231 O O
+
+Fall O O
+of O O
+wickets O O
+: O O
+1-3 O O
+2-7 O O
+3-125 O O
+4-146 O O
+5-170 O O
+6-190 O O
+7-195 O O
+
+8-213 O O
+9-216 O O
+. O O
+
+Result O O
+: O O
+Pakistan B-LOC B-LOC
+won O O
+by O O
+46 O O
+runs O O
+. O O
+
+Third O O
+one-day O O
+match O O
+: O O
+December O O
+8 O O
+, O O
+in O O
+Karachi B-LOC B-LOC
+. O O
+
+LONDON B-LOC B-LOC
+1996-12-06 O O
+
+LONDON B-LOC B-LOC
+1996-12-06 O O
+
+LONDON B-LOC B-LOC
+1996-12-06 O O
+
+He O O
+was O O
+fined O O
+and O O
+ordered O O
+to O O
+pay O O
+a O O
+total O O
+of O O
+175 O O
+pounds O O
+to O O
+two O O
+members O O
+of O O
+staff O O
+injured O O
+in O O
+the O O
+fracas O O
+in O O
+an O O
+east O O
+London B-LOC B-LOC
+restaurant O O
+in O O
+October O O
+. O O
+
+LONDON B-LOC B-LOC
+1996-12-06 O O
+
+basketball O O
+championship O O
+after O O
+Thursday O O
+'s O O
+matches O O
+( O O
+tabulate O O
+under O O
+
+played O O
+, O O
+won O O
+, O O
+lost O O
+, O O
+points O O
+) O O
+: O O
+
+Group O O
+A O O
+
+Group O O
+B O O
+
+Group O O
+C O O
+
+Group O O
+D O O
+
+LONDON B-LOC B-LOC
+1996-12-06 O O
+

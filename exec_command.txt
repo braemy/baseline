@@ -1,0 +1,41 @@
+# baseline features
+python main.py --data_path ../train.txt --test_data_path ../test.txt --train --feature_template baseline --model_path model_path --language en
+
+# bitstring features
+python main.py  --data_path ../train.txt --test_data_path ../test.txt --train --feature_template bitstring --bitstring_path ../example.bitstring --model_path model_path --language en
+
+# word embeddings features
+python main.py  --data_path ../train.txt --test_data_path ../test.txt --train --feature_template embedding --embedding_path ../example.embedding --model_path model_path --language en
+
+# relational features
+python main.py  --data_path ../train.txt --test_data_path ../test.txt --train --feature_template relational --model_path model_path --language en
+
+# word embeddings + relational features
+python main.py  --data_path ../train.txt --test_data_path ../test.txt --train --feature_template relational --embedding_path ../example.embedding --model_path model_path --language en --parser_type syntaxnet --enable_embeddings
+
+## Active learning
+python main.py  --data_path ../train.txt --test_data_path ../test.txt --train --feature_template embedding --embedding_path ../example.embedding --model_path model_path --language en --active --active_seed_size 1 --active_step_size 1 --active_output_interval 1 --active_output_path active_output_path
+
+## Active learning
+python main.py  --data_path ../train.txt --test_data_path ../test.txt --train --feature_template relational --model_path model_path --language en --parser_type spacy --active --active_seed_size 1 --active_step_size 1 --active_output_interval 1 --active_output_path active_output_path
+
+
+
+## MINITAGGER WITH REAL DATA
+
+# baseline features
+python main.py --data_path ../../data/train.txt --test_data_path ../../data/test.txt --train --feature_template baseline --model_path model_path --language en --debug --prediction_path predictions
+
+# relational features
+python main.py --data_path ../../data/train.txt --test_data_path ../../data/test.txt --train --feature_template relational --model_path model_path --language en --debug --prediction_path predictions
+
+# word embeddings features
+python main.py  --data_path ../../data/train.txt --test_data_path ../../data/test.txt --train --feature_template embedding --embedding_path ../../data/word_embeddings.p --model_path model_path --language en --debug --prediction_path predictions
+
+# word embeddings + relational features
+python main.py  --data_path ../../data/train.txt --test_data_path ../../data/test.txt --train --feature_template relational --embedding_path ../../data/word_embeddings.p --model_path model_path --language en --enable_embeddings --debug --prediction_path predictions
+
+
+
+## USING SAVED MODEL
+python main.py --data_path ../../data/sample_test.txt --model_path model_path --prediction_path ./ --language en --feature_template baseline

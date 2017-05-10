@@ -1,0 +1,26 @@
+the I-MISC O
+International I-MISC I-ORG
+, O Oarx I-PER I-PER
+
+the I-MISC O
+International I-MISC I-MISC
+became O O
+
+M
+and O O
+Bakunin I-PER I-PER
+as O O
+
+Hague I-MISC I-LOC
+Congress I-MISC I-LOC
+where O O
+Bakunin I-PER I-PER
+and O O
+James I-PER I-PER
+Guillaume I-PER I-PER
+were O O
+International I-MISC I-ORG
+to O O
+New I-LOC I-LOC
+York I-LOC I-LOC
+. O O
