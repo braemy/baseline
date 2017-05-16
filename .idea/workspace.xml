@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8af4a8c7-411f-44e4-ab7e-4b5a1b22a9a7" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/minitagger.iml" afterPath="$PROJECT_DIR$/.idea/minitagger.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FeatureExtractor_CRF_SVM.py" afterPath="$PROJECT_DIR$/FeatureExtractor_CRF_SVM.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MinitaggerSVM.py" afterPath="$PROJECT_DIR$/MinitaggerSVM.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/helper/FeatureExtractor.py" afterPath="$PROJECT_DIR$/helper/FeatureExtractor.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/helper/model_evaluation.py" afterPath="$PROJECT_DIR$/helper/model_evaluation.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.py" afterPath="$PROJECT_DIR$/main.py" />
     </list>
     <ignored path="minitagger.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -109,8 +102,8 @@
       <file leaf-file-name="FeatureExtractor.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/helper/FeatureExtractor.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="122">
-              <caret line="336" column="64" lean-forward="true" selection-start-line="335" selection-start-column="8" selection-end-line="336" selection-end-column="64" />
+            <state relative-caret-position="137">
+              <caret line="337" column="61" lean-forward="false" selection-start-line="337" selection-start-column="61" selection-end-line="337" selection-end-column="61" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -204,7 +197,7 @@
   </component>
   <component name="ProjectFrameBounds">
     <option name="y" value="23" />
-    <option name="width" value="1021" />
+    <option name="width" value="1652" />
     <option name="height" value="977" />
   </component>
   <component name="ProjectView">
@@ -601,10 +594,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1021" height="977" extended-state="0" />
+    <frame x="0" y="23" width="1652" height="977" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.45658836" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27763975" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32970297" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27947155" sideWeight="0.5043668" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.38882422" sideWeight="0.49563318" order="2" side_tool="false" content_ui="tabs" />
@@ -665,7 +658,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/helper/FeatureExtractor.py</url>
-          <line>353</line>
+          <line>355</line>
           <option name="timeStamp" value="39" />
         </line-breakpoint>
       </breakpoints>
@@ -956,8 +949,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/helper/FeatureExtractor.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="122">
-          <caret line="336" column="64" lean-forward="true" selection-start-line="335" selection-start-column="8" selection-end-line="336" selection-end-column="64" />
+        <state relative-caret-position="137">
+          <caret line="337" column="61" lean-forward="false" selection-start-line="337" selection-start-column="61" selection-end-line="337" selection-end-column="61" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>

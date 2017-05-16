@@ -332,12 +332,14 @@ class FeatureExtractor(object):
 
         # get word at given position
         word = get_word(word_sequence, position)
+
+        # extract spelling features
+        if self.morphological_features is not None:
+            features.update(self._spelling_features(word, 0))
+
         # identify word
         if self.token_features0:
             features["word({0})={1}".format(position, word)] = 1
-        # extract spelling features
-        if self.morphological_features is not None:
-            features = self._spelling_features(word, 0)
 
         # get 2 words on the left and right¨
         # add features for the words on the left and right side
