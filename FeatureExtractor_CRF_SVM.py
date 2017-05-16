@@ -7,8 +7,8 @@ import sys
 
 sys.path.insert(0, 'helper')
 
-from FeatureExtractor import FeatureExtractor
-from utils_data import *
+from helper.FeatureExtractor  import FeatureExtractor
+from helper.utils_data import *
 import os
 
 
@@ -295,10 +295,15 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
         dataDict = {}
         dataDict['language'] = self.language
         dataDict['template'] = self.feature_template
-        dataDict['featureStr2Index'] = self.__map_feature_str2num
-        dataDict['featureIndex2Str'] = self.__map_feature_num2str
-        dataDict['labelStr2Index'] = self.__map_label_str2num
-        dataDict['labelIndex2Str'] = self.__map_label_num2str
+        dataDict['featureStr2Index'] = self._map_feature_str2num
+        dataDict['featureIndex2Str'] = self._map_feature_num2str
+        dataDict['labelStr2Index'] = self._map_label_str2num
+        dataDict['labelIndex2Str'] = self._map_label_num2str
+        print('sanity check :')
+        print('featureStr2Index  size {0}'.format(len(self._map_feature_str2num)))
+        print('featureIndex2Str  size {0}'.format(len(self._map_feature_num2str)))
+        print('labelStr2Index  size {0}'.format(len(self._map_label_str2num)))
+        print('labelIndex2Str  size {0}'.format(len(self._map_label_num2str)))
         with open(file_path, 'w') as outfile:
             json.dump(dataDict, outfile)
 

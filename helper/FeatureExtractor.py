@@ -1,11 +1,11 @@
 import math
 import pickle
 import numpy as np
-import fasttext
+#import fasttext
 from tqdm import tqdm
 
-from utils import *
-from utils_data import *
+from helper.utils import *
+from helper.utils_data import *
 import sys
 import os
 
@@ -178,6 +178,7 @@ class FeatureExtractor(object):
             raise Exception("Unsupported feature template {0}".format(self.feature_template))
         # map extracted raw features to numeric
         numeric_features = self._map_raw_to_numeric_features(raw_features)
+        print ()
         if numeric_feature:
             return numeric_features
         else:

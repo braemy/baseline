@@ -10,8 +10,8 @@ sys.path.insert(0, 'helper')
 
 import numpy as np
 from Minitagger import Minitagger
-from model_evaluation import report_fscore_from_file
-from score import Score
+from helper.model_evaluation import report_fscore_from_file
+from helper.score import Score
 
 LIBLINEAR_PATH = os.path.join(os.path.dirname(__file__), "liblinear-1.96/python")
 print(LIBLINEAR_PATH)
@@ -37,17 +37,22 @@ class MinitaggerSVM(Minitagger):
         print("SVM (liblinear)")
 
     def extract_features(self, data_train, data_test, validation_sequence = None, num_data =None):
-        # Extract features only for labeled instances from data_train
-        self.data_train = data_train.get_copy()
+        if data_train is None: # data_train is none ==> we are going to predict
+            # make sure is_training is false
+            assert (not self.feature_extractor.is_training), "In order to train, is_training flag should be True"
+        else:
+            # Extract features only for labeled instances from data_train
+            self.data_train = data_train.get_copy()
+            self.features_list_train, self.label_list_train, _ = self.feature_extractor.extract_features_svm(
+                self.data_train, extract_all=False)
+
+
         self.data_test = data_test
         if num_data is not None:
             arg = np.random.permutation(len(data_train.sequence_pairs))[:int(num_data)]
             self.data_train.sequence_pairs = np.array(data_train.sequence_pairs)[arg]
-        assert (self.feature_extractor.is_training), "In order to train, is_training flag should be True"
 
-        self.features_list_train, self.label_list_train, _ = self.feature_extractor.extract_features_svm(self.data_train,
-                                                                                                         extract_all=False)
-        self.feature_extractor.is_training = False
+        #self.feature_extractor.is_training = False
         self.features_list_test, self.label_list_test, _ = self.feature_extractor.extract_features_svm(self.data_test,
                                                                                                        extract_all=True)
         #if validation_sequence is not None:
@@ -203,9 +208,12 @@ class MinitaggerSVM(Minitagger):
         # 	self.__liblinear_model = liblinearutil.load_model(os.path.join(model_path, "liblinear_model"))
         try:
             print(self.model_path)
-            self.__feature_extractor = pickle.load(open(os.path.join(self.model_path, "feature_extractor"), "rb"))
+            self.feature_extractor = pickle.load(open(os.path.join(self.model_path, "feature_extractor"), "rb"))
+            print()
+            #self.feature_extractor.save_json_format(os.path.join(self.model_path, "feature_extractor_json"))
             # load trained model
             self.__liblinear_model = liblinearutil.load_model(os.path.join(self.model_path, "liblinear_model"))
+            print()
         except:
             raise Exception("No files found in the model path " + self.model_path)
 
@@ -239,6 +247,7 @@ class MinitaggerSVM(Minitagger):
         pred_labels = self.convert_prediction(pred_labels, self.data_test )
         #for i, label in enumerate(pred_labels):
         #    pred_labels[i] = self.feature_extractor.get_label_string(label)
+        self.__save_prediction_to_file(self.data_test, pred_labels)
 
         return pred_labels, acc
 
@@ -282,6 +291,62 @@ class MinitaggerSVM(Minitagger):
 
             score.save_class_to_file(self.model_path)
             self.save(self.model_path)
+
+    def __save_prediction_to_file(self, data_test, pred_labels):
+        # file to print all predictions
+        file_name = os.path.join(self.prediction_path, "predictions.txt")
+        f1 = open(file_name, "w")
+        # file to print only sentences that contain at least one wrong label after classification
+        file_name = os.path.join(self.prediction_path, "predictions_wrong.txt")
+        f2 = open(file_name, "w")
+        # file to print only sentences whose labels are predicted 100% correctly
+        file_name = os.path.join(self.prediction_path, "predictions_correct.txt")
+        f3 = open(file_name, "w")
+        # index for prediction label
+        pred_idx = 0
+        # list to store all true labels
+        true_labels = []
+        true_pos_tags = []
+        # iterate through the test set
+        # labels_pos: [[labels]. [pos tag]] => labels = labels_pos[0] / pos_tag = labels_pos[1]
+        for words, *labels_pos in data_test.sequence_pairs:
+            # prediction sequence for each sentence
+            pred_sequence = []
+            for i in range(len(words)):
+                # append label to the prediction sequence
+                pred_sequence = pred_labels[pred_idx]
+                # append label to the list of true labels
+                true_labels.append(labels_pos[0][i])
+                # append pos tag (if exist) to the list of true pos tag
+                if len(labels_pos) == 2: true_pos_tags.append(labels_pos[1][i])
+                # create line to print in the file
+                line = words[i] + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
+                # write to file
+                f1.write(line)
+
+            pred_idx += 1
+            # separate sentences with empty lines
+            f1.write("\n")
+            # check if classification error occurred
+            if labels_pos[0] != pred_sequence:
+                for i in range(len(labels_pos[0])):
+                    # create line to print to file
+                    line = words[i] + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
+                    f2.write(line)
+                # separate sentences with empty lines
+                f2.write("\n")
+            else:
+                for i in range(len(labels_pos[0])):
+                    # create line to print to file
+                    line = words[i] + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
+                    f3.write(line)
+                # separate sentences with empty lines
+                f3.write("\n")
+        # close files
+        f1.close()
+        f2.close()
+        f3.close()
+        return true_labels
 
 
 

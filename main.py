@@ -2,25 +2,28 @@ import argparse
 import os
 import sys
 
-from MinitaggerCRF import MinitaggerCRF
+#from MinitaggerCRF import MinitaggerCRF
 from MinitaggerSVM import MinitaggerSVM
 from helper.SequenceData import SequenceData
 from FeatureExtractor_CRF_SVM import FeatureExtractor_CRF_SVM
+from helper.model_evaluation import report_fscore_from_file
 
 # Used for instances without gold labels
 ABSENT_GOLD_LABEL = "<NO_GOLD_LABEL>"
 
 
+
+
 def main(args):
     # train or use a tagger model on the given data.
-    if "svm" in args.model_name:
-        minitagger = MinitaggerSVM()
-    elif "crf" in args.model_name:
-        minitagger = MinitaggerCRF()
-    else:
-        print("Unrecognized model name")
-        sys.exit(1)
-
+    # if "svm" in args.model_name:
+    #     minitagger = MinitaggerSVM()
+    # elif "crf" in args.model_name:
+    #     minitagger = MinitaggerCRF()
+    # else:
+    #     print("Unrecognized model name")
+    #     sys.exit(1)
+    minitagger = MinitaggerSVM()
     sequence_data = SequenceData(args.train_data_path,args.pos_tag)
 
     minitagger.language = args.language
@@ -63,32 +66,37 @@ def main(args):
             # minitagger.cross_validation(sequence_data, test_data, 5)
     # predict labels in the given data.
     else:
-        assert args.model_path
-        minitagger.load(args.model_path)
-        pred_labels, _ = minitagger.predict(sequence_data)
+
+        minitagger.load(minitagger.model_path)
+        minitagger.set_is_training(False)
+        minitagger.extract_features(None, sequence_data)
+        pred_labels, _ = minitagger.predict()
+        report_fscore_from_file(os.path.join(minitagger.prediction_path, "predictions.txt"), quiet=False)
+
+
 
         # optional prediction output
         # write predictions to file
-        if args.prediction_path:
-            file_name = os.path.join(args.project_dir, args.prediction_path, "predictions.txt")
-            with open(file_name, "w") as outfile:
-                label_index = 0
-                for sequence_num, (word_sequence, label_sequence) in enumerate(sequence_data.sequence_pairs):
-                    for position, word in enumerate(word_sequence):
-                        if not label_sequence[position] is None:
-                            gold_label = label_sequence[position]
-                        else:
-                            gold_label = ABSENT_GOLD_LABEL
-                        outfile.write(word + "\t" + gold_label + "\t" + pred_labels[label_index] + "\n")
-                        label_index += 1
-                    if sequence_num < len(sequence_data.sequence_pairs) - 1:
-                        outfile.write("\n")
+        # if args.prediction_path:
+        #     file_name = os.path.join(args.project_dir, args.prediction_path, "predictions.txt")
+        #     with open(file_name, "w") as outfile:
+        #         label_index = 0
+        #         for sequence_num, (word_sequence, label_sequence) in enumerate(sequence_data.sequence_pairs):
+        #             for position, word in enumerate(word_sequence):
+        #                 if not label_sequence[position] is None:
+        #                     gold_label = label_sequence[position]
+        #                 else:
+        #                     gold_label = ABSENT_GOLD_LABEL
+        #                 outfile.write(word + "\t" + gold_label + "\t" + pred_labels[label_index] + "\n")
+        #                 label_index += 1
+        #             if sequence_num < len(sequence_data.sequence_pairs) - 1:
+        #                 outfile.write("\n")
 
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
-    argparser.add_argument("--train_data_path", type=str, help="path to data (used for training/testing)", required=True)
-    argparser.add_argument("--model_name", type=str, help="name used to store the model and the predictions", required=True)
+    argparser.add_argument("--train_data_path", type=str, help="path to data (used for training/testing)", required=False)
+    argparser.add_argument("--model_name", type=str, help="name used to store the model and the predictions", required=False, default='svm')
     argparser.add_argument("--train", action="store_true", help="train the tagger on the given data")
     argparser.add_argument("--feature_template", type=str, default="baseline",
                            help="feature template (default: %(default)s)")

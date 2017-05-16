@@ -274,8 +274,8 @@ def split_prediction_true_label(file_name):
         tokens = line.split()
         if len(tokens) != 0:
             sentence.append(tokens[0])
-            y_true.append(tokens[2])
-            y_pred.append(tokens[3])
+            y_true.append(tokens[1])
+            y_pred.append(tokens[2])
         else:
             true_sequence.append(y_true)
             pred_sequence.append(y_pred)
@@ -286,9 +286,7 @@ def split_prediction_true_label(file_name):
     if sentence:
         true_sequence.append(y_true)
         pred_sequence.append(y_pred)
-        sentence = []
-        y_true = []
-        y_pred = []
+
 
     return true_sequence, pred_sequence
 
@@ -332,17 +330,17 @@ def report_fscore(true_label, pred_label, wikiner=False, quiet=True):
         fn_exact += fn
         total_seq += seq
 
-    # print("TP exact: ", tp_exact)
-    # print("TN exact: ", tn_exact)
-    # print("FP exact: ", fp_exact)
-    # print("FN exact: ", fn_exact)
-    # print("seq: ", total_seq)
-    # print()
-    # print("TP inexact: ", tp_inexact)
-    # print("TN inexact: ", tn_inexact)
-    # print("FP inexact: ", fp_inexact)
-    # print("FN inexact: ", fn_inexact)
-    # print()
+    print("TP exact: ", tp_exact)
+    print("TN exact: ", tn_exact)
+    print("FP exact: ", fp_exact)
+    print("FN exact: ", fn_exact)
+    print("seq: ", total_seq)
+    print()
+    print("TP inexact: ", tp_inexact)
+    print("TN inexact: ", tn_inexact)
+    print("FP inexact: ", fp_inexact)
+    print("FN inexact: ", fn_inexact)
+    print()
 
     exact_score=dict()
     precision = estimate_precision(tp_exact, fp_exact)
