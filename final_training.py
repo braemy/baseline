@@ -130,6 +130,7 @@ class final_training(object):
             self.minitagger.train_with_step(self.train_sequence, self.test_sequence)
         else:
             self.minitagger.extract_features(self.train_sequence, self.test_sequence)
+            self.minitagger.quiet=False
             self.minitagger.train()
             self.minitagger.save(self.minitagger.model_path)
 
@@ -187,7 +188,7 @@ class final_training(object):
 if __name__ == "__main__":
 
     a = "wikiner"
-    language = "en"
+    language = "de"
     embedding_size = 300
     if a == "test":
         train_data_path = "../../ner/small_datasets/eng-simplified.train"
@@ -201,9 +202,10 @@ if __name__ == "__main__":
         model_name = "SVM_test_finale_score"
 
     elif a == "wikiner":
-        train_data_path = "../../wikiner_dataset/aij-wikiner-en-wp2-simplified"
-        validation_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
-        test_data_path = "../../ner/nerc-conll2003/eng-simplified.testb"
+        train_data_path = "../../wikiner_dataset/aij-wikiner-de-wp2-simplified"
+        #train_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
+        validation_data_path = "../../ner/nerc-conll2003/deu-simplified.testa"
+        test_data_path = "../../ner/nerc-conll2003/deu-simplified.testb"
         feature_template = "baseline"
         embedding_path = "../../word_embeddings/fasttext"
         #model_name = "SVM_wikiner_emb" + str(embedding_size) + "_finale_score"
