@@ -1,9 +1,8 @@
 import argparse
 
-import sys
-sys.path.insert(0, '../helper')
-from conlleval import evaluate
-from conlleval import report
+
+from helper.conlleval import evaluate, report
+
 
 
 def estimate_inexact_fscore(y_true, y_pred, b_equals_i=False):
@@ -295,6 +294,7 @@ def report_fscore_from_file(prediction_file, wikiner=False, quiet=True):
     with open(prediction_file) as f:
         counts = evaluate(f, None)
     conllEval = report(counts)
+    print(conllEval)
     exact_score, inexact_score = report_fscore(true_label, pred_label, wikiner, quiet)
 
     return exact_score, inexact_score, conllEval

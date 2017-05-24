@@ -178,7 +178,6 @@ class FeatureExtractor(object):
             raise Exception("Unsupported feature template {0}".format(self.feature_template))
         # map extracted raw features to numeric
         numeric_features = self._map_raw_to_numeric_features(raw_features)
-        print ()
         if numeric_feature:
             return numeric_features
         else:
