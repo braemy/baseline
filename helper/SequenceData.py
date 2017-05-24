@@ -201,13 +201,14 @@ class SequenceData(object):
 
 		"""
         self.data_path = data_path
-        with open(data_path, "r") as input_file:
+        with open(data_path, "r", encoding="ISO-8859-1") as input_file:
             word_sequence = []
             pos_sequence = []
             label_sequence = []
             id_token = []
 
             for line in input_file:
+                #print(line)
                 tokens = line.split()
                 # if not pos_tag:
                 #    assert (len(tokens) < 3), "Each line should contain no more than 3 columns"
@@ -361,12 +362,15 @@ class SequenceData(object):
                 # create line to print in the file
                 if not list_tokens: # used in case of NN or CRF because pred_labels is a list of sentence : list[list[label]]
                     if type(words) == dict:
-                        line = words[i]['t'] + " " + "POS" + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
+                        #line = words[i]['t'] + " " + "POS" + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
+                        line = words[i]['t'] + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
                     else:
-                        line = words[i] + " " + "POS" + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
+                        #line = words[i] + " " + "POS" + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
+                        line = words[i] +  " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
 
                 else: # use in case of svm: pred_labels is list of tokens
-                    line = words[i] + " " + "POS" + " " + labels_pos[0][i] + " " + pred_labels[pred_idx] + "\n"
+                    #line = words[i] + " " + "POS" + " " + labels_pos[0][i] + " " + pred_labels[pred_idx] + "\n"
+                    line = words[i] + " "  + labels_pos[0][i] + " " + pred_labels[pred_idx] + "\n"
                 # write to file
                 f1.write(line)
                 pred_idx += 1
