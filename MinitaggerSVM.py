@@ -79,6 +79,7 @@ class MinitaggerSVM(Minitagger):
         if not self.quiet:
             print("{0} labeled words (out of {1})".format(len(self.label_list_train), self.data_train.num_of_words))
             print("{0} label types".format(len(self.data_train.label_count)))
+            print("label types: ", self.data_train.label_count)
             print("{0} word types".format(len(self.data_train.word_count)))
             print("\"{0}\" feature template".format(self.feature_extractor.feature_template))
             print("{0} feature types".format(self.feature_extractor.num_feature_types()))

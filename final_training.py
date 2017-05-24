@@ -58,11 +58,10 @@ class final_training(object):
         self.feature_extractor = FeatureExtractor_CRF_SVM(self.feature_template, self.language,
                                                          self.embedding_size if self.embedding_size else None)
 
-        self.train_sequence = SequenceData(self.train_data_path, pos_tag=True)
-        self.validation_sequence = SequenceData(self.validation_data_path, pos_tag=True) if self.validation_data_path is not None else None
+        self.train_sequence = SequenceData(self.train_data_path,language=self.language, pos_tag=True)
+        self.validation_sequence = SequenceData(self.validation_data_path,language=self.language, pos_tag=True) if self.validation_data_path is not None else None
+        self.test_sequence = SequenceData(self.test_data_path,language=self.language, pos_tag=True)
 
-
-        self.test_sequence = SequenceData(self.test_data_path, pos_tag=True)
         # load bitstring or embeddings data
         if self.feature_template == "embedding":
             self.feature_extractor.load_word_embeddings(self.embedding_path, self.embedding_size)
@@ -187,19 +186,18 @@ class final_training(object):
 
 if __name__ == "__main__":
 
-    a = "wikiner"
-    language = "de"
+    a = "new_dataset"
+    language = "en"
     embedding_size = 300
-    if a == "test":
-        train_data_path = "../../ner/small_datasets/eng-simplified.train"
-        validation_data_path = "../../ner/small_datasets/eng-simplified.testa"
-        test_data_path = "../../ner/small_datasets/eng-simplified.testb"
-
-        # train_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
-        # test_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
+    if a == "new_dataset":
+        train_data_path = "../../new_dataset/combined_1000000Sport.txt"
+        validation_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
+        test_data_path = "../../ner/nerc-conll2003/eng-simplified.testb"
         feature_template = "baseline"
         embedding_path = "../../word_embeddings/glove"
-        model_name = "SVM_test_finale_score"
+
+
+        model_name = "SVM_new_dataset_finale_score"
 
     elif a == "wikiner":
         train_data_path = "../../wikiner_dataset/aij-wikiner-de-wp2-simplified"

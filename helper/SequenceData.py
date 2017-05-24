@@ -12,7 +12,7 @@ class SequenceData(object):
 	The data be loaded from a text file or a list
 	"""
 
-    def __init__(self, given_data, pos_tag, convert_to_id=False):
+    def __init__(self, given_data, pos_tag, language="en", convert_to_id=False):
         # path to the data
         self.data_path = None
         # number of words in the data
@@ -38,6 +38,8 @@ class SequenceData(object):
         self.pos_count = collections.Counter()
 
         self.convert_to_id = False
+
+        self.language = language
 
         # check if given data is a path to file, i.e. a string
         if isinstance(given_data, str):
@@ -201,7 +203,12 @@ class SequenceData(object):
 
 		"""
         self.data_path = data_path
-        with open(data_path, "r", encoding="ISO-8859-1") as input_file:
+        if self.language == 'en':
+            encoding = "utf-8"
+        elif self.language == 'de':
+            encoding = "iso-8859-1"
+
+        with open(data_path, "r", encoding=encoding) as input_file:
             word_sequence = []
             pos_sequence = []
             label_sequence = []
@@ -222,7 +229,7 @@ class SequenceData(object):
                         pos = tokens[1]
                     # the label is the 3td token, if it exists, otherwise label = None
                     if pos_tag:
-                        label = None if len(tokens) == 2 else tokens[2] # TODO have a look for POS
+                        label = None if len(tokens) == 2 else tokens[2] # TODO have a look for POS¨
                     else:
                         label = None if len(tokens) == 1 else tokens[1]
                     # else:
