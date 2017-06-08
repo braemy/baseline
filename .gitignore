@@ -99,4 +99,5 @@ ENV/
 predictions
 models_path
 parameters
+.idea/*
 
