@@ -235,7 +235,6 @@ class MinitaggerCRF(Minitagger):
 
         # data_train.sequence_pairs: [[[tokens sentence1]. [label senteces1]], [[tokens sentence2]. [label senteces12]],...]
         # 1)permute randomly all sentences
-        np.random.seed(123456)
         data_train.sequence_pairs = np.random.permutation(data_train.sequence_pairs)
         # 2) do cross validation
 

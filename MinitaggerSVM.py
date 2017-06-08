@@ -152,7 +152,6 @@ class MinitaggerSVM(Minitagger):
 
         # data_train.sequence_pairs: [[[tokens sentence1]. [label senteces1]], [[tokens sentence2]. [label senteces12]],...]
         # 1)permute randomly all sentences
-        np.random.seed(123456)
         data_train.sequence_pairs = np.random.permutation(data_train.sequence_pairs)
         # 2) do cross validation
 
@@ -291,7 +290,7 @@ class MinitaggerSVM(Minitagger):
             print("Iteration:", time.time() - start_time, "score: ", conllEval)
 
             score.save_class_to_file(self.model_path)
-            self.save(self.model_path)
+            #self.save(self.model_path)
 
     def __save_prediction_to_file(self, data_test, pred_labels):
         # file to print all predictions

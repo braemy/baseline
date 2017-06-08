@@ -50,17 +50,11 @@ class FeatureExtractor(object):
         self.block_size= 50000
         self.token_features2 = True
         self.morphological_features = "regular"
-        self.keep_position_features = True
         self.token_features1 = True
         self.token_features0 = True
 
 
         self.window_size = 0
-
-        np.random.seed(12345)
-
-    def change_seed(self, new_seed):
-        np.random.seed(new_seed)
 
 
     def get_feature_dim(self):
@@ -167,7 +161,7 @@ class FeatureExtractor(object):
 		@param: sequence of pos tag
 		@return: a dictionary of numeric features (key = feature id, value = value for the specific feature)
 		"""
-        position = position if self.keep_position_features else 0
+        position = position
         # Extract raw features depending on the given feature template
         if self.feature_template == "baseline":
             raw_features = self._get_baseline_features(word_sequence, position, pos_tag)
@@ -277,14 +271,14 @@ class FeatureExtractor(object):
             if self.morphological_features == "regular":
                 for length in range(1, 5):
                     features[
-                        "prefix{0}({1})={2}".format(length, relative_position, get_prefix(word.lower(), length))] = 1
+                        "prefix{0}({1})={2}".format(length, relative_position, get_prefix(word, length))] = 1
                     features[
-                        "suffix{0}({1})={2}".format(length, relative_position, get_suffix(word.lower(), length))] = 1
+                        "suffix{0}({1})={2}".format(length, relative_position, get_suffix(word, length))] = 1
             # use fasttext to create morphological features
             if self.morphological_features == "fasttext":
                 for length in range(1, 5):
                     # get prefix of word
-                    prefix = get_prefix(word.lower(), length)
+                    prefix = get_prefix(word, length)
                     if prefix in self._word_embeddings:
                         # get the word embeddings for the prefix
                         prefix_embedding = self._word_embeddings[prefix]
@@ -406,18 +400,12 @@ class FeatureExtractor(object):
         else:
             word = word_sequence[position + offset]
             word = word.lower()
-            # build offset string
-            # get word embedding for the given word
-            #try:
-            word_embedding = self._word_embeddings.get(word,np.random.rand(self.embedding_size) )
+            if self.embedding_type == "glove":
+                word_embedding = self._word_embeddings.get(word,np.random.rand(self.embedding_size) )
+            else:
+                word_embedding = self._word_embeddings[word]
+
             word_embedding /= np.linalg.norm(word_embedding)
-            #except KeyError:
-                #word_embedding = self.__word_embeddings[self.unknown_symbol]
-                #if the word is not in the word embedding matrix, return a random vector
-            #    word_embedding = np.random.rand(self.embedding_size)
-                #normalize vecotr
-            #    word_embedding /= np.linalg.norm(word_embedding)
-            # enrich given features dict
         offset = str(offset) if offset <= 0 else "+" + str(offset)
         for i in range(len(word_embedding)):
            features["embedding({0})_at({1})".format(offset, (i + 1))] = word_embedding[i]

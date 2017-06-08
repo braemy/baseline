@@ -4,6 +4,7 @@ import sys
 sys.path.insert(0, '../helper')
 from conlleval import evaluate
 from conlleval import report
+from conlleval import metrics
 
 
 def estimate_inexact_fscore(y_true, y_pred, b_equals_i=False):
@@ -295,6 +296,26 @@ def report_fscore_from_file(prediction_file, wikiner=False, quiet=True):
     with open(prediction_file) as f:
         counts = evaluate(f, None)
     conllEval = report(counts)
+    overall, by_type = metrics(counts)
+    c = counts
+    print("ConllEval: \n")
+    print('processed %d tokens with %d phrases; ' %
+          (c.token_counter, c.found_correct))
+    print('found: %d phrases; correct: %d.\n' %
+          (c.found_guessed, c.correct_chunk))
+
+    if c.token_counter > 0:
+        print('accuracy: %6.2f%%; ' %
+              (100. * c.correct_tags / c.token_counter), end="")
+        print('precision: %6.2f%%; ' % (100. * overall.prec), end="")
+        print('recall: %6.2f%%; ' % (100. * overall.rec), end="")
+        print('FB1: %6.2f\n' % (100. * overall.fscore))
+
+    for i, m in sorted(by_type.items()):
+        print('%17s: ' % i, end="")
+        print('precision: %6.2f%%; ' % (100. * m.prec), end="")
+        print('recall: %6.2f%%; ' % (100. * m.rec), end="")
+        print('FB1: %6.2f  %d\n' % (100. * m.fscore, c.t_found_guessed[i]), end="")
     exact_score, inexact_score = report_fscore(true_label, pred_label, wikiner, quiet)
 
     return exact_score, inexact_score, conllEval

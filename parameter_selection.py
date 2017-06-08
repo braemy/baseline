@@ -22,9 +22,7 @@ class Parameter_selection(object):
     def __init__(self):
         self.minitagger=None
 
-    def parameter_selection_svm(self, train_data_path, test_data_path, language, model_name, feature_template, embedding_size=None, embedding_path=None, number_of_trial=20, seed=123456):
-        np.random.seed(seed=seed)
-
+    def parameter_selection_svm(self, train_data_path, test_data_path, language, model_name, feature_template, embedding_size=None, embedding_path=None, number_of_trial=20):
         minitagger = MinitaggerSVM()
 
         sequence_data = SequenceData(train_data_path, pos_tag=True)
@@ -79,7 +77,7 @@ class Parameter_selection(object):
                     ok = True
 
             mean_fscore_conll, param = minitagger.cross_validation(i+1, sequence_data, feature_template, language,
-                                                                   embedding_path, embedding_size, data_test=None, n_fold=5)
+                                                                   embedding_path, embedding_size, data_test=None, n_fold=3)
             score.add_scores(mean_fscore_conll, None, None, param)
             score.save_result_to_file(infos, minitagger.model_path)
 
@@ -100,8 +98,7 @@ class Parameter_selection(object):
         selection.final_training("svm", best_param )
 
 
-    def parameter_selection_crf(self, train_data_path, validation_data_path, test_data_path, language, model_name, feature_template, embedding_size=None, embedding_path=None, number_of_trial=10, seed=123456):
-        np.random.seed(seed=seed)
+    def parameter_selection_crf(self, train_data_path, validation_data_path, test_data_path, language, model_name, feature_template, embedding_size=None, embedding_path=None, number_of_trial=10):
         data_to_use = 20000
         self.minitagger = MinitaggerCRF()
 
@@ -243,7 +240,7 @@ class Parameter_selection(object):
 
 if __name__ == "__main__":
 
-    a = "test"
+    a = "conll"
     language = "en"
     embedding_size = 300
     if a == "test":
@@ -271,8 +268,8 @@ if __name__ == "__main__":
         validation_data_path = None
         test_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
         feature_template = "embedding"
-        embedding_path = "../../word_embeddings/glove"
-        model_name = "_conll_emb" + str(embedding_size) + "_parameter_selection_1"
+        embedding_path = "../../word_embeddings/fasttext"
+        model_name = "_conll_emb" + str(embedding_size) + "_parameter_selection_2"
         number_of_trial = 10
 
 
@@ -281,9 +278,9 @@ if __name__ == "__main__":
 
 
     # elif algorithm == "CRF":
-    #selection.parameter_selection_crf(train_data_path,validation_data_path, test_data_path,
-    #                                 language, "CRF"+model_name, feature_template,
-    #                                 embedding_size,embedding_path, number_of_trial = number_of_trial)
+    selection.parameter_selection_crf(train_data_path,validation_data_path, test_data_path,
+                                     language, "CRF"+model_name, feature_template,
+                                     embedding_size,embedding_path, number_of_trial = number_of_trial)
 
     #if algorithm == "SVM":
     selection.parameter_selection_svm(train_data_path,test_data_path,

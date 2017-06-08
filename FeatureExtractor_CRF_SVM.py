@@ -1,6 +1,8 @@
 import json
 import math
 import pickle
+
+import fasttext
 import numpy as np
 from tqdm import tqdm
 import sys
@@ -49,7 +51,7 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
 
         self.block_size= 50000
         self.quiet = True
-
+        self.embedding_type = None
 
 
 
@@ -154,31 +156,38 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
 
         # load the word embeddings dictionary
         print("Loading word embeddings...")
-        file_name = "word_embeddings_dict_" + str(embedding_length) + ".p"
-        file_name = os.path.join(embedding_path,self.language, file_name)
-        self._word_embeddings = pickle.load(open(file_name, "rb"))
+        if "glove" in embedding_path:
+            self.embedding_type = "glove"
+            print("Load glove...")
+            file_name = "word_embeddings_dict_" + str(embedding_length) + ".p"
+            file_name = os.path.join(embedding_path,self.language, file_name)
+            self._word_embeddings = pickle.load(open(file_name, "rb"))
 
-        # the token for unknown word types must be present
- #       assert (
- #           self.unknown_symbol in self.__word_embeddings), "The token for unknown word types must be present in the embeddings file"
+            # the token for unknown word types must be present
+     #       assert (
+     #           self.unknown_symbol in self.__word_embeddings), "The token for unknown word types must be present in the embeddings file"
 
-        # address some treebank token conventions.
-        if "(" in self._word_embeddings:
-            self._word_embeddings["-LCB-"] = self._word_embeddings["("]
-            self._word_embeddings["-LRB-"] = self._word_embeddings["("]
-            self._word_embeddings["*LCB*"] = self._word_embeddings["("]
-            self._word_embeddings["*LRB*"] = self._word_embeddings["("]
-        if ")" in self._word_embeddings:
-            self._word_embeddings["-RCB-"] = self._word_embeddings[")"]
-            self._word_embeddings["-RRB-"] = self._word_embeddings[")"]
-            self._word_embeddings["*RCB*"] = self._word_embeddings[")"]
-            self._word_embeddings["*RRB*"] = self._word_embeddings[")"]
-        if "\"" in self._word_embeddings:
-            self._word_embeddings["``"] = self._word_embeddings["\""]
-            self._word_embeddings["''"] = self._word_embeddings["\""]
-            self._word_embeddings["`"] = self._word_embeddings["\""]
-            self._word_embeddings["'"] = self._word_embeddings["\""]
-
+            # address some treebank token conventions.
+            if "(" in self._word_embeddings:
+                self._word_embeddings["-LCB-"] = self._word_embeddings["("]
+                self._word_embeddings["-LRB-"] = self._word_embeddings["("]
+                self._word_embeddings["*LCB*"] = self._word_embeddings["("]
+                self._word_embeddings["*LRB*"] = self._word_embeddings["("]
+            if ")" in self._word_embeddings:
+                self._word_embeddings["-RCB-"] = self._word_embeddings[")"]
+                self._word_embeddings["-RRB-"] = self._word_embeddings[")"]
+                self._word_embeddings["*RCB*"] = self._word_embeddings[")"]
+                self._word_embeddings["*RRB*"] = self._word_embeddings[")"]
+            if "\"" in self._word_embeddings:
+                self._word_embeddings["``"] = self._word_embeddings["\""]
+                self._word_embeddings["''"] = self._word_embeddings["\""]
+                self._word_embeddings["`"] = self._word_embeddings["\""]
+                self._word_embeddings["'"] = self._word_embeddings["\""]
+        else:
+            print("Loading fasttext ...")
+            self.embedding_type = "fasttext"
+            print(os.path.join(embedding_path,self.language, "wiki.en.bin"))
+            self._word_embeddings = fasttext.load_model(os.path.join(embedding_path,self.language, "wiki.en.bin"))
 
     def is_training(self):
         return self.is_training

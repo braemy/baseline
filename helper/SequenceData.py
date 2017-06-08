@@ -3,6 +3,7 @@ import numpy as np
 import copy
 import os
 import pickle
+import sys
 
 
 class SequenceData(object):
@@ -226,7 +227,12 @@ class SequenceData(object):
                     # the word is the 1st token
                     word = tokens[0]
                     if pos_tag:
-                        pos = tokens[1]
+                        try:
+                            pos = tokens[1]
+                        except:
+                            print(line)
+                            print(next(input_file))
+                            sys.exit()
                     # the label is the 3td token, if it exists, otherwise label = None
                     if pos_tag:
                         label = None if len(tokens) == 2 else tokens[2] # TODO have a look for POS¨
@@ -260,6 +266,9 @@ class SequenceData(object):
                         word_sequence = []
                         label_sequence = []
                         pos_sequence = []
+
+                        #if len(self.sequence_pairs) >= 45802 and ("train" in data_path or "combined" in data_path or "wikiner" in data_path): #TODO remove it. debug purpose
+                         #   break
 
             # file may not end with empty line
             # data of last sentence should be also be appended to sequence_pairs
