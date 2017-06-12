@@ -70,8 +70,12 @@ def estimate_exact_fscore(y_true, y_pred):
                 fp += 1
         else:
             y_true[i]
-            assert "-" in y_true[i], "true label " + y_true[i] + " should contains '-'"
-            true_b_i, true_class = y_true[i].split("-")
+            if y_true[i][0]!='B' and y_true[i][0]!='I':
+                y_true[i]='O'
+                true_b_i, true_class = 'O', 'O'
+            else:
+                #assert "-" in y_true[i], "true label " + y_true[i] + " should contains '-'"
+                true_b_i, true_class = y_true[i].split("-")
 
             if true_b_i == "B":
                 if start:  # in case B-PER I-PER B-LOC I-LOC => is sequence started, need to add it when we are at B-LOC
@@ -85,8 +89,7 @@ def estimate_exact_fscore(y_true, y_pred):
                     #    print(y_pred)
                     #    print("should not happen: i" + y_true[i] + " i+1:" + y_true[i+1])
 
-                    if y_true[i + 1] == "O" or y_true[i + 1].split("-")[
-                        0] == "B":  # if next label start with "B" => not a sequence
+                    if y_true[i + 1] == "O" or y_true[i + 1].split("-")[0] == "B":  # if next label start with "B" => not a sequence
                         start_index = i
                         pairs.append((start_index,))
                         continue
@@ -260,7 +263,7 @@ def estimate_fscore(precision, recall):
 
 
 def split_prediction_true_label(file_name):
-    f = open(file_name, "r")
+    f = open(file_name, "r", encoding='utf-8')
 
     sentence = []
     y_true = []
@@ -291,7 +294,7 @@ def split_prediction_true_label(file_name):
 
 def report_fscore_from_file(prediction_file, wikiner=False, quiet=True):
     true_label, pred_label = split_prediction_true_label(prediction_file)
-    with open(prediction_file) as f:
+    with open(prediction_file, encoding='utf-8') as f:
         counts = evaluate(f, None)
     conllEval = report(counts)
     print(conllEval)

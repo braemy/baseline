@@ -15,8 +15,8 @@ from MinitaggerSVM import MinitaggerSVM
 sys.path.insert(0, 'helper')
 
 from Minitagger import Minitagger
-from SequenceData import SequenceData
-from utils import create_recursive_folder
+from helper.SequenceData import SequenceData
+from helper.utils import create_recursive_folder
 
 from MinitaggerCRF import MinitaggerCRF
 from FeatureExtractor_CRF_SVM import FeatureExtractor_CRF_SVM
@@ -188,28 +188,25 @@ class final_training(object):
 if __name__ == "__main__":
 
     a = "wikiner"
-    language = "de"
+    language = "it"
     embedding_size = 300
     if a == "test":
         train_data_path = "../../ner/small_datasets/eng-simplified.train"
         validation_data_path = "../../ner/small_datasets/eng-simplified.testa"
         test_data_path = "../../ner/small_datasets/eng-simplified.testb"
 
-        # train_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
-        # test_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
         feature_template = "baseline"
         embedding_path = "../../word_embeddings/glove"
         model_name = "SVM_test_finale_score"
 
     elif a == "wikiner":
-        train_data_path = "../../wikiner_dataset/aij-wikiner-de-wp2-simplified"
-        #train_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
-        validation_data_path = "../../ner/nerc-conll2003/deu-simplified.testa"
-        test_data_path = "../../ner/nerc-conll2003/deu-simplified.testb"
+        train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/wikiner_dataset/aij-wikiner-it-wp2-simplified"
+        validation_data_path = None#"/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/conll_dataset/nerc-conll2003/deu-simplified.testa"
+        test_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/test_wikiner_dataset/test_training/it_wikiner_wp3_tail5k.test"
         feature_template = "baseline"
-        embedding_path = "../../word_embeddings/fasttext"
-        #model_name = "SVM_wikiner_emb" + str(embedding_size) + "_finale_score"
-        model_name = "SVM_wikiner_baseline_finale_score"
+        embedding_path = None  # "../../word_embeddings/glove"
+        model_name = "It_final_model"
+
     elif a == "conll":
         train_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
         validation_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
@@ -222,10 +219,6 @@ if __name__ == "__main__":
     selection = final_training(train_data_path, validation_data_path, test_data_path, language, model_name,
                                       feature_template, embedding_size, embedding_path)
 
-    # elif algorithm == "CRF":
-    selection.final_training("svm")
+    best_params = {'epsilon': 0.00017782794100389227, 'cost':1e-05}
+    selection.final_training("svm", best_param=best_params)
 
-
-    # if algorithm == "SVM":
-    # model_name = "SVM_wikiner_emb"+str(embedding_size)+"_parameter_selection_1"
-    # parameter_selection_svm(train_data_path,test_data_path, language, model_name, feature_template, embedding_size,embedding_path)

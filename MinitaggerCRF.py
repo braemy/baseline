@@ -3,14 +3,13 @@ import os
 import pickle
 import time
 import sys
-sys.path.insert(0, 'helper')
 
 import numpy as np
 import sklearn_crfsuite
-from model_evaluation import report_fscore_from_file
+from helper.model_evaluation import report_fscore_from_file
 
 from Minitagger import Minitagger
-from score import Score
+from helper.score import Score
 
 
 class MinitaggerCRF(Minitagger):
