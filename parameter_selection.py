@@ -91,8 +91,7 @@ class Parameter_selection(object):
         print("============================")
         _,_,_,best_param,_  = score.get_max_conll_fscore()
 
-        validation_data_path = None#"../../ner/nerc-conll2003/eng-simplified.testa"
-        #test_data_path = "../../ner/nerc-conll2003/eng-simplified.testb"
+        validation_data_path = None
         model_name = model_name+"_finale_score"
 
         selection = final_training(train_data_path, validation_data_path, test_data_path, language, model_name,
@@ -155,8 +154,6 @@ class Parameter_selection(object):
         print("============================")
         _, _, _, best_param, _ = score.get_max_conll_fscore()
 
-        validation_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
-        test_data_path = "../../ner/nerc-conll2003/eng-simplified.testb"
         model_name = model_name + "_finale_score"
 
         selection = final_training(train_data_path, validation_data_path, test_data_path, language, model_name,
@@ -244,36 +241,26 @@ class Parameter_selection(object):
 if __name__ == "__main__":
 
     a = "wikiner"
-    language = "it"
+    language = "de"
     embedding_size = 300
     if a == "test":
         train_data_path = "../../ner/small_datasets/eng-simplified.train"
         validation_data_path = "../../ner/small_datasets/eng-simplified.testa"
         test_data_path = "../../ner/small_datasets/eng-simplified.testb"
 
-        #train_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
-        #test_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
         feature_template = "baseline"
         embedding_path = "../../word_embeddings/glove"
         model_name = "_test_baseline_parameter_selection_2"
         number_of_trial = 2
 
     elif a == "wikiner":
-        # train_data_path = "../../wikiner_dataset/aij-wikiner-en-wp2-simplified"
-        # validation_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
-        # test_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
-        # feature_template = "embedding"
-        # embedding_path = "../../word_embeddings/glove"
-        # model_name = "_wikiner_emb" + str(embedding_size) + "_parameter_selection_2"
-        # number_of_trial = 10
-
-        train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/wikiner_dataset/aij-wikiner-it-wp2-simplified"
-        validation_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/test_wikiner_dataset/test_training/it_wikiner_wp3_tail5k.test"
-        test_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/test_wikiner_dataset/test_training/it_wikiner_wp3_tail5k.test"
+        train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/training_data/it"
+        validation_data_path = None
+        test_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/external_api_test/it_wikiner_wp3_tail5k.test"
         feature_template = "baseline"
-        embedding_path = None#"../../word_embeddings/glove"
-        model_name = "It_parameter_selection_2"
-        number_of_trial = 3
+        embedding_path = None
+        model_name = "it_parameter_selection"
+        number_of_trial = 4
     elif a =="conll":
         train_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
         validation_data_path = None

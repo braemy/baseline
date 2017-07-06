@@ -188,7 +188,7 @@ class final_training(object):
 if __name__ == "__main__":
 
     a = "wikiner"
-    language = "it"
+    language = "en"
     embedding_size = 300
     if a == "test":
         train_data_path = "../../ner/small_datasets/eng-simplified.train"
@@ -200,12 +200,13 @@ if __name__ == "__main__":
         model_name = "SVM_test_finale_score"
 
     elif a == "wikiner":
-        train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/wikiner_dataset/aij-wikiner-it-wp2-simplified"
+        #train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/wikiner_dataset/aij-wikiner-it-wp2-simplified"
+        train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/toy_dataset"
         validation_data_path = None#"/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/conll_dataset/nerc-conll2003/deu-simplified.testa"
-        test_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/test_wikiner_dataset/test_training/it_wikiner_wp3_tail5k.test"
+        test_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/toy_exp"
         feature_template = "baseline"
         embedding_path = None  # "../../word_embeddings/glove"
-        model_name = "It_final_model"
+        model_name = "toy"
 
     elif a == "conll":
         train_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
