@@ -13,7 +13,7 @@ class SequenceData(object):
 	The data be loaded from a text file or a list
 	"""
 
-    def __init__(self, given_data, pos_tag, language="en", convert_to_id=False):
+    def __init__(self, given_data, pos_tag, language, convert_to_id=False):
         # path to the data
         self.data_path = None
         # number of words in the data
@@ -204,19 +204,32 @@ class SequenceData(object):
 
 		"""
         self.data_path = data_path
-        if self.language == 'en':
-            encoding = "utf-8"
-        elif self.language == 'de':
+        token_index = 0
+        #defautl config
+
+        pos_tag_index = 1
+        label_index = 2
+
+        if (self.language == 'de' or self.language == "deu") and "wikiner" not in data_path:
             encoding = "iso-8859-1"
+            #if "conll" in data_path:
+            pos_tag_index = 2
+            label_index = 4
+        else:
+            encoding = "utf-8"
+            if "conll" in data_path:
+                pos_tag_index = 1
+                label_index = 3
 
         with open(data_path, "r", encoding=encoding) as input_file:
             word_sequence = []
             pos_sequence = []
             label_sequence = []
             id_token = []
-
+            capitalized = np.random.rand()
             for line in input_file:
-                #print(line)
+                if "-DOCSTART-" in line:
+                    continue
                 tokens = line.split()
                 # if not pos_tag:
                 #    assert (len(tokens) < 3), "Each line should contain no more than 3 columns"
@@ -225,24 +238,15 @@ class SequenceData(object):
                 # if line is not empty
                 if tokens:
                     # the word is the 1st token
-                    word = tokens[0]
-                    if pos_tag:
-                        try:
-                            pos = tokens[1]
-                        except:
-                            print(line)
-                            print(next(input_file))
-                            sys.exit()
-                    # the label is the 3td token, if it exists, otherwise label = None
-                    if pos_tag:
-                        label = None if len(tokens) == 2 else tokens[2] # TODO have a look for POS¨
-                    else:
-                        label = None if len(tokens) == 1 else tokens[1]
-                    # else:
-                    #    if len(tokens) ==
-                    #    # the label is the 2nd token, if it exists, otherwise label = None
-                    #    label = None if len(tokens) == 1 else tokens[1]
+                    word = tokens[token_index]
 
+                    # the label is the 3td token, if it exists, otherwise label = None
+                    #if pos_tag:
+                    #    label = None if len(tokens) == 2 else tokens[2] # TODO have a look for POS¨
+                    #else:
+                    #    label = None if len(tokens) == 1 else tokens[1]
+                    label = tokens[-1]
+                    pos_tag = tokens[pos_tag_index]
                     if label is None:
                         # set the partially labeled flag to True
                         self.is_partially_labeled = True
@@ -250,18 +254,16 @@ class SequenceData(object):
                     word_sequence.append(word)
                     # build sequence of labels
                     label_sequence.append(label)
-                    if pos_tag:
-                        # build_sequence of pos tags
-                        pos_sequence.append(pos)
+                    # build_sequence of pos tags
+                    pos_sequence.append(pos_tag)
                 # line is empty means that a new sentence if about to start
                 else:
                     # check if word_sequence is empty
                     if word_sequence:
-                        if pos_tag:
-                            # append word_sequence and label_sequence and pos_sequence to sequence_pairs
-                            self.sequence_pairs.append([word_sequence, label_sequence, pos_sequence])
-                        else:
-                            self.sequence_pairs.append([word_sequence, label_sequence])
+
+                        # append word_sequence and label_sequence and pos_sequence to sequence_pairs
+                        self.sequence_pairs.append([word_sequence, label_sequence, pos_sequence])
+
                         # flush lists for the next sentence
                         word_sequence = []
                         label_sequence = []
