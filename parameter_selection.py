@@ -90,16 +90,24 @@ class Parameter_selection(object):
         _, _, _, best_param, _ = score.get_max_conll_fscore()
 
         validation_data_path = None
-        model_name = parameters["model_name"] + "_finale_score"
-
+        parameters["model_name"] = model_name + "_finale_score"
+        parameters["method"] = "SVM"
         parameters["best_param"] = best_param
         selection = Final_training(parameters)
         selection.train()
 
-    def parameter_selection_crf(self, train_data_path, validation_data_path, test_data_path, language, model_name,
-                                feature_template, embedding_size=None, embedding_path=None, number_of_trial=10,
-                                seed=123456):
-        np.random.seed(seed=seed)
+    def parameter_selection_crf(self, parameters):
+        train_data_path = parameters["train_data_path"]
+        validation_data_path = parameters["validation_data_path"]
+        test_data_path = parameters["test_data_path"]
+        language = parameters["language"]
+        feature_template = parameters["feature_template"]
+        if feature_template == "embedding":
+            embedding_size = parameters["embedding_size"]
+            embedding_path = parameters["embedding_path"]
+        model_name = parameters["model_name"]
+        number_of_trial = parameters["number_of_trial"] if "number_of_trial" in parameters else 5
+
         data_to_use = 20000
         self.minitagger = MinitaggerCRF()
 
@@ -115,20 +123,12 @@ class Parameter_selection(object):
         self.minitagger.set_prediction_path(model_name)
         self.minitagger.set_model_path(model_name)
 
-        self.display_info(data_to_use, language, model_name, feature_template, embedding_size, embedding_path)
-        infos = dict()
-        infos["algorithm"] = "CRF"
-        infos["train_data_path"] = train_data_path
-        infos["test_data_path"] = test_data_path
-        infos["language"] = language
-        infos["mpdel_name"] = model_name
-        infos["feature_template"] = feature_template
-        infos["embedding_size"] = embedding_size
-        infos["embedding_path"] = embedding_path
+        self.display_info(data_to_use, parameters)
+
 
         # initialize feature extractor with the right feature template
         feature_extractor = FeatureExtractor_CRF_SVM(feature_template, language,
-                                                     embedding_size if embedding_size else None)
+                                                     embedding_size if feature_template == "embedding" else None)
         # load bitstring or embeddings data
         if feature_template == "embedding":
             feature_extractor.load_word_embeddings(embedding_path, embedding_size)
@@ -139,12 +139,12 @@ class Parameter_selection(object):
         print("Features extracted")
 
         start = time.time()
-        score = Score("CRF_parameter_selection", infos)
+        score = Score("CRF_parameter_selection", parameters)
 
         for i in range(number_of_trial):
             mean_fscore_conll, param = self.cv_crf(i)
             score.add_scores(mean_fscore_conll, None, None, param)
-            score.save_result_to_file(infos, self.minitagger.model_path)
+            score.save_result_to_file(self.minitagger.model_path)
 
         score.display_results()
 
@@ -154,11 +154,12 @@ class Parameter_selection(object):
         print("============================")
         _, _, _, best_param, _ = score.get_max_conll_fscore()
 
-        model_name = model_name + "_finale_score"
+        parameters["model_name"] = model_name + "_finale_score"
 
-        selection = Final_training(train_data_path, validation_data_path, test_data_path, language, model_name,
-                                   feature_template, embedding_size, embedding_path)
-        selection.train("crf", best_param)
+        parameters["best_param"] = best_param
+        parameters["method"] = "CRF"
+        selection = Final_training(parameters)
+        selection.train()
 
     def cv_crf(self, i):
         algorithm = "lbfgs"
@@ -184,7 +185,9 @@ class Parameter_selection(object):
 
         print("Step", str(i + 1), ":")
 
-        return self.minitagger.cross_validation(i + 1, self.sequence_data, feature_template, language, embedding_path,
+        return self.minitagger.cross_validation(i + 1,
+                                                self.sequence_data,
+                                                feature_template, language, embedding_path,
                                                 embedding_size, data_test=None, n_fold=5)
         # exact_score, inexact_score, conllEval = self.minitagger.train(self.sequence_data, self.test_sequence,
         #                                                        feature_already_extracted=True, id=i)

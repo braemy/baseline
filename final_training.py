@@ -1,15 +1,7 @@
-
-
-import os
-
-import datetime
-import numpy as np
-import json
-import multiprocessing
-import time
-
 import sys
+from pprint import pprint
 
+from MinitaggerCRF_tf import MinitaggerCRF_tf
 from MinitaggerSVM import MinitaggerSVM
 
 sys.path.insert(0, 'helper')
