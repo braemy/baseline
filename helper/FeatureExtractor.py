@@ -1,13 +1,10 @@
 import math
-import pickle
-import numpy as np
+
 import fasttext
-from tqdm import tqdm
+import numpy as np
 
 from helper.utils import *
 from helper.utils_data import *
-import sys
-import os
 
 
 class FeatureExtractor(object):
@@ -43,23 +40,20 @@ class FeatureExtractor(object):
         self.location_list = []
         self.max_sentence_length = -1
         if embedding_size is not None:
-            self.embedding_size=int(embedding_size)
+            self.embedding_size = int(embedding_size)
             self.embedding_start = np.zeros(self.embedding_size)
             self.embedding_end = np.ones(self.embedding_size) / np.linalg.norm(np.ones(self.embedding_size))
 
-        self.block_size= 50000
+        self.block_size = 50000
         self.token_features2 = True
         self.morphological_features = "regular"
         self.token_features1 = True
         self.token_features0 = True
 
-
         self.window_size = 2
-
 
     def get_feature_dim(self):
         return len(self._map_feature_str2num.keys())
-
 
     def _get_label(self, label):
         """
@@ -119,7 +113,7 @@ class FeatureExtractor(object):
 		"""
 
         assert (label_number in self._map_label_num2str), "Label id not in labelID-to-string dictionary"
-        #if label_number not in self._map_label_num2str:
+        # if label_number not in self._map_label_num2str:
         #    return "O"
         return self._map_label_num2str[label_number]
 
@@ -145,7 +139,7 @@ class FeatureExtractor(object):
 		"""
 
         assert (label_string in self._map_label_str2num), "Label string not in labelString-to-ID dictionary"
-        #if label_string not in self._map_feature_str2num:
+        # if label_string not in self._map_feature_str2num:
         #    return self._map_feature_str2num["O"]
         return self._map_label_str2num[label_string]
 
@@ -225,13 +219,13 @@ class FeatureExtractor(object):
             print("Loading FastText word embeddings...")
             # fasttext supports only word embeddings with 300 dimensionality
             assert (embedding_length == 300), "Embedding length should be 300 when using FastText"
-            file_name = os.path.join(embedding_path,self.language, "wiki.en.bin")
+            file_name = os.path.join(embedding_path, self.language, "wiki.en.bin")
             # load fasttext word embeddings
             print(file_name)
             self._word_embeddings = fasttext.load_model(file_name)
-        # the token for unknown word types must be present
-        # assert (self.unknown_symbol in self.__word_embeddings), "The <?> must be present in the embeddings file"
- #       assert self._word_embeddings is not None, "Use glove or FastText embeddings"
+            # the token for unknown word types must be present
+            # assert (self.unknown_symbol in self.__word_embeddings), "The <?> must be present in the embeddings file"
+            #       assert self._word_embeddings is not None, "Use glove or FastText embeddings"
         print("Words embeddings loaded")
 
         # address some treebank token conventions.
@@ -266,18 +260,18 @@ class FeatureExtractor(object):
         if (word, relative_position) not in self.spelling_feature_cache:
             features = dict()
             # check if word is capitalized
-            #features["is_capitalized({0})={1}".format(relative_position, is_capitalized(word))] = 1
-            #features["is_upper({0})={1}".format(relative_position, word.isupper())] = 1
-            #features["contains_only_digit({0})={1}".format(relative_position, word.isdigit())] = 1
-            #features["contains_any_digit({0})={1}".format(relative_position, has_numbers(word))] = 1
-            #features["character_length({0})={1}".format(relative_position, len(word))] = 1
+            # features["is_capitalized({0})={1}".format(relative_position, is_capitalized(word))] = 1
+            # features["is_upper({0})={1}".format(relative_position, word.isupper())] = 1
+            # features["contains_only_digit({0})={1}".format(relative_position, word.isdigit())] = 1
+            # features["contains_any_digit({0})={1}".format(relative_position, has_numbers(word))] = 1
+            # features["character_length({0})={1}".format(relative_position, len(word))] = 1
             # check if all chars are nonalphanumeric
-            #features["is_all_nonalphanumeric({0})={1}".format(relative_position, is_all_nonalphanumeric(word))] = 1
+            # features["is_all_nonalphanumeric({0})={1}".format(relative_position, is_all_nonalphanumeric(word))] = 1
             # check if word can be converted to float, i.e. word is a number
-            #features["is_float({0})={1}".format(relative_position, is_float(word))] = 1
+            # features["is_float({0})={1}".format(relative_position, is_float(word))] = 1
 
             if is_capitalized(word):
-                #is the word capialized? Joe
+                # is the word capialized? Joe
                 features["cap({0})".format(relative_position)] = int(is_capitalized(word))
             if word.isupper():
                 # is the word all in upper case? HELLO
@@ -294,18 +288,17 @@ class FeatureExtractor(object):
             if is_float(word):
                 # check if word can be converted to float, i.e. word is a number
                 features["f({0})".format(relative_position)] = int(is_float(word))
-            #character_length
-            features["c_l({0})".format(relative_position)] = float(1)/len(word)
-
+            # character_length
+            features["c_l({0})".format(relative_position)] = float(1) / len(word)
 
             # build suffixes and preffixes for each word (up to a length of 4)
             if self.morphological_features == "regular":
                 for length in range(1, 5):
                     features[
-                        #prefix
+                        # prefix
                         "p{0}({1})={2}".format(length, relative_position, get_prefix(word, length))] = 1
                     features[
-                        #suffix
+                        # suffix
                         "s{0}({1})={2}".format(length, relative_position, get_suffix(word, length))] = 1
 
 
@@ -315,7 +308,6 @@ class FeatureExtractor(object):
                 for length in range(1, 5):
                     # get prefix of word
                     prefix = get_prefix(word, length)
-
 
                     if prefix in self._word_embeddings:
                         # get the word embeddings for the prefix
@@ -328,19 +320,19 @@ class FeatureExtractor(object):
                                 features["ngram{0}({1})_at({2})".format(length, relative_position, (i + 1))] = value
                     else:
                         # initialize embeddings to zero
-                        #prefix_embedding = np.zeros((self.embedding_size))
+                        # prefix_embedding = np.zeros((self.embedding_size))
                         # create a unique numpy array for each prefix of a specific length
-                        #prefix_embedding[length - 1] = 1
+                        # prefix_embedding[length - 1] = 1
                         # normalize embeddings
-                        #prefix_embedding /= np.linalg.norm(prefix_embedding)
+                        # prefix_embedding /= np.linalg.norm(prefix_embedding)
                         # enrich given features dict
 
-                        #for i, value in enumerate(prefix_embedding):
+                        # for i, value in enumerate(prefix_embedding):
                         #    features["ngram{0}({1})_at({2})".format(length, relative_position, (i + 1))] = value
 
-                        features["ngram{0}({1})_at({2})".format(length, relative_position, length-1)] = 1
+                        features["ngram{0}({1})_at({2})".format(length, relative_position, length - 1)] = 1
             else:
-                raise("Unrecognized feature type")
+                raise ("Unrecognized feature type")
 
             self.spelling_feature_cache[(word, relative_position)] = features
 
@@ -370,8 +362,8 @@ class FeatureExtractor(object):
             features.update(self._spelling_features(word, 0))
 
         # extract pos_tag features
-        if pos_tag is not None:
-            features.update(self.__get_pos_features(word_sequence,position, pos_tag))
+        if pos_tag_sequence is not None:
+            features.update(self.__get_pos_features(word_sequence, position, pos_tag_sequence=pos_tag_sequence))
 
         # identify word
         if self.token_features0:
@@ -392,8 +384,8 @@ class FeatureExtractor(object):
             word_left = get_word(word_sequence, position - i)
             if self.morphological_features == "regular":
                 # words around the word to predict
-                features["w({0})={1}".format(i,word_right)] = 1
-                features["w({0})={1}".format(-i,word_left)] = 1
+                features["w({0})={1}".format(i, word_right)] = 1
+                features["w({0})={1}".format(-i, word_left)] = 1
             elif self.morphological_features == "embeddings":
                 self.__get_word_embeddings(word_sequence, position, i, features, "w")
                 self.__get_word_embeddings(word_sequence, position, -i, features, "w")
@@ -403,13 +395,13 @@ class FeatureExtractor(object):
             features.update(self._spelling_features(word_right, i))
             features.update(self._spelling_features(word_left, -i))
 
-        #features["chunk(-1_0)={0}".format(get_chunk(word_sequence,position-1,position))] = 1
-        #features["chunk(0_1)={0}".format(get_chunk(word_sequence,position,position+1))] = 1
+        # features["chunk(-1_0)={0}".format(get_chunk(word_sequence,position-1,position))] = 1
+        # features["chunk(0_1)={0}".format(get_chunk(word_sequence,position,position+1))] = 1
 
-        #if pos_tag_sequence:
+        # if pos_tag_sequence:
         assert pos_tag_sequence is not None, "need pos_tag_sequence"
         features.update(self.__get_pos_features(pos_tag_sequence, position))
-        #if word == "Brann":
+        # if word == "Brann":
         #    pprint(features)
 
         return features
@@ -457,18 +449,18 @@ class FeatureExtractor(object):
 		"""
 
         # get current word
-        if position + offset <0:
-            #before the sentence
+        if position + offset < 0:
+            # before the sentence
             word_embedding = self.embedding_start
-        elif (position + offset) > len(word_sequence)-1:
-            #after the sequence
+        elif (position + offset) > len(word_sequence) - 1:
+            # after the sequence
             word_embedding = self.embedding_end
 
         else:
             word = word_sequence[position + offset]
             word = word.lower()
             if self.embedding_type == "glove":
-                word_embedding = self._word_embeddings.get(word,np.random.rand(self.embedding_size) )
+                word_embedding = self._word_embeddings.get(word, np.random.rand(self.embedding_size))
             else:
                 word_embedding = self._word_embeddings[word]
 
@@ -476,9 +468,8 @@ class FeatureExtractor(object):
         offset = str(offset) if offset <= 0 else "+" + str(offset)
         for i in range(len(word_embedding)):
             if word_embedding[i] != 0:
-                features[name+"({0})_at({1})".format(offset, (i + 1))] = word_embedding[i]
-        #features.update(dict(enumerate(word_embedding)))
-
+                features[name + "({0})_at({1})".format(offset, (i + 1))] = word_embedding[i]
+                # features.update(dict(enumerate(word_embedding)))
 
     def _get_embedding_features(self, word_sequence, position, pos_tags):
         """
@@ -531,7 +522,6 @@ class FeatureExtractor(object):
         self.location_list = []
         self.max_sentence_length = -1
 
-
     def save_preprocessing(self, dir):
         # remove unused data
         del self._word_embeddings
@@ -545,27 +535,25 @@ class FeatureExtractor(object):
         self.pickle_file(dir, "_map_feature_str2num")
         self.pickle_file(dir, "_map_feature_num2str")
         # save the features
-        #self.__save_training_features(dir)
-        #self.pickle_file(dir, "map_label2id")
-        #self.pickle_file(dir, "map_id2label")
-        #self.pickle_file(dir, "map_feature_str2num")
-        #self.pickle_file(dir, "map_feature_num2str")
+        # self.__save_training_features(dir)
+        # self.pickle_file(dir, "map_label2id")
+        # self.pickle_file(dir, "map_id2label")
+        # self.pickle_file(dir, "map_feature_str2num")
+        # self.pickle_file(dir, "map_feature_num2str")
 
     def __save_training_features(self, dir):
-        for block_num, i in enumerate(range(0,len(self.train_features), self.block_size)):
+        for block_num, i in enumerate(range(0, len(self.train_features), self.block_size)):
             with open(os.path.join(dir, "train_features_" + str(block_num) + ".p"), "wb") as file:
-                pickle.dump(self.train_features[i: i+self.block_size], file)
+                pickle.dump(self.train_features[i: i + self.block_size], file)
 
     def __load_features(self, dir, file_name):
         i = 0
-        tmè =np.empty(0)
+        tmè = np.empty(0)
         while os.path.exists(os.path.join(dir, file_name + str(i) + ".p")):
             with open(os.path.join(dir, file_name + str(i) + ".p"), "rb") as file:
-                tmp = np.append(tmp, pickle.load(file), axis = 0)
+                tmp = np.append(tmp, pickle.load(file), axis=0)
             i += 1
         return tmp
-
-
 
     def load_preprocessing(self, dir):
         self.train_features = self.__load_features(dir, "train_features_")
@@ -587,31 +575,22 @@ class FeatureExtractor(object):
         self.num_tokens_test = len(self.test_features)
 
     def pickle_file(self, dir, name):
-        with open(os.path.join(dir, name+ ".p"), "wb") as file:
+        with open(os.path.join(dir, name + ".p"), "wb") as file:
             pickle.dump(getattr(self, name), file)
 
-    def load_file(self,dir, name):
-        with open(os.path.join(dir, name+ ".p"), "rb") as file:
+    def load_file(self, dir, name):
+        with open(os.path.join(dir, name + ".p"), "rb") as file:
             return pickle.load(file)
 
     def is_training(self):
         return self.is_training
 
-
     def display_summary(self):
 
-        print("Feature template:", "\""+self.feature_template+"\"")
+        print("Feature template:", "\"" + self.feature_template + "\"")
         print("Number of sentences/tokens in train:", len(self.train_features))
         print("Number of sentences/tokens in validation:", len(self.validation_features))
         print("Number of sentences/tokens: in test", len(self.test_features))
-
-
-
-
-
-
-
-
 
     def build_feature_map(self, sequence_data, extract_all):
         self.label_list = [None] * len(sequence_data.sequence_pairs)
@@ -620,8 +599,8 @@ class FeatureExtractor(object):
             label_sequence = label_pos_sequence[0]
             pos_sequence = None if len(label_pos_sequence) == 1 else label_pos_sequence[1]
 
-            if sequence_num %10000 == 0:
-                print("Extracting features:",sequence_num)
+            if sequence_num % 10000 == 0:
+                print("Extracting features:", sequence_num)
             for position, label in enumerate(label_sequence):
 
                 # only use labeled instances unless extract_all=True.
