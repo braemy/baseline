@@ -4,7 +4,7 @@ import sys
 sys.path.insert(0, 'helper')
 
 import numpy as np
-from sklearn.metrics import confusion_matrix
+#from sklearn.metrics import confusion_matrix
 from utils import create_recursive_folder
 
 #LIBLINEAR_PATH = os.path.join(os.path.dirname(__file__), "liblinear-1.96/python")

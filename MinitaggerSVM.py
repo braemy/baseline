@@ -79,6 +79,7 @@ class MinitaggerSVM(Minitagger):
         if not self.quiet:
             print("{0} labeled words (out of {1})".format(len(self.label_list_train), self.data_train.num_of_words))
             print("{0} label types".format(len(self.data_train.label_count)))
+            print("label types: ", self.data_train.label_count)
             print("{0} word types".format(len(self.data_train.word_count)))
             print("\"{0}\" feature template".format(self.feature_extractor.feature_template))
             print("{0} feature types".format(self.feature_extractor.num_feature_types()))
@@ -151,7 +152,6 @@ class MinitaggerSVM(Minitagger):
 
         # data_train.sequence_pairs: [[[tokens sentence1]. [label senteces1]], [[tokens sentence2]. [label senteces12]],...]
         # 1)permute randomly all sentences
-        np.random.seed(123456)
         data_train.sequence_pairs = np.random.permutation(data_train.sequence_pairs)
         # 2) do cross validation
 
@@ -288,7 +288,7 @@ class MinitaggerSVM(Minitagger):
             print("Iteration:", time.time() - start_time, "score: ", conllEval)
 
             score.save_class_to_file(self.model_path)
-            self.save(self.model_path)
+            #self.save(self.model_path)
 
     def __save_prediction_to_file(self, data_test, pred_labels):
         # file to print all predictions

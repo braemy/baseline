@@ -3,6 +3,7 @@ import numpy as np
 import copy
 import os
 import pickle
+import sys
 
 
 class SequenceData(object):
@@ -12,7 +13,7 @@ class SequenceData(object):
 	The data be loaded from a text file or a list
 	"""
 
-    def __init__(self, given_data, pos_tag, convert_to_id=False):
+    def __init__(self, given_data, pos_tag, language="en", convert_to_id=False):
         # path to the data
         self.data_path = None
         # number of words in the data
@@ -38,6 +39,8 @@ class SequenceData(object):
         self.pos_count = collections.Counter()
 
         self.convert_to_id = False
+
+        self.language = language
 
         # check if given data is a path to file, i.e. a string
         if isinstance(given_data, str):
@@ -201,7 +204,12 @@ class SequenceData(object):
 
 		"""
         self.data_path = data_path
-        with open(data_path, "r", encoding="ISO-8859-1") as input_file:
+        if self.language == 'en':
+            encoding = "utf-8"
+        elif self.language == 'de':
+            encoding = "iso-8859-1"
+
+        with open(data_path, "r", encoding=encoding) as input_file:
             word_sequence = []
             pos_sequence = []
             label_sequence = []
@@ -219,10 +227,15 @@ class SequenceData(object):
                     # the word is the 1st token
                     word = tokens[0]
                     if pos_tag:
-                        pos = tokens[1]
+                        try:
+                            pos = tokens[1]
+                        except:
+                            print(line)
+                            print(next(input_file))
+                            sys.exit()
                     # the label is the 3td token, if it exists, otherwise label = None
                     if pos_tag:
-                        label = None if len(tokens) == 2 else tokens[2] # TODO have a look for POS
+                        label = None if len(tokens) == 2 else tokens[2] # TODO have a look for POS¨
                     else:
                         label = None if len(tokens) == 1 else tokens[1]
                     # else:
@@ -253,6 +266,9 @@ class SequenceData(object):
                         word_sequence = []
                         label_sequence = []
                         pos_sequence = []
+
+                        #if len(self.sequence_pairs) >= 45802 and ("train" in data_path or "combined" in data_path or "wikiner" in data_path): #TODO remove it. debug purpose
+                         #   break
 
             # file may not end with empty line
             # data of last sentence should be also be appended to sequence_pairs

@@ -40,7 +40,6 @@ def main(args):
         feature_extractor.morphological_features = "regular"
         feature_extractor.token_features2 = True
         feature_extractor.token_features1 = True
-        feature_extractor.keep_position_features = True
         feature_extractor.feature_template = "baseline"
 
         if feature_extractor.feature_template == "embedding":
