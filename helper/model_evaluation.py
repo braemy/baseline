@@ -1,10 +1,8 @@
 import argparse
 
-import sys
-sys.path.insert(0, '../helper')
-from conlleval import evaluate
-from conlleval import report
-from conlleval import metrics
+
+from helper.conlleval import evaluate, report
+
 
 
 def estimate_inexact_fscore(y_true, y_pred, b_equals_i=False):
@@ -72,8 +70,12 @@ def estimate_exact_fscore(y_true, y_pred):
                 fp += 1
         else:
             y_true[i]
-            assert "-" in y_true[i], "true label " + y_true[i] + " should contains '-'"
-            true_b_i, true_class = y_true[i].split("-")
+            if y_true[i][0]!='B' and y_true[i][0]!='I':
+                y_true[i]='O'
+                true_b_i, true_class = 'O', 'O'
+            else:
+                #assert "-" in y_true[i], "true label " + y_true[i] + " should contains '-'"
+                true_b_i, true_class = y_true[i].split("-")
 
             if true_b_i == "B":
                 if start:  # in case B-PER I-PER B-LOC I-LOC => is sequence started, need to add it when we are at B-LOC
@@ -87,8 +89,7 @@ def estimate_exact_fscore(y_true, y_pred):
                     #    print(y_pred)
                     #    print("should not happen: i" + y_true[i] + " i+1:" + y_true[i+1])
 
-                    if y_true[i + 1] == "O" or y_true[i + 1].split("-")[
-                        0] == "B":  # if next label start with "B" => not a sequence
+                    if y_true[i + 1] == "O" or y_true[i + 1].split("-")[0] == "B":  # if next label start with "B" => not a sequence
                         start_index = i
                         pairs.append((start_index,))
                         continue
@@ -262,7 +263,7 @@ def estimate_fscore(precision, recall):
 
 
 def split_prediction_true_label(file_name):
-    f = open(file_name, "r")
+    f = open(file_name, "r", encoding='utf-8')
 
     sentence = []
     y_true = []
@@ -293,29 +294,10 @@ def split_prediction_true_label(file_name):
 
 def report_fscore_from_file(prediction_file, wikiner=False, quiet=True):
     true_label, pred_label = split_prediction_true_label(prediction_file)
-    with open(prediction_file) as f:
+    with open(prediction_file, encoding='utf-8') as f:
         counts = evaluate(f, None)
     conllEval = report(counts)
-    overall, by_type = metrics(counts)
-    c = counts
-    print("ConllEval: \n")
-    print('processed %d tokens with %d phrases; ' %
-          (c.token_counter, c.found_correct))
-    print('found: %d phrases; correct: %d.\n' %
-          (c.found_guessed, c.correct_chunk))
-
-    if c.token_counter > 0:
-        print('accuracy: %6.2f%%; ' %
-              (100. * c.correct_tags / c.token_counter), end="")
-        print('precision: %6.2f%%; ' % (100. * overall.prec), end="")
-        print('recall: %6.2f%%; ' % (100. * overall.rec), end="")
-        print('FB1: %6.2f\n' % (100. * overall.fscore))
-
-    for i, m in sorted(by_type.items()):
-        print('%17s: ' % i, end="")
-        print('precision: %6.2f%%; ' % (100. * m.prec), end="")
-        print('recall: %6.2f%%; ' % (100. * m.rec), end="")
-        print('FB1: %6.2f  %d\n' % (100. * m.fscore, c.t_found_guessed[i]), end="")
+    print(conllEval)
     exact_score, inexact_score = report_fscore(true_label, pred_label, wikiner, quiet)
 
     return exact_score, inexact_score, conllEval

@@ -7,7 +7,7 @@
 # - optional file argument (default STDIN)
 # - option to set boundary (-b argument)
 # - LaTeX output (-l argument) not supported
-# - raw tags (-r argument) not supported
+    # - raw tags (-r argument) not supported
 
 import sys
 import re
@@ -166,13 +166,13 @@ def report(counts, out=None):
     c = counts
     out.write("ConllEval: \n")
     out.write('processed %d tokens with %d phrases; ' %
-              (c.token_counter, c.found_correct))
+             (c.token_counter, c.found_correct))
     out.write('found: %d phrases; correct: %d.\n' %
-              (c.found_guessed, c.correct_chunk))
+             (c.found_guessed, c.correct_chunk))
 
     if c.token_counter > 0:
         out.write('accuracy: %6.2f%%; ' %
-                  (100.*c.correct_tags/c.token_counter))
+                 (100.*c.correct_tags/c.token_counter))
         out.write('precision: %6.2f%%; ' % (100.*overall.prec))
         out.write('recall: %6.2f%%; ' % (100.*overall.rec))
         out.write('FB1: %6.2f\n' % (100.*overall.fscore))

@@ -15,8 +15,8 @@ from MinitaggerSVM import MinitaggerSVM
 sys.path.insert(0, 'helper')
 
 from Minitagger import Minitagger
-from SequenceData import SequenceData
-from utils import create_recursive_folder
+from helper.SequenceData import SequenceData
+from helper.utils import create_recursive_folder
 
 from MinitaggerCRF import MinitaggerCRF
 from FeatureExtractor_CRF_SVM import FeatureExtractor_CRF_SVM
@@ -24,7 +24,7 @@ from FeatureExtractor_CRF_SVM import FeatureExtractor_CRF_SVM
 
 class final_training(object):
     def __init__(self,train_data_path, validation_data_path, test_data_path, language, model_name,
-                                feature_template, embedding_size=None, embedding_path=None, CV=10):
+                                feature_template, embedding_size=None, embedding_path=None, CV=10, seed=123456):
         self.validation_data_path = validation_data_path
         self.train_data_path = train_data_path
         self.test_data_path = test_data_path
@@ -35,7 +35,9 @@ class final_training(object):
         self.embedding_size = embedding_size
         self.embedding_path = embedding_path
         self.CV = CV
+        self.seed = seed
 
+        np.random.seed(seed=seed)
         create_recursive_folder(["parameters", model_name])
         self.display_info(language, model_name, feature_template, embedding_size, embedding_path)
 
@@ -56,22 +58,21 @@ class final_training(object):
         self.feature_extractor = FeatureExtractor_CRF_SVM(self.feature_template, self.language,
                                                          self.embedding_size if self.embedding_size else None)
 
-        self.train_sequence = SequenceData(self.train_data_path,language=self.language, pos_tag=True)
-        self.validation_sequence = SequenceData(self.validation_data_path,language=self.language, pos_tag=True) if self.validation_data_path is not None else None
-        self.test_sequence = SequenceData(self.test_data_path,language=self.language, pos_tag=True)
+        self.train_sequence = SequenceData(self.train_data_path, pos_tag=True)
+        self.validation_sequence = SequenceData(self.validation_data_path, pos_tag=True) if self.validation_data_path is not None else None
 
+
+        self.test_sequence = SequenceData(self.test_data_path, pos_tag=True)
         # load bitstring or embeddings data
         if self.feature_template == "embedding":
             self.feature_extractor.load_word_embeddings(self.embedding_path, self.embedding_size)
 
-        print("Number of sentences in training dataset:", len(self.train_sequence.sequence_pairs))
-        print("Number of sentences in testing dataset:", len(self.test_sequence.sequence_pairs))
-        if method is "CRF":
-            self.crf(best_param, train_with_step)
-        elif method is "SVM":
+        if method is "crf":
+            self.crf(best_param)
+        elif method is "svm":
             self.svm(best_param, train_with_step)
 
-    def crf(self,best_param, train_with_step=False):
+    def crf(self,best_param):
         self.minitagger = MinitaggerCRF()
         self.minitagger.language = self.language
         self.minitagger.quiet = True
@@ -89,9 +90,9 @@ class final_training(object):
             self.minitagger.c2 = best_param['c2']
             self.minitagger.epsilon = best_param['epsilon']
         else:
-            self.minitagger.c1 = 0.1282051282051282
-            self.minitagger.c2 = 0.23076923076923075
-            self.minitagger.epsilon =0.0008376776400682924
+            self.minitagger.c1 = 0.10526315789473684
+            self.minitagger.c2 = 0.89473684210526305
+            self.minitagger.epsilon = 0.11288378916846883
 
         self.minitagger.all_possible_state = True
         self.minitagger.all_possible_transitions = True
@@ -105,12 +106,7 @@ class final_training(object):
         parameter["all_possible_transition"] = self.minitagger.all_possible_transitions
 
         self.minitagger.extract_features(self.train_sequence, self.test_sequence, self.validation_sequence)
-        if train_with_step:
-            self.minitagger.train_with_step()
-        else:
-            self.minitagger.quiet = False
-            self.minitagger.train()
-
+        self.minitagger.train_with_step()
 
     def svm(self, best_param, train_with_step=False):
         self.minitagger = MinitaggerSVM()
@@ -191,48 +187,39 @@ class final_training(object):
 
 if __name__ == "__main__":
 
-    a = "new_dataset"
+    a = "wikiner"
     language = "en"
     embedding_size = 300
-    if a == "new_dataset":
-        train_data_path = "../../new_dataset/combined_100000.txt"
-        validation_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
-        test_data_path = "../../ner/nerc-conll2003/eng-simplified.testb"
+    if a == "test":
+        train_data_path = "../../ner/small_datasets/eng-simplified.train"
+        validation_data_path = "../../ner/small_datasets/eng-simplified.testa"
+        test_data_path = "../../ner/small_datasets/eng-simplified.testb"
+
         feature_template = "baseline"
         embedding_path = "../../word_embeddings/glove"
-        method = "SVM"
-
-        model_name = "_new_dataset_finale_score"
+        model_name = "SVM_test_finale_score"
 
     elif a == "wikiner":
-        train_data_path = "../../wikiner_dataset/aij-wikiner-en-wp2-simplified"
-        #train_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
-        validation_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
-        test_data_path = "../../ner/nerc-conll2003/eng-simplified.testb"
+        #train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/wikiner_dataset/aij-wikiner-it-wp2-simplified"
+        train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/toy_dataset"
+        validation_data_path = None#"/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/conll_dataset/nerc-conll2003/deu-simplified.testa"
+        test_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/toy_exp"
         feature_template = "baseline"
-        embedding_path = "../../word_embeddings/fasttext"
-        #model_name = "SVM_wikiner_emb" + str(embedding_size) + "_finale_score"
-        model_name = "_wikiner_baseline_finale_score"
-        method = "SVM"
+        embedding_path = None  # "../../word_embeddings/glove"
+        model_name = "toy"
+
     elif a == "conll":
         train_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
         validation_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
         test_data_path = "../../ner/nerc-conll2003/eng-simplified.testb"
-        #feature_template = "embedding"
+        feature_template = "embedding"
         feature_template = "baseline"
-        embedding_path = "../../word_embeddings/fasttext"
-        embedding_size = 300
-        method = "SVM"
-        model_name = method + "_conll_emb" + str(embedding_size) + "_finale_score"
-
+        embedding_path = "../../word_embeddings/glove"
+        model_name = "CRF_conll_emb" + str(embedding_size) + "_finale_score"
 
     selection = final_training(train_data_path, validation_data_path, test_data_path, language, model_name,
                                       feature_template, embedding_size, embedding_path)
 
-    # elif algorithm == "CRF":
-    selection.final_training(method)
+    best_params = {'epsilon': 0.00017782794100389227, 'cost':1e-05}
+    selection.final_training("svm", best_param=best_params)
 
-
-    # if algorithm == "SVM":
-    # model_name = "SVM_wikiner_emb"+str(embedding_size)+"_parameter_selection_1"
-    # parameter_selection_svm(train_data_path,test_data_path, language, model_name, feature_template, embedding_size,embedding_path)

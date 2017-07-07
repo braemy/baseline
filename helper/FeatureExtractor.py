@@ -369,6 +369,10 @@ class FeatureExtractor(object):
         if self.morphological_features is not None:
             features.update(self._spelling_features(word, 0))
 
+        # extract pos_tag features
+        if pos_tag is not None:
+            features.update(self.__get_pos_features(word_sequence,position, pos_tag))
+
         # identify word
         if self.token_features0:
             if self.morphological_features == "regular":

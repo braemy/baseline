@@ -6,14 +6,14 @@ import sys
 
 from MinitaggerSVM import MinitaggerSVM
 
-from score import Score
+from helper.score import Score
 
 from final_training import final_training
 
-sys.path.insert(0, 'helper')
 
-from SequenceData import SequenceData
-from utils import *
+
+from helper.SequenceData import SequenceData
+from helper.utils import *
 
 from MinitaggerCRF import MinitaggerCRF
 from FeatureExtractor_CRF_SVM import FeatureExtractor_CRF_SVM
@@ -22,7 +22,9 @@ class Parameter_selection(object):
     def __init__(self):
         self.minitagger=None
 
-    def parameter_selection_svm(self, train_data_path, test_data_path, language, model_name, feature_template, embedding_size=None, embedding_path=None, number_of_trial=20):
+    def parameter_selection_svm(self, train_data_path, test_data_path, language, model_name, feature_template, embedding_size=None, embedding_path=None, number_of_trial=20, seed=123456):
+        np.random.seed(seed=seed)
+
         minitagger = MinitaggerSVM()
 
         sequence_data = SequenceData(train_data_path, pos_tag=True)
@@ -77,7 +79,7 @@ class Parameter_selection(object):
                     ok = True
 
             mean_fscore_conll, param = minitagger.cross_validation(i+1, sequence_data, feature_template, language,
-                                                                   embedding_path, embedding_size, data_test=None, n_fold=3)
+                                                                   embedding_path, embedding_size, data_test=None, n_fold=5)
             score.add_scores(mean_fscore_conll, None, None, param)
             score.save_result_to_file(infos, minitagger.model_path)
 
@@ -89,8 +91,7 @@ class Parameter_selection(object):
         print("============================")
         _,_,_,best_param,_  = score.get_max_conll_fscore()
 
-        validation_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
-        test_data_path = "../../ner/nerc-conll2003/eng-simplified.testb"
+        validation_data_path = None
         model_name = model_name+"_finale_score"
 
         selection = final_training(train_data_path, validation_data_path, test_data_path, language, model_name,
@@ -98,7 +99,8 @@ class Parameter_selection(object):
         selection.final_training("svm", best_param )
 
 
-    def parameter_selection_crf(self, train_data_path, validation_data_path, test_data_path, language, model_name, feature_template, embedding_size=None, embedding_path=None, number_of_trial=10):
+    def parameter_selection_crf(self, train_data_path, validation_data_path, test_data_path, language, model_name, feature_template, embedding_size=None, embedding_path=None, number_of_trial=10, seed=123456):
+        np.random.seed(seed=seed)
         data_to_use = 20000
         self.minitagger = MinitaggerCRF()
 
@@ -152,8 +154,6 @@ class Parameter_selection(object):
         print("============================")
         _, _, _, best_param, _ = score.get_max_conll_fscore()
 
-        validation_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
-        test_data_path = "../../ner/nerc-conll2003/eng-simplified.testb"
         model_name = model_name + "_finale_score"
 
         selection = final_training(train_data_path, validation_data_path, test_data_path, language, model_name,
@@ -240,36 +240,34 @@ class Parameter_selection(object):
 
 if __name__ == "__main__":
 
-    a = "conll"
-    language = "en"
+    a = "wikiner"
+    language = "de"
     embedding_size = 300
     if a == "test":
         train_data_path = "../../ner/small_datasets/eng-simplified.train"
         validation_data_path = "../../ner/small_datasets/eng-simplified.testa"
         test_data_path = "../../ner/small_datasets/eng-simplified.testb"
 
-        #train_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
-        #test_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
         feature_template = "baseline"
         embedding_path = "../../word_embeddings/glove"
         model_name = "_test_baseline_parameter_selection_2"
         number_of_trial = 2
 
     elif a == "wikiner":
-        train_data_path = "../../wikiner_dataset/aij-wikiner-en-wp2-simplified"
-        validation_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
-        test_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
-        feature_template = "embedding"
-        embedding_path = "../../word_embeddings/glove"
-        model_name = "_wikiner_emb" + str(embedding_size) + "_parameter_selection_2"
-        number_of_trial = 10
+        train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/training_data/de"
+        validation_data_path = None
+        test_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/external_api_test/de_simplified.testb"
+        feature_template = "baseline"
+        embedding_path = None
+        model_name = "de_parameter_selection"
+        number_of_trial = 5
     elif a =="conll":
         train_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
         validation_data_path = None
         test_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
         feature_template = "embedding"
-        embedding_path = "../../word_embeddings/fasttext"
-        model_name = "_conll_emb" + str(embedding_size) + "_parameter_selection_2"
+        embedding_path = "../../word_embeddings/glove"
+        model_name = "_conll_emb" + str(embedding_size) + "_parameter_selection_1"
         number_of_trial = 10
 
 
@@ -278,9 +276,9 @@ if __name__ == "__main__":
 
 
     # elif algorithm == "CRF":
-    selection.parameter_selection_crf(train_data_path,validation_data_path, test_data_path,
-                                     language, "CRF"+model_name, feature_template,
-                                     embedding_size,embedding_path, number_of_trial = number_of_trial)
+    #selection.parameter_selection_crf(train_data_path,validation_data_path, test_data_path,
+    #                                 language, "CRF"+model_name, feature_template,
+    #                                 embedding_size,embedding_path, number_of_trial = number_of_trial)
 
     #if algorithm == "SVM":
     selection.parameter_selection_svm(train_data_path,test_data_path,

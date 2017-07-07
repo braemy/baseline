@@ -104,7 +104,7 @@ if __name__ == "__main__":
                            help="the size of the word embedding vectors")
     argparser.add_argument("--quiet", action="store_true", help="no messages")
     argparser.add_argument("--test_data_path", type=str, help="path to test data set (used for training)")
-    argparser.add_argument("--language", type=str, choices=["en", "de", "fr"],
+    argparser.add_argument("--language", type=str, choices=["en", "de", "fr", "it"],
                            help="language of the data set [en, de,fr]", required=True)
     argparser.add_argument("--debug", action="store_true", help="produce some files for debugging")
     argparser.add_argument("--pos_tag", action="store_true",

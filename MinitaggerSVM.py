@@ -209,11 +209,9 @@ class MinitaggerSVM(Minitagger):
         try:
             print(self.model_path)
             self.feature_extractor = pickle.load(open(os.path.join(self.model_path, "feature_extractor"), "rb"))
-            print()
             #self.feature_extractor.save_json_format(os.path.join(self.model_path, "feature_extractor_json"))
             # load trained model
             self.__liblinear_model = liblinearutil.load_model(os.path.join(self.model_path, "liblinear_model"))
-            print()
         except:
             raise Exception("No files found in the model path " + self.model_path)
 
@@ -295,13 +293,13 @@ class MinitaggerSVM(Minitagger):
     def __save_prediction_to_file(self, data_test, pred_labels):
         # file to print all predictions
         file_name = os.path.join(self.prediction_path, "predictions.txt")
-        f1 = open(file_name, "w")
+        f1 = open(file_name, "w", encoding='utf-8')
         # file to print only sentences that contain at least one wrong label after classification
         file_name = os.path.join(self.prediction_path, "predictions_wrong.txt")
-        f2 = open(file_name, "w")
+        f2 = open(file_name, "w", encoding='utf-8')
         # file to print only sentences whose labels are predicted 100% correctly
         file_name = os.path.join(self.prediction_path, "predictions_correct.txt")
-        f3 = open(file_name, "w")
+        f3 = open(file_name, "w", encoding='utf-8')
         # index for prediction label
         pred_idx = 0
         # list to store all true labels

@@ -356,13 +356,13 @@ class SequenceData(object):
     def save_prediction_to_file(self,pred_labels, dir_output, id="", list_tokens=False):
         # file to print all predictions
         file_name = os.path.join(dir_output, "predictions" + str(id) + ".txt")
-        f1 = open(file_name, "w")
+        f1 = open(file_name, "w", encoding='utf-8')
         # file to print only sentences that contain at least one wrong label after classification
         file_name = os.path.join(dir_output, "predictions_wrong" + str(id) + ".txt")
-        f2 = open(file_name, "w")
+        f2 = open(file_name, "w", encoding='utf-8')
         # file to print only sentences whose labels are predicted 100% correctly
         file_name = os.path.join(dir_output, "predictions_correct" + str(id) + ".txt")
-        f3 = open(file_name, "w")
+        f3 = open(file_name, "w", encoding='utf-8')
         # index for prediction label
         pred_idx = 0
         # list to store all true labels
