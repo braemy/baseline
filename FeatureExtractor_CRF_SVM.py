@@ -90,7 +90,7 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
                     label_list.append(self._get_label(label))
                     # append feature id in features list
                     self.features_list.append(
-                        self._get_features(word_sequence, position, None, numeric_feature=True))
+                        self._get_features(word_sequence, position, pos_sequence, numeric_feature=True))
                     # append location in locations list
                     location_list.append((sequence_num, position))
         return self.features_list, label_list, location_list

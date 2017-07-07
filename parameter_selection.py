@@ -254,13 +254,13 @@ if __name__ == "__main__":
         number_of_trial = 2
 
     elif a == "wikiner":
-        train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/training_data/it"
+        train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/training_data/de"
         validation_data_path = None
-        test_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/external_api_test/it_wikiner_wp3_tail5k.test"
+        test_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/external_api_test/de_simplified.testb"
         feature_template = "baseline"
         embedding_path = None
-        model_name = "it_parameter_selection"
-        number_of_trial = 4
+        model_name = "de_parameter_selection"
+        number_of_trial = 5
     elif a =="conll":
         train_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
         validation_data_path = None
