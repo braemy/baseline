@@ -1,17 +1,14 @@
 import argparse
 import os
-import sys
 
-#from MinitaggerCRF import MinitaggerCRF
+from FeatureExtractor_CRF_SVM import FeatureExtractor_CRF_SVM
+# from MinitaggerCRF import MinitaggerCRF
 from MinitaggerSVM import MinitaggerSVM
 from helper.SequenceData import SequenceData
-from FeatureExtractor_CRF_SVM import FeatureExtractor_CRF_SVM
 from helper.model_evaluation import report_fscore_from_file
 
 # Used for instances without gold labels
 ABSENT_GOLD_LABEL = "<NO_GOLD_LABEL>"
-
-
 
 
 def main(args):
@@ -24,7 +21,7 @@ def main(args):
     #     print("Unrecognized model name")
     #     sys.exit(1)
     minitagger = MinitaggerSVM()
-    sequence_data = SequenceData(args.train_data_path,args.pos_tag)
+    sequence_data = SequenceData(args.train_data_path, args.pos_tag)
 
     minitagger.language = args.language
     minitagger.set_prediction_path(args.model_name)
@@ -35,7 +32,8 @@ def main(args):
     if args.train:
 
         # initialize feature extractor with the right feature template
-        feature_extractor = FeatureExtractor_CRF_SVM(args.feature_template, args.language, args.embedding_size if args.embedding_size else None)
+        feature_extractor = FeatureExtractor_CRF_SVM(args.feature_template, args.language,
+                                                     args.embedding_size if args.embedding_size else None)
         # load bitstring or embeddings data
         feature_extractor.morphological_features = "regular"
         feature_extractor.token_features2 = True
@@ -56,13 +54,13 @@ def main(args):
             assert args.prediction_path, "Path for prediction should be specified"
         # normal training, no active learning used
 
-        #minitagger.feature_extractor.all_features = False
+        # minitagger.feature_extractor.all_features = False
         minitagger.train(sequence_data, test_data)
-    #    minitagger.cross_validation(sequence_data, test_data)
-       # minitagger.train_sparse(sequence_data, test_data)
-     #   minitagger.save(args.model_path)
+        #    minitagger.cross_validation(sequence_data, test_data)
+        # minitagger.train_sparse(sequence_data, test_data)
+        #   minitagger.save(args.model_path)
 
-            # minitagger.cross_validation(sequence_data, test_data, 5)
+        # minitagger.cross_validation(sequence_data, test_data, 5)
     # predict labels in the given data.
     else:
 
@@ -94,8 +92,10 @@ def main(args):
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
-    argparser.add_argument("--train_data_path", type=str, help="path to data (used for training/testing)", required=False)
-    argparser.add_argument("--model_name", type=str, help="name used to store the model and the predictions", required=False, default='svm')
+    argparser.add_argument("--train_data_path", type=str, help="path to data (used for training/testing)",
+                           required=False)
+    argparser.add_argument("--model_name", type=str, help="name used to store the model and the predictions",
+                           required=False, default='svm')
     argparser.add_argument("--train", action="store_true", help="train the tagger on the given data")
     argparser.add_argument("--feature_template", type=str, default="baseline",
                            help="feature template (default: %(default)s)")
@@ -113,13 +113,11 @@ if __name__ == "__main__":
     argparser.add_argument("--wikiner", action="store_true",
                            help="if we are using wikiner dataset, use this arg to use appropriate scoring function")
 
-
-
     parsed_args = argparser.parse_args()
 
     main(parsed_args)
 
-    #from model_evaluation import report_fscore
+    # from model_evaluation import report_fscore
 
-    #report_fscore("test_predictions.txt", wikiner=True)
-    #report_fscore("../old_model_and_prediction/predictions/en/predictions_wikiner/predictions_wrong.txt", wikiner =True)
+    # report_fscore("test_predictions.txt", wikiner=True)
+    # report_fscore("../old_model_and_prediction/predictions/en/predictions_wikiner/predictions_wrong.txt", wikiner =True)

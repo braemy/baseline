@@ -1,17 +1,12 @@
 import json
-import math
+import os
 import pickle
 
 import fasttext
 import numpy as np
 from tqdm import tqdm
-import sys
 
-sys.path.insert(0, 'helper')
-
-from helper.FeatureExtractor  import FeatureExtractor
-from helper.utils_data import *
-import os
+from helper.FeatureExtractor import FeatureExtractor
 
 
 class FeatureExtractor_CRF_SVM(FeatureExtractor):
@@ -45,15 +40,13 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
         self.location_list = []
         self.max_length = -1
         if embedding_size is not None:
-            self.embedding_size=int(embedding_size)
+            self.embedding_size = int(embedding_size)
             self.embedding_start = np.zeros(self.embedding_size)
             self.embedding_end = np.ones(self.embedding_size) / np.linalg.norm(np.ones(self.embedding_size))
 
-        self.block_size= 50000
+        self.block_size = 50000
         self.quiet = True
         self.embedding_type = None
-
-
 
     def extract_features_svm(self, sequence_data, extract_all):
         """
@@ -80,7 +73,7 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
         # extract data path from sequence_data
         self.data_path = sequence_data.data_path
         # iterate through all sequences (=sentences) and all words in each sentence
-        for sequence_num, (word_sequence, *label_pos_sequence) in tqdm(enumerate(sequence_data.sequence_pairs) ):
+        for sequence_num, (word_sequence, *label_pos_sequence) in tqdm(enumerate(sequence_data.sequence_pairs)):
             # check if relational features are used
             # if so, build relational info for the current word_sequence
             label_sequence = label_pos_sequence[0]
@@ -120,7 +113,9 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
         # list for locations
         self.location_list = [None] * len(tokens_list)
         # iterate through all sequences (=sentences) and all words in each sentence
-        for sequence_num, (word_sequence, labels_sequence, pos_sequence) in tqdm(enumerate(zip(tokens_list, label_list)),"Feature extraction", miniters=200, mininterval=2, disable=self.quiet):
+        for sequence_num, (word_sequence, labels_sequence, pos_sequence) in tqdm(
+                enumerate(zip(tokens_list, label_list)), "Feature extraction", miniters=200, mininterval=2,
+                disable=self.quiet):
 
             sentence_features = [None] * len(labels_sequence)
             sentence_labels = [None] * len(labels_sequence)
@@ -131,9 +126,10 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
                 # only use labeled instances unless extract_all=True.
                 if (label is not None) or extract_all:
                     # append label id to label list
-                    sentence_labels[position]=(self._get_label(label))
+                    sentence_labels[position] = (self._get_label(label))
                     # append feature id in features list
-                    sentence_features[position]=(self._get_features(word_sequence, position, pos_tag=pos_tags, numeric_feature=False))
+                    sentence_features[position] = (
+                        self._get_features(word_sequence, position, pos_tag=pos_tags, numeric_feature=False))
                     # append location in locations list
                     sentence_locations[position] = ((sequence_num, position))
 
@@ -142,9 +138,7 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
             self.label_list[sequence_num] = (sentence_labels)
             self.location_list[sequence_num] = (sentence_locations)
 
-
         return self.features_list, self.label_list, self.length
-
 
     def load_word_embeddings(self, embedding_path, embedding_length):
         """
@@ -160,12 +154,12 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
             self.embedding_type = "glove"
             print("Load glove...")
             file_name = "word_embeddings_dict_" + str(embedding_length) + ".p"
-            file_name = os.path.join(embedding_path,self.language, file_name)
+            file_name = os.path.join(embedding_path, self.language, file_name)
             self._word_embeddings = pickle.load(open(file_name, "rb"))
 
             # the token for unknown word types must be present
-     #       assert (
-     #           self.unknown_symbol in self.__word_embeddings), "The token for unknown word types must be present in the embeddings file"
+            #       assert (
+            #           self.unknown_symbol in self.__word_embeddings), "The token for unknown word types must be present in the embeddings file"
 
             # address some treebank token conventions.
             if "(" in self._word_embeddings:
@@ -186,28 +180,13 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
         else:
             print("Loading fasttext ...")
             self.embedding_type = "fasttext"
-            print(os.path.join(embedding_path,self.language, "wiki.en.bin"))
-            self._word_embeddings = fasttext.load_model(os.path.join(embedding_path,self.language, "wiki.en.bin"))
+            print(os.path.join(embedding_path, self.language, "wiki.en.bin"))
+            self._word_embeddings = fasttext.load_model(os.path.join(embedding_path, self.language, "wiki.en.bin"))
 
     def is_training(self):
         return self.is_training
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    #====================================
+    # ====================================
     # NOT USED ANY MORE BUT KEEPED
     # ===================================
 
@@ -221,8 +200,8 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
             label_sequence = label_pos_sequence[0]
             pos_sequence = None if len(label_pos_sequence) == 1 else label_pos_sequence[1]
 
-            if sequence_num %10000 == 0:
-                print("Extracting features:",sequence_num)
+            if sequence_num % 10000 == 0:
+                print("Extracting features:", sequence_num)
             for position, label in enumerate(label_sequence):
 
                 # only use labeled instances unless extract_all=True.
@@ -240,14 +219,13 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
         total_label = len(set([item for sublist in self.label_list for item in sublist]))
         return self.max_length, total_label, self.feature_dim
 
-
     def transform_feature(self, data_to_transform, labels):
-        features_tensorflow = np.zeros([0,self.feature_dim])
+        features_tensorflow = np.zeros([0, self.feature_dim])
         for i, sentence in enumerate(data_to_transform):
             for j, feature in enumerate(sentence):
-                vector = np.zeros([1,self.feature_dim])
+                vector = np.zeros([1, self.feature_dim])
                 for k, (key, value) in enumerate(feature.items()):
-                    vector[0, key-1] = value
+                    vector[0, key - 1] = value
                 features_tensorflow = np.append(features_tensorflow, vector, axis=0)
 
         output_label = []
@@ -256,8 +234,6 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
                 output_label.append(label)
 
         return features_tensorflow, output_label
-
-
 
     def transform_feature_by_sentence(self, data_to_transform, label, nbr_classes):
         num_data = len(data_to_transform)
@@ -271,26 +247,23 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
                     #    features_tensorflow = np.append(features_tensorflow[i], np.zeros(max_value),axis =0)
         label_output = np.zeros([num_data, self.max_length]).astype(int)
         for i in range(len(label)):
-            label_output[i] = np.append(label[i], [nbr_classes-1] * (
-            self.max_length - len(label[i])))
+            label_output[i] = np.append(label[i], [nbr_classes - 1] * (
+                self.max_length - len(label[i])))
         return features_tensorflow, label_output
-
-
-
 
     def transform_sparce_feature(self, data_to_transform, label, nbr_classes):
         num_data = len(data_to_transform)
 
         indices = []
         values = []
-        id= 0
+        id = 0
         for i, sentence in enumerate(data_to_transform):
             for j, feature in enumerate(sentence):
                 for k, (key, value) in enumerate(feature.items()):
                     indices.append((id, k))
                     values.append(value)
-            id +=1
-        #sparce_tensor = SparseTensor(indices=indices, values=values,
+            id += 1
+        # sparce_tensor = SparseTensor(indices=indices, values=values,
         #                             dense_shape=[len(data_to_transform) * self.max_length, self.feature_dim])
         label_output = np.zeros([num_data, self.max_length]).astype(int)
         for i in range(len(label)):

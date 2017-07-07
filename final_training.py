@@ -1,20 +1,13 @@
-
-
-import os
-
-import datetime
-import numpy as np
 import json
-import multiprocessing
-import time
-
+import os
 import sys
+
+import numpy as np
 
 from MinitaggerSVM import MinitaggerSVM
 
 sys.path.insert(0, 'helper')
 
-from Minitagger import Minitagger
 from helper.SequenceData import SequenceData
 from helper.utils import create_recursive_folder
 
@@ -23,8 +16,8 @@ from FeatureExtractor_CRF_SVM import FeatureExtractor_CRF_SVM
 
 
 class final_training(object):
-    def __init__(self,train_data_path, validation_data_path, test_data_path, language, model_name,
-                                feature_template, embedding_size=None, embedding_path=None, CV=10, seed=123456):
+    def __init__(self, train_data_path, validation_data_path, test_data_path, language, model_name,
+                 feature_template, embedding_size=None, embedding_path=None, CV=10, seed=123456):
         self.validation_data_path = validation_data_path
         self.train_data_path = train_data_path
         self.test_data_path = test_data_path
@@ -41,9 +34,7 @@ class final_training(object):
         create_recursive_folder(["parameters", model_name])
         self.display_info(language, model_name, feature_template, embedding_size, embedding_path)
 
-
-
-    def final_training(self,method, best_param=None, train_with_step=False):
+    def final_training(self, method, best_param=None, train_with_step=False):
         infos = dict()
         infos["method"] = method
         infos["train_data_path"] = self.train_data_path
@@ -56,11 +47,11 @@ class final_training(object):
 
         # initialize feature extractor with the right feature template
         self.feature_extractor = FeatureExtractor_CRF_SVM(self.feature_template, self.language,
-                                                         self.embedding_size if self.embedding_size else None)
+                                                          self.embedding_size if self.embedding_size else None)
 
         self.train_sequence = SequenceData(self.train_data_path, pos_tag=True)
-        self.validation_sequence = SequenceData(self.validation_data_path, pos_tag=True) if self.validation_data_path is not None else None
-
+        self.validation_sequence = SequenceData(self.validation_data_path,
+                                                pos_tag=True) if self.validation_data_path is not None else None
 
         self.test_sequence = SequenceData(self.test_data_path, pos_tag=True)
         # load bitstring or embeddings data
@@ -72,14 +63,13 @@ class final_training(object):
         elif method is "svm":
             self.svm(best_param, train_with_step)
 
-    def crf(self,best_param):
+    def crf(self, best_param):
         self.minitagger = MinitaggerCRF()
         self.minitagger.language = self.language
         self.minitagger.quiet = True
 
         self.minitagger.set_prediction_path(self.model_name)
         self.minitagger.set_model_path(self.model_name)
-
 
         # equip Minitagger with the appropriate feature extractor
         self.minitagger.equip_feature_extractor(self.feature_extractor)
@@ -121,7 +111,7 @@ class final_training(object):
             self.minitagger.epsilon = best_param['epsilon']
             self.minitagger.cost = best_param['cost']
         else:
-            self.minitagger.epsilon =0.153617494667
+            self.minitagger.epsilon = 0.153617494667
             self.minitagger.cost = 17.9571449437
         parameter["epsilon"] = self.minitagger.epsilon
         parameter["cost"] = self.minitagger.cost
@@ -130,7 +120,7 @@ class final_training(object):
             self.minitagger.train_with_step(self.train_sequence, self.test_sequence)
         else:
             self.minitagger.extract_features(self.train_sequence, self.test_sequence)
-            self.minitagger.quiet=False
+            self.minitagger.quiet = False
             self.minitagger.train()
             self.minitagger.save(self.minitagger.model_path)
 
@@ -200,9 +190,9 @@ if __name__ == "__main__":
         model_name = "SVM_test_finale_score"
 
     elif a == "wikiner":
-        #train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/wikiner_dataset/aij-wikiner-it-wp2-simplified"
+        # train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/wikiner_dataset/aij-wikiner-it-wp2-simplified"
         train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/toy_dataset"
-        validation_data_path = None#"/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/conll_dataset/nerc-conll2003/deu-simplified.testa"
+        validation_data_path = None  # "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/conll_dataset/nerc-conll2003/deu-simplified.testa"
         test_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/toy_exp"
         feature_template = "baseline"
         embedding_path = None  # "../../word_embeddings/glove"
@@ -218,8 +208,7 @@ if __name__ == "__main__":
         model_name = "CRF_conll_emb" + str(embedding_size) + "_finale_score"
 
     selection = final_training(train_data_path, validation_data_path, test_data_path, language, model_name,
-                                      feature_template, embedding_size, embedding_path)
+                               feature_template, embedding_size, embedding_path)
 
-    best_params = {'epsilon': 0.00017782794100389227, 'cost':1e-05}
+    best_params = {'epsilon': 0.00017782794100389227, 'cost': 1e-05}
     selection.final_training("svm", best_param=best_params)
-

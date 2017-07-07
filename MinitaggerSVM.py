@@ -4,7 +4,9 @@ import os
 import pickle
 import time
 import warnings
+
 import numpy as np
+
 from Minitagger import Minitagger
 from helper.model_evaluation import report_fscore_from_file
 from helper.score import Score
