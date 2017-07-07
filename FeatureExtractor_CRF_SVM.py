@@ -80,7 +80,7 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
         # extract data path from sequence_data
         self.data_path = sequence_data.data_path
         # iterate through all sequences (=sentences) and all words in each sentence
-        for sequence_num, (word_sequence, *label_pos_sequence) in tqdm(enumerate(sequence_data.sequence_pairs),disable=self.quiet ):
+        for sequence_num, (word_sequence, *label_pos_sequence) in tqdm(enumerate(sequence_data.sequence_pairs) ):
             # check if relational features are used
             # if so, build relational info for the current word_sequence
             label_sequence = label_pos_sequence[0]
@@ -92,7 +92,7 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
                     label_list.append(self._get_label(label))
                     # append feature id in features list
                     self.features_list.append(
-                        self._get_features(word_sequence, position, None, numeric_feature=True))
+                        self._get_features(word_sequence, position, pos_tag=pos_sequence, numeric_feature=True))
                     # append location in locations list
                     location_list.append((sequence_num, position))
         return self.features_list, label_list, location_list
@@ -120,20 +120,20 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
         # list for locations
         self.location_list = [None] * len(tokens_list)
         # iterate through all sequences (=sentences) and all words in each sentence
-        for sequence_num, (word_sequence, labels_sequence) in tqdm(enumerate(zip(tokens_list, label_list)),"Feature extraction", miniters=200, mininterval=2, disable=self.quiet):
+        for sequence_num, (word_sequence, labels_sequence, pos_sequence) in tqdm(enumerate(zip(tokens_list, label_list)),"Feature extraction", miniters=200, mininterval=2, disable=self.quiet):
 
             sentence_features = [None] * len(labels_sequence)
             sentence_labels = [None] * len(labels_sequence)
             sentence_locations = [None] * len(labels_sequence)
 
-            for position, label in enumerate(labels_sequence):
+            for position, label, pos_tags in enumerate(zip(labels_sequence, pos_sequence)):
 
                 # only use labeled instances unless extract_all=True.
                 if (label is not None) or extract_all:
                     # append label id to label list
                     sentence_labels[position]=(self._get_label(label))
                     # append feature id in features list
-                    sentence_features[position]=(self._get_features(word_sequence, position, None, numeric_feature=False))
+                    sentence_features[position]=(self._get_features(word_sequence, position, pos_tag=pos_tags, numeric_feature=False))
                     # append location in locations list
                     sentence_locations[position] = ((sequence_num, position))
 

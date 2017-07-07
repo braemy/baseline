@@ -48,7 +48,7 @@ class MinitaggerCRF(Minitagger):
         self.test_sequence = test_sequence
 
         assert (self.feature_extractor.is_training), "In order to train, is_training flag should be True"
-        self.train_features, _, _ = self.feature_extractor.extract_features_crf(train_tokens_sequence, self.train_labels_sequence, extract_all=False)
+        self.train_features, _, _ = self.feature_extractor.extract_features_crf(train_tokens_sequence, self.train_labels_sequence, extract_all=True)
 
         self.__save_features(self.train_features, self.model_path, "train_features")
         if not self.quiet:

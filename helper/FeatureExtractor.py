@@ -1,7 +1,7 @@
 import math
 import pickle
 import numpy as np
-#import fasttext
+import fasttext
 from tqdm import tqdm
 
 from helper.utils import *
@@ -54,7 +54,7 @@ class FeatureExtractor(object):
         self.token_features0 = True
 
 
-        self.window_size = 0
+        self.window_size = 2
 
 
     def get_feature_dim(self):
@@ -167,7 +167,7 @@ class FeatureExtractor(object):
             raw_features = self._get_baseline_features(word_sequence, position, pos_tag)
         elif self.feature_template == "embedding":
             assert (self._word_embeddings is not None), "A path to embedding file should be given"
-            raw_features = self._get_embedding_features(word_sequence, position)
+            raw_features = self._get_embedding_features(word_sequence, position, pos_tag)
         else:
             raise Exception("Unsupported feature template {0}".format(self.feature_template))
         # map extracted raw features to numeric
@@ -266,49 +266,88 @@ class FeatureExtractor(object):
         if (word, relative_position) not in self.spelling_feature_cache:
             features = dict()
             # check if word is capitalized
-            features["is_capitalized({0})={1}".format(relative_position, is_capitalized(word))] = 1
+            #features["is_capitalized({0})={1}".format(relative_position, is_capitalized(word))] = 1
+            #features["is_upper({0})={1}".format(relative_position, word.isupper())] = 1
+            #features["contains_only_digit({0})={1}".format(relative_position, word.isdigit())] = 1
+            #features["contains_any_digit({0})={1}".format(relative_position, has_numbers(word))] = 1
+            #features["character_length({0})={1}".format(relative_position, len(word))] = 1
+            # check if all chars are nonalphanumeric
+            #features["is_all_nonalphanumeric({0})={1}".format(relative_position, is_all_nonalphanumeric(word))] = 1
+            # check if word can be converted to float, i.e. word is a number
+            #features["is_float({0})={1}".format(relative_position, is_float(word))] = 1
+
+            if is_capitalized(word):
+                #is the word capialized? Joe
+                features["cap({0})".format(relative_position)] = int(is_capitalized(word))
+            if word.isupper():
+                # is the word all in upper case? HELLO
+                features["up({0})".format(relative_position)] = int(word.isupper())
+            if word.isdigit():
+                # does the word contain only digit? 12334
+                features["o_d({0})".format(relative_position)] = int(word.isdigit())
+            if has_numbers(word):
+                # does the word contains at least one digit? joe
+                features["a_d({0})".format(relative_position)] = int(has_numbers(word))
+            if is_all_nonalphanumeric(word):
+                # check if all chars are nonalphanumeric
+                features["non_alpa({0})".format(relative_position)] = int(is_all_nonalphanumeric(word))
+            if is_float(word):
+                # check if word can be converted to float, i.e. word is a number
+                features["f({0})".format(relative_position)] = int(is_float(word))
+            #character_length
+            features["c_l({0})".format(relative_position)] = float(1)/len(word)
+
+
             # build suffixes and preffixes for each word (up to a length of 4)
             if self.morphological_features == "regular":
                 for length in range(1, 5):
                     features[
-                        "prefix{0}({1})={2}".format(length, relative_position, get_prefix(word, length))] = 1
+                        #prefix
+                        "p{0}({1})={2}".format(length, relative_position, get_prefix(word, length))] = 1
                     features[
-                        "suffix{0}({1})={2}".format(length, relative_position, get_suffix(word, length))] = 1
+                        #suffix
+                        "s{0}({1})={2}".format(length, relative_position, get_suffix(word, length))] = 1
+
+
+
             # use fasttext to create morphological features
-            if self.morphological_features == "fasttext":
+            elif self.morphological_features == "embeddings":
                 for length in range(1, 5):
                     # get prefix of word
                     prefix = get_prefix(word, length)
+
+
                     if prefix in self._word_embeddings:
                         # get the word embeddings for the prefix
-                        prefix_embedding = self._word_embeddings[prefix]
+                        prefix_embedding = self._word_embeddings[prefix.lower()]
                         # normalize embeddings
                         prefix_embedding /= np.linalg.norm(prefix_embedding)
                         # enrich given features dict
                         for i, value in enumerate(prefix_embedding):
-                            features["ngram{0}({1})_at({2})".format(length, relative_position, (i + 1))] = value
+                            if value != 0:
+                                features["ngram{0}({1})_at({2})".format(length, relative_position, (i + 1))] = value
                     else:
                         # initialize embeddings to zero
-                        prefix_embedding = np.zeros((300))
+                        #prefix_embedding = np.zeros((self.embedding_size))
                         # create a unique numpy array for each prefix of a specific length
-                        prefix_embedding[length - 1] = 1
+                        #prefix_embedding[length - 1] = 1
                         # normalize embeddings
-                        prefix_embedding /= np.linalg.norm(prefix_embedding)
+                        #prefix_embedding /= np.linalg.norm(prefix_embedding)
                         # enrich given features dict
-                        for i, value in enumerate(prefix_embedding):
-                            features["ngram{0}({1})_at({2})".format(length, relative_position, (i + 1))] = value
 
+                        #for i, value in enumerate(prefix_embedding):
+                        #    features["ngram{0}({1})_at({2})".format(length, relative_position, (i + 1))] = value
 
-            # check if all chars are nonalphanumeric
-            features["is_all_nonalphanumeric({0})={1}".format(relative_position, is_all_nonalphanumeric(word))] = 1
-            # check if word can be converted to float, i.e. word is a number
-            features["is_float({0})={1}".format(relative_position, is_float(word))] = 1
+                        features["ngram{0}({1})_at({2})".format(length, relative_position, length-1)] = 1
+            else:
+                raise("Unrecognized feature type")
+
             self.spelling_feature_cache[(word, relative_position)] = features
 
         # Return a copy so that modifying that object doesn't modify the cache.
         return self.spelling_feature_cache[(word, relative_position)].copy()
 
-    def _get_baseline_features(self, word_sequence, position, pos_tag=None):
+    def _get_baseline_features(self, word_sequence, position, pos_tag_sequence=None):
         """
         Builds the baseline features by using spelling of the word at the position
         and 2 words left and right of the word.
@@ -317,8 +356,8 @@ class FeatureExtractor(object):
         @param word_sequence: sequence of words
         @type position: int
         @param position: position of word in the given sequence
-        @type pos_tag: list
-        @param pos_tag: sequence of pos_tag
+        @type pos_tag_sequence: list
+        @param pos_tag_sequence: sequence of pos_tag
         @return: baseline features (dict)
         """
         features = {}
@@ -332,41 +371,65 @@ class FeatureExtractor(object):
 
         # identify word
         if self.token_features0:
-            features["word({0})={1}".format(position, word)] = 1
-
+            if self.morphological_features == "regular":
+                # the word in lower case
+                features["w_l({0})={1}".format(position, word.lower())] = 1
+                # the word like it appears in the text
+                features["w({0})={1}".format(position, word)] = 1
+            elif self.morphological_features == "embeddings":
+                self.__get_word_embeddings(word_sequence, position, 0, features, "w")
+                self.__get_word_embeddings(word_sequence, position, 0, features, "w_l")
+            else:
+                raise ("Unrecognized feature type")
         # get 2 words on the left and right¨
         # add features for the words on the left and right side
-        if self.token_features2:
-            word_right2 = get_word(word_sequence, position + 2)
-            word_left2 = get_word(word_sequence, position - 2)
-            features["word(-2)={0}".format(word_left2)] = 1
-            features["word(+2)={0}".format(word_right2)] = 1
-        if self.token_features1:
-            word_left1 = get_word(word_sequence, position - 1)
-            word_right1 = get_word(word_sequence, position + 1)
-            features["word(-1)={0}".format(word_left1)] = 1
-            features["word(+1)={0}".format(word_right1)] = 1
+        for i in range(1, 4 + 1):
+            word_right = get_word(word_sequence, position + i)
+            word_left = get_word(word_sequence, position - i)
+            if self.morphological_features == "regular":
+                # words around the word to predict
+                features["w({0})={1}".format(i,word_right)] = 1
+                features["w({0})={1}".format(-i,word_left)] = 1
+            elif self.morphological_features == "embeddings":
+                self.__get_word_embeddings(word_sequence, position, i, features, "w")
+                self.__get_word_embeddings(word_sequence, position, -i, features, "w")
+            else:
+                raise ("Unrecognized feature type")
+
+            features.update(self._spelling_features(word_right, i))
+            features.update(self._spelling_features(word_left, -i))
+
+        #features["chunk(-1_0)={0}".format(get_chunk(word_sequence,position-1,position))] = 1
+        #features["chunk(0_1)={0}".format(get_chunk(word_sequence,position,position+1))] = 1
+
+        #if pos_tag_sequence:
+        assert pos_tag_sequence is not None, "need pos_tag_sequence"
+        features.update(self.__get_pos_features(pos_tag_sequence, position))
+        #if word == "Brann":
+        #    pprint(features)
+
         return features
 
-    def __get_pos_features(self, word_sequence, position, pos_tag):
+    def __get_pos_features(self, pos_tag_sequence, position):
         """
         Build the pos tag features
         :param word_sequence:
         :param position:
-        :param pos_tag:
+        :param pos_tag_sequence:
         :return:
         """
         # TODO implement pos features
-        pos = get_pos(pos_tag, position)
-        pos_left1 = get_pos(pos_tag, position - 1)
-        pos_left2 = get_pos(pos_tag, position - 2)
-        pos_right1 = get_pos(pos_tag, position + 1)
-        pos_right2 = get_pos(pos_tag, position + 2)
+        pos = get_pos(pos_tag_sequence, position)
+        pos_left1 = get_pos(pos_tag_sequence, position - 1)
+        pos_left2 = get_pos(pos_tag_sequence, position - 2)
+        pos_right1 = get_pos(pos_tag_sequence, position + 1)
+        pos_right2 = get_pos(pos_tag_sequence, position + 2)
 
         features = dict()
 
         features["pos(-1) = {0}".format(pos_left1)] = 1
         features["pos(-2) = {0}".format(pos_left2)] = 1
+        features["pos(0) = {0}".format(pos)] = 1
         features["pos(+1) = {0}".format(pos_right1)] = 1
         features["pos(+2) = {0}".format(pos_right2)] = 1
 
@@ -375,7 +438,7 @@ class FeatureExtractor(object):
 
         return features
 
-    def __get_word_embeddings(self, word_sequence, position, offset, features):
+    def __get_word_embeddings(self, word_sequence, position, offset, features, name="emb"):
         """
 		Gets embeddings for a given word using the embeddings dictionary
 
@@ -408,11 +471,12 @@ class FeatureExtractor(object):
             word_embedding /= np.linalg.norm(word_embedding)
         offset = str(offset) if offset <= 0 else "+" + str(offset)
         for i in range(len(word_embedding)):
-           features["embedding({0})_at({1})".format(offset, (i + 1))] = word_embedding[i]
+            if word_embedding[i] != 0:
+                features[name+"({0})_at({1})".format(offset, (i + 1))] = word_embedding[i]
         #features.update(dict(enumerate(word_embedding)))
 
 
-    def _get_embedding_features(self, word_sequence, position):
+    def _get_embedding_features(self, word_sequence, position, pos_tags):
         """
 		Extract embedding features = normalized baseline features + (normalized) embeddings
 		of current, left, and right words.
@@ -424,21 +488,20 @@ class FeatureExtractor(object):
 		@return: full dict of features
 		"""
         # compute the baseline feature vector and normalize its length to 1
-        features = self._get_baseline_features(word_sequence, position)
+        features = self._get_baseline_features(word_sequence, position, pos_tags)
         # assumes binary feature values
         norm_features = math.sqrt(len(features))
         # normalize
         for feature in features:
             features[feature] /= norm_features
             # extract word embedding for given and neighbor words
-
         for i in range(-self.window_size, self.window_size + 1):
             self.__get_word_embeddings(word_sequence, position, i, features)
-
         # if position > 0:
         #    self.__get_word_embeddings(word_sequence, position, -1, features)
         # if position < len(word_sequence) - 1:
         #    self.__get_word_embeddings(word_sequence, position, 1, features)
+
         return features
 
     def reset(self):

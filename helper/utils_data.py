@@ -18,6 +18,23 @@ def get_word(word_sequence, position):
     else:
         return word_sequence[position]
 
+def get_chunk(word_sequence, start, end):
+    """
+    return a chunk from start to end (included)
+    :param word_sequence:
+    :type word_sequence:
+    :param start:
+    :type start:
+    :param end:
+    :type end:
+    :return:
+    :rtype:
+    """
+    sentence = ["_START_"]
+    sentence.extend(word_sequence)
+    sentence.append("_END_")
+    return " ".join(sentence[start + 1: end+2])
+
 def get_pos(pos_sequence, position):
     """
     Gets the part of speech tag at the specified position
@@ -97,6 +114,8 @@ def is_all_nonalphanumeric(word):
             return False
     return True
 
+def has_numbers(inputString):
+    return any(char.isdigit() for char in inputString)
 
 def is_float(word):
     """
