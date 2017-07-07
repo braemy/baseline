@@ -2,21 +2,15 @@ import datetime
 import math
 import os
 import pickle
-import sys
 import time
 import warnings
-sys.path.insert(0, 'helper')
-
 
 import numpy as np
+
 from Minitagger import Minitagger
 from helper.model_evaluation import report_fscore_from_file
 from helper.score import Score
-
-LIBLINEAR_PATH = os.path.join(os.path.dirname(__file__), "liblinear-1.96/python")
-print(LIBLINEAR_PATH)
-sys.path.append(os.path.abspath(LIBLINEAR_PATH))
-import liblinearutil
+from liblinear.python import liblinearutil
 
 
 class MinitaggerSVM(Minitagger):
@@ -30,14 +24,14 @@ class MinitaggerSVM(Minitagger):
         Minitagger.__init__(self)
         # it stores a trained liblinearutil
         self.__liblinear_model = None
-        #Parameters:
+        # Parameters:
         self.epsilon = 0.1
         self.cost = 0.1
 
         print("SVM (liblinear)")
 
-    def extract_features(self, data_train, data_test, validation_sequence = None, num_data =None):
-        if data_train is None: # data_train is none ==> we are going to predict
+    def extract_features(self, data_train, data_test, validation_sequence=None, num_data=None):
+        if data_train is None:  # data_train is none ==> we are going to predict
             # make sure is_training is false
             assert (not self.feature_extractor.is_training), "In order to train, is_training flag should be True"
         else:
@@ -46,16 +40,15 @@ class MinitaggerSVM(Minitagger):
             self.features_list_train, self.label_list_train, _ = self.feature_extractor.extract_features_svm(
                 self.data_train, extract_all=False)
 
-
         self.data_test = data_test
         if num_data is not None:
             arg = np.random.permutation(len(data_train.sequence_pairs))[:int(num_data)]
             self.data_train.sequence_pairs = np.array(data_train.sequence_pairs)[arg]
 
-        #self.feature_extractor.is_training = False
+        # self.feature_extractor.is_training = False
         self.features_list_test, self.label_list_test, _ = self.feature_extractor.extract_features_svm(self.data_test,
                                                                                                        extract_all=True)
-        #if validation_sequence is not None:
+        # if validation_sequence is not None:
         #    self.data_validation = validation_sequence
         #    self.features_list_validation, self.label_list_validation, _ = self.feature_extractor.extract_features_svm(
         #        self.data_validation,
@@ -86,7 +79,7 @@ class MinitaggerSVM(Minitagger):
         # define problem to be trained using the parameters received from the feature_extractor
         problem = liblinearutil.problem(self.label_list_train, self.features_list_train)
         # train the model (-q stands for quiet = True in the liblinearutil)
-#        self.__liblinear_model = liblinearutil.train(problem, liblinearutil.parameter(" -q -p " + str(self.epsilon) + " -c " +str(self.cost)))
+        #        self.__liblinear_model = liblinearutil.train(problem, liblinearutil.parameter(" -q -p " + str(self.epsilon) + " -c " +str(self.cost)))
         self.__liblinear_model = liblinearutil.train(problem, liblinearutil.parameter(" -q"))
 
         # training is done, set is_training to False, so that prediction can be done
@@ -105,7 +98,8 @@ class MinitaggerSVM(Minitagger):
             self.quiet = quiet_value
 
             self.data_test.save_prediction_to_file(pred_labels, self.prediction_path)
-            exact_score, inexact_score, conllEval = report_fscore_from_file(self.prediction_path + "/predictions.txt", wikiner=self.wikiner)
+            exact_score, inexact_score, conllEval = report_fscore_from_file(self.prediction_path + "/predictions.txt",
+                                                                            wikiner=self.wikiner)
             # create some files useful for debugging
             if self.debug:
                 self.__debug(self.data_test, pred_labels)
@@ -114,11 +108,12 @@ class MinitaggerSVM(Minitagger):
             self.display_results("Exact", exact_score)
             self.display_results("Inexact", inexact_score)
 
-        self.save_results(conllEval, exact_score,inexact_score)
+        self.save_results(conllEval, exact_score, inexact_score)
 
         return exact_score, inexact_score, conllEval
 
-    def cross_validation(self, id_, data_train,feature_template, language,embedding_path, embedding_size,  data_test=None, n_fold=5):
+    def cross_validation(self, id_, data_train, feature_template, language, embedding_path, embedding_size,
+                         data_test=None, n_fold=5):
         """
         compute the cross validation on the data_train.
         It report the f1_score of each fold and the average with the standard deviation
@@ -142,13 +137,12 @@ class MinitaggerSVM(Minitagger):
         parameter["cost"] = self.cost
 
         training_size = len(data_train.sequence_pairs)
-        self.quiet=True
+        self.quiet = True
         assert (n_fold >= 2), "n_fold must be at least 2"
         if n_fold > training_size:
             n_fold = training_size
             warnings.warn("n_fold can not be bigger than the size of the training set. n-fold is replace by the size "
                           "of the training set")
-
 
         # data_train.sequence_pairs: [[[tokens sentence1]. [label senteces1]], [[tokens sentence2]. [label senteces12]],...]
         # 1)permute randomly all sentences
@@ -159,20 +153,15 @@ class MinitaggerSVM(Minitagger):
         score = Score("SVM_CV_" + str(id_), None)
 
         for k in range(n_fold):
-            print("--- Fold: {} ---".format(k+1))
-            #reset features extractor:
+            print("--- Fold: {} ---".format(k + 1))
+            # reset features extractor:
             self.feature_extractor.reset()
             train_set, test_set = data_train.split_in_2_sequences(start=k * test_size, end=(k + 1) * test_size)
             self.extract_features(train_set, test_set)
-            exact_score, inexact_score, conllEval  = self.train()
-            score.add_scores(conllEval,exact_score,inexact_score,parameter)
+            exact_score, inexact_score, conllEval = self.train()
+            score.add_scores(conllEval, exact_score, inexact_score, parameter)
         print("Mean conll fscore: ", score.get_mean_conll_fscore())
         return score.get_mean_conll_fscore(), parameter
-
-
-
-
-
 
     def save(self, model_path):
         """
@@ -186,8 +175,6 @@ class MinitaggerSVM(Minitagger):
                     protocol=pickle.HIGHEST_PROTOCOL)
         # save trained model in the model_path directory
         liblinearutil.save_model(os.path.join(self.model_path, "liblinear_model"), self.__liblinear_model)
-
-
 
     def load(self, model_path):
         """
@@ -209,7 +196,7 @@ class MinitaggerSVM(Minitagger):
         try:
             print(self.model_path)
             self.feature_extractor = pickle.load(open(os.path.join(self.model_path, "feature_extractor"), "rb"))
-            #self.feature_extractor.save_json_format(os.path.join(self.model_path, "feature_extractor_json"))
+            # self.feature_extractor.save_json_format(os.path.join(self.model_path, "feature_extractor_json"))
             # load trained model
             self.__liblinear_model = liblinearutil.load_model(os.path.join(self.model_path, "liblinear_model"))
         except:
@@ -232,7 +219,8 @@ class MinitaggerSVM(Minitagger):
         # Extract features on all instances (labeled or unlabeled) of the test set
 
         # pass them to liblinearutil for prediction
-        pred_labels, (acc, _, _), _ = liblinearutil.predict(self.label_list_test, self.features_list_test, self.__liblinear_model, "-q")
+        pred_labels, (acc, _, _), _ = liblinearutil.predict(self.label_list_test, self.features_list_test,
+                                                            self.__liblinear_model, "-q")
 
         # print some useful information
         if not self.quiet:
@@ -240,15 +228,13 @@ class MinitaggerSVM(Minitagger):
             # estimate prediction time
             print("Prediction time: {0}".format(str(datetime.timedelta(seconds=num_seconds))))
 
-
         # convert predicted labels from integer IDs to strings.
-        pred_labels = self.convert_prediction(pred_labels, self.data_test )
-        #for i, label in enumerate(pred_labels):
+        pred_labels = self.convert_prediction(pred_labels, self.data_test)
+        # for i, label in enumerate(pred_labels):
         #    pred_labels[i] = self.feature_extractor.get_label_string(label)
         self.__save_prediction_to_file(self.data_test, pred_labels)
 
         return pred_labels, acc
-
 
     def convert_prediction(self, predictions, true_label):
 
@@ -256,7 +242,7 @@ class MinitaggerSVM(Minitagger):
         pred_pos = 0
         for i, (sentence, _, _) in enumerate(true_label.sequence_pairs):
             prediction_sentence = [""] * len(sentence)
-            for pos,_ in enumerate(sentence):
+            for pos, _ in enumerate(sentence):
                 prediction_sentence[pos] = self.feature_extractor.get_label_string(int(predictions[pred_pos]))
                 pred_pos += 1
 
@@ -266,16 +252,14 @@ class MinitaggerSVM(Minitagger):
     def train_with_step(self, data_train, data_test):
         print("number of feature:", len(self.feature_extractor._map_feature_str2num.keys()))
 
-
         score = Score("finale_score", None)
         param = dict()
         param["epsilon"] = self.epsilon
 
-        for i in np.linspace(10,len(data_train.sequence_pairs),50):
+        for i in np.linspace(10, len(data_train.sequence_pairs), 50):
             self.feature_extractor.reset()
             start_time = time.time()
             self.extract_features(data_train, data_test, num_data=i)
-
 
             problem = liblinearutil.problem(self.label_list_train, self.features_list_train)
 
@@ -288,7 +272,7 @@ class MinitaggerSVM(Minitagger):
             print("Iteration:", time.time() - start_time, "score: ", conllEval)
 
             score.save_class_to_file(self.model_path)
-            #self.save(self.model_path)
+            # self.save(self.model_path)
 
     def __save_prediction_to_file(self, data_test, pred_labels):
         # file to print all predictions
@@ -345,18 +329,3 @@ class MinitaggerSVM(Minitagger):
         f2.close()
         f3.close()
         return true_labels
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

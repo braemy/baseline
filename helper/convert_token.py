@@ -1,10 +1,8 @@
 import pickle
 
-import numpy as np
 from tqdm import tqdm
 
 from helper.SequenceData import SequenceData
-
 
 sequence = SequenceData("../../wikiner_dataset/aij-wikiner-en-wp2-simplified", pos_tag=True)
 
@@ -16,5 +14,5 @@ with open(file_name, "rb") as file:
 
 output = []
 dummy = len(vocab)
-for i,(sentence, *_) in tqdm(enumerate(sequence.sequence_pairs)):
-    output.append(list(map(lambda x:vocab.get(x.lower(), dummy),sentence)))
+for i, (sentence, *_) in tqdm(enumerate(sequence.sequence_pairs)):
+    output.append(list(map(lambda x: vocab.get(x.lower(), dummy), sentence)))

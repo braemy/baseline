@@ -1,8 +1,4 @@
-import argparse
-
-
 from helper.conlleval import evaluate, report
-
 
 
 def estimate_inexact_fscore(y_true, y_pred, b_equals_i=False):
@@ -70,11 +66,11 @@ def estimate_exact_fscore(y_true, y_pred):
                 fp += 1
         else:
             y_true[i]
-            if y_true[i][0]!='B' and y_true[i][0]!='I':
-                y_true[i]='O'
+            if y_true[i][0] != 'B' and y_true[i][0] != 'I':
+                y_true[i] = 'O'
                 true_b_i, true_class = 'O', 'O'
             else:
-                #assert "-" in y_true[i], "true label " + y_true[i] + " should contains '-'"
+                # assert "-" in y_true[i], "true label " + y_true[i] + " should contains '-'"
                 true_b_i, true_class = y_true[i].split("-")
 
             if true_b_i == "B":
@@ -89,7 +85,8 @@ def estimate_exact_fscore(y_true, y_pred):
                     #    print(y_pred)
                     #    print("should not happen: i" + y_true[i] + " i+1:" + y_true[i+1])
 
-                    if y_true[i + 1] == "O" or y_true[i + 1].split("-")[0] == "B":  # if next label start with "B" => not a sequence
+                    if y_true[i + 1] == "O" or y_true[i + 1].split("-")[
+                        0] == "B":  # if next label start with "B" => not a sequence
                         start_index = i
                         pairs.append((start_index,))
                         continue
@@ -166,7 +163,7 @@ def estimate_exact_fscore_wikiner(y_true, y_pred):
 
             if true_b_i == "I":
                 # next label is the same=> start a sequence or continue one
-                if i < len(y_true)-1 and y_true[i] == y_true[i + 1]:
+                if i < len(y_true) - 1 and y_true[i] == y_true[i + 1]:
                     if start:
                         continue
                     else:
@@ -182,7 +179,7 @@ def estimate_exact_fscore_wikiner(y_true, y_pred):
                         end_index = i
                     if start:
                         start = False
-                        pairs.append((start_index, end_index+1))
+                        pairs.append((start_index, end_index + 1))
                     else:
                         start_index = i
                         pairs.append((start_index,))
@@ -228,7 +225,8 @@ def estimate_exact_fscore_wikiner(y_true, y_pred):
                 print(y_true)
                 print(y_pred)
 
-            try: y_pred[pair[0]]
+            try:
+                y_pred[pair[0]]
             except:
                 print("Pair", pair)
                 print("Pair", len(pair))
@@ -289,8 +287,8 @@ def split_prediction_true_label(file_name):
         true_sequence.append(y_true)
         pred_sequence.append(y_pred)
 
-
     return true_sequence, pred_sequence
+
 
 def report_fscore_from_file(prediction_file, wikiner=False, quiet=True):
     true_label, pred_label = split_prediction_true_label(prediction_file)
@@ -302,8 +300,8 @@ def report_fscore_from_file(prediction_file, wikiner=False, quiet=True):
 
     return exact_score, inexact_score, conllEval
 
-def report_fscore(true_label, pred_label, wikiner=False, quiet=True):
 
+def report_fscore(true_label, pred_label, wikiner=False, quiet=True):
     tp_exact = 0
     tn_exact = 0
     fp_exact = 0
@@ -345,14 +343,13 @@ def report_fscore(true_label, pred_label, wikiner=False, quiet=True):
     #print("FN inexact: ", fn_inexact)
     #print()
 
-    exact_score=dict()
+    exact_score = dict()
     precision = estimate_precision(tp_exact, fp_exact)
     exact_score["precision"] = precision
     recall = estimate_recall(tp_exact, fn_exact)
     exact_score["recall"] = recall
     e_fscore = estimate_fscore(precision, recall)
     exact_score["f1score"] = e_fscore
-
 
     inexact_score = dict()
     precision = estimate_precision(tp_inexact, fp_inexact)

@@ -1,11 +1,15 @@
-import json
+
+
 import os
-import sys
-from pprint import pprint
 
+import datetime
 import numpy as np
+import json
+import multiprocessing
+import time
 
-from MinitaggerCRF_tf import MinitaggerCRF_tf
+import sys
+
 from MinitaggerSVM import MinitaggerSVM
 
 sys.path.insert(0, 'helper')
@@ -73,7 +77,6 @@ class Final_training(object):
         self.minitagger.set_prediction_path(self.model_name)
         self.minitagger.set_model_path(self.model_name)
 
-
         # equip Minitagger with the appropriate feature extractor
         self.minitagger.equip_feature_extractor(self.feature_extractor)
 
@@ -127,7 +130,7 @@ class Final_training(object):
             self.minitagger.train_with_step(self.train_sequence, self.test_sequence)
         else:
             self.minitagger.extract_features(self.train_sequence, self.test_sequence)
-            self.minitagger.quiet=False
+            self.minitagger.quiet = False
             self.minitagger.train()
             self.minitagger.save(self.minitagger.model_path)
 
@@ -143,7 +146,10 @@ if __name__ == "__main__":
 
     sys.exit()
 
-
+    #=========================================================
+    # Everything below is not use anymore, move your configurations
+    # in the parameter files, then you can remove everything
+    #=========================================================
 
     a = "conll"
     language = "de"
@@ -166,15 +172,10 @@ if __name__ == "__main__":
         model_name = "_new_dataset_"+dataset_method+"_"+str(filter)+"_finale_score"
 
     elif a == "wikiner":
-        language = "de"
-        if language == "en":
-            file_name = "eng"
-        elif language == "de":
-            file_name = "deu"
-        train_data_path = "../../wikiner_dataset/aij-wikiner-"+language+"-wp2-simplified"
-        #train_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
-        validation_data_path = "../../ner/nerc-conll2003/"+file_name+".testa"
-        test_data_path = "../../ner/nerc-conll2003/"+file_name+".testb"
+        # train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/wikiner_dataset/aij-wikiner-it-wp2-simplified"
+        train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/toy_dataset"
+        validation_data_path = None  # "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/conll_dataset/nerc-conll2003/deu-simplified.testa"
+        test_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/toy_exp"
         feature_template = "baseline"
         embedding_path = "../../word_embeddings/glove"
         #model_name = "SVM_wikiner_emb" + str(embedding_size) + "_finale_score"
@@ -204,12 +205,7 @@ if __name__ == "__main__":
 
 
     selection = final_training(train_data_path, validation_data_path, test_data_path, language, model_name,
-                                      feature_template, embedding_size, embedding_path)
+                               feature_template, embedding_size, embedding_path)
 
-    # elif algorithm == "CRF":
-    selection.train(method)
-
-
-    # if algorithm == "SVM":
-    # model_name = "SVM_wikiner_emb"+str(embedding_size)+"_parameter_selection_1"
-    # parameter_selection_svm(train_data_path,test_data_path, language, model_name, feature_template, embedding_size,embedding_path)
+    best_params = {'epsilon': 0.00017782794100389227, 'cost': 1e-05}
+    selection.final_training("svm", best_param=best_params)

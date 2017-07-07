@@ -1,6 +1,7 @@
 import collections
-import numpy as np
 import copy
+
+import numpy as np
 
 
 class SequenceData(object):
@@ -76,7 +77,7 @@ class SequenceData(object):
 		"""
 
         self.data_path = data_path
-        with open(data_path, "r",encoding='utf-8') as input_file:
+        with open(data_path, "r", encoding='utf-8') as input_file:
             word_sequence = []
             pos_sequence = []
             label_sequence = []
@@ -95,7 +96,7 @@ class SequenceData(object):
                         pos = tokens[1]
                     # the label is the 3td token, if it exists, otherwise label = None
                     if pos_tag:
-                        label = None if len(tokens) == 2 else tokens[2] # TODO have a look for POS
+                        label = None if len(tokens) == 2 else tokens[2]  # TODO have a look for POS
                     else:
                         label = None if len(tokens) == 1 else tokens[1]
                     # else:
@@ -208,7 +209,7 @@ class SequenceData(object):
             self.word_pos_count[word] = sorted(self.word_pos_count[word].items(),
                                                key=lambda pair: pair[1], reverse=True)
 
-    def split_token_label(self,num_of_sentences = 50000):
+    def split_token_label(self, num_of_sentences=50000):
         size = len(self.sequence_pairs) if len(self.sequence_pairs) < num_of_sentences else num_of_sentences
         list_tokens_sequence = [None] * size
         list_labels_sequence = [None] * size
@@ -247,7 +248,6 @@ class SequenceData(object):
                 string_rep += "\n"
         return string_rep
 
-
     def split_train_validation(self, train_ratio):
         """
         randomize the sentences
@@ -262,16 +262,16 @@ class SequenceData(object):
         :rtype:
         """
 
-        assert train_ratio <=1, " train ration should be less or equal to 1 "+train_ratio
-        validation_ratio = round(1-train_ratio,2)
+        assert train_ratio <= 1, " train ration should be less or equal to 1 " + train_ratio
+        validation_ratio = round(1 - train_ratio, 2)
         combine_sequence = copy.copy(self)
 
-        #randomize the sequence_pairs
+        # randomize the sequence_pairs
         np.random.shuffle(combine_sequence.sequence_pairs)
 
         total_sequence = len(combine_sequence.sequence_pairs)
-        train_sequence = combine_sequence.get_subsequence_pairs(start=0, end= int(train_ratio * total_sequence))
-        dev_sequence = combine_sequence.get_subsequence_pairs(start=int(train_ratio * total_sequence), end= None)
+        train_sequence = combine_sequence.get_subsequence_pairs(start=0, end=int(train_ratio * total_sequence))
+        dev_sequence = combine_sequence.get_subsequence_pairs(start=int(train_ratio * total_sequence), end=None)
 
         return train_sequence, dev_sequence
 

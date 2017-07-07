@@ -1,4 +1,4 @@
-from SequenceData import SequenceData
+from helper.SequenceData import SequenceData
 
 
 def get_word(word_sequence, position):
@@ -18,6 +18,7 @@ def get_word(word_sequence, position):
     else:
         return word_sequence[position]
 
+
 def get_chunk(word_sequence, start, end):
     """
     return a chunk from start to end (included)
@@ -33,7 +34,8 @@ def get_chunk(word_sequence, start, end):
     sentence = ["_START_"]
     sentence.extend(word_sequence)
     sentence.append("_END_")
-    return " ".join(sentence[start + 1: end+2])
+    return " ".join(sentence[start + 1: end + 2])
+
 
 def get_pos(pos_sequence, position):
     """
@@ -50,6 +52,7 @@ def get_pos(pos_sequence, position):
         return "_END_"
     else:
         return pos_sequence[position]
+
 
 def is_capitalized(word):
     """
@@ -114,8 +117,10 @@ def is_all_nonalphanumeric(word):
             return False
     return True
 
+
 def has_numbers(inputString):
     return any(char.isdigit() for char in inputString)
+
 
 def is_float(word):
     """
@@ -253,7 +258,7 @@ def analyze_data(data_path):
     else:
         print("A non-prediction data file:", data_path)
     print("{0} sequences (average length: {1:.1f})".format(
-            len(data.sequence_pairs), data.get_sequence_average_length()))
+        len(data.sequence_pairs), data.get_sequence_average_length()))
     print("{0} words".format(data.num_of_words))
     print("{0} labeled words".format(data.num_labeled_words))
     print("{0} word types".format(len(data.word_count)))

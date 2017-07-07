@@ -1,15 +1,15 @@
 import json
 import os
-import sys
-sys.path.insert(0, 'helper')
 
 import numpy as np
-#from sklearn.metrics import confusion_matrix
-from utils import create_recursive_folder
+from sklearn.metrics import confusion_matrix
 
-#LIBLINEAR_PATH = os.path.join(os.path.dirname(__file__), "liblinear-1.96/python")
-#print(LIBLINEAR_PATH)
-#sys.path.append(os.path.abspath(LIBLINEAR_PATH))
+from helper.utils import create_recursive_folder
+
+
+# LIBLINEAR_PATH = os.path.join(os.path.dirname(__file__), "liblinear/python")
+# print(LIBLINEAR_PATH)
+# sys.path.append(os.path.abspath(LIBLINEAR_PATH))
 
 class Minitagger(object):
     """
@@ -37,7 +37,7 @@ class Minitagger(object):
         # wikiner dataset
         self.wikiner = ""
 
-        #Parameters:
+        # Parameters:
         self.epsilon = 0.1
 
     def equip_feature_extractor(self, feature_extractor):
@@ -50,7 +50,7 @@ class Minitagger(object):
         self.feature_extractor = feature_extractor
 
     def set_is_training(self, is_training):
-        self.feature_extractor.is_training=is_training
+        self.feature_extractor.is_training = is_training
 
     def set_prediction_path(self, model_name):
         create_recursive_folder([self.project_dir, "predictions", self.language, model_name])
@@ -70,7 +70,7 @@ class Minitagger(object):
 
     @staticmethod
     def display_mean_result(title, fscore, precision, recall):
-        print("==================", title,"==================")
+        print("==================", title, "==================")
         print("  F1-Score: ", fscore)
         print("  F1-score Mean: {:.3f}".format(np.mean(fscore)))
         print("  F1-score Standard deviation: {:.3f}".format(np.std(fscore)))
@@ -85,11 +85,11 @@ class Minitagger(object):
         print()
 
     def save_results(self, conll, exact, inexact, id=""):
-        with open(os.path.join(self.model_path, "results_"+str(id)+".json"), "w") as file:
+        with open(os.path.join(self.model_path, "results_" + str(id) + ".json"), "w") as file:
             result = dict()
-            result["ConllEval"] =  conll
-            result["Exact"] =  exact
-            result["Inexact"] =  inexact
+            result["ConllEval"] = conll
+            result["Exact"] = exact
+            result["Inexact"] = inexact
             json.dump(result, file, indent=2, separators=(',', ': '))
 
     def __debug(self, data_test, pred_labels):
@@ -125,4 +125,3 @@ class Minitagger(object):
         for row in cm:
             print(row)
             # plot_confusion_matrix(cm, labels_list)
-

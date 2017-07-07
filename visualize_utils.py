@@ -1,6 +1,8 @@
 import itertools
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 def plot_confusion_matrix(cm, classes):
     """
@@ -12,8 +14,8 @@ def plot_confusion_matrix(cm, classes):
 	@param classes: list of the class labels
     """
 
-    title='Confusion matrix' 
-    cmap=plt.cm.Blues
+    title = 'Confusion matrix'
+    cmap = plt.cm.Blues
 
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)

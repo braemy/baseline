@@ -1,9 +1,8 @@
 import json
 import os
-import numpy as np
 import pickle
 
-from utils import pickle_data
+import numpy as np
 
 
 class Score(object):
@@ -24,18 +23,17 @@ class Score(object):
 
         self.parameters = []
 
-        self.iterations =[]
+        self.iterations = []
         self.time_step = []
 
     def add_conll(self, score):
-        f,p,r = self.split_score(score)
+        f, p, r = self.split_score(score)
         self.fscore_conll.append(f)
         self.precision_conll.append(p)
         self.recall_conll.append(r)
 
-
     def add_exact(self, score):
-        f,p,r = self.split_score(score)
+        f, p, r = self.split_score(score)
         self.fscore_exact.append(f)
         self.precision_exact.append(p)
         self.recall_exact.append(r)
@@ -67,7 +65,7 @@ class Score(object):
         self.add_parameters(param)
 
     def save_class_to_file(self, path):
-        with open(os.path.join(path,self.name + ".p"), 'wb') as fid:
+        with open(os.path.join(path, self.name + ".p"), 'wb') as fid:
             pickle.dump(self, fid)
 
     def add_scores(self, conll, exact, inexact, param=None):
@@ -78,12 +76,13 @@ class Score(object):
 
     def get_max_conll_fscore(self):
         argmax = np.argmax(self.fscore_conll)
-        return self.fscore_conll[argmax], self.precision_conll[argmax], self.recall_conll[argmax], self.parameters[argmax], argmax
+        return self.fscore_conll[argmax], self.precision_conll[argmax], self.recall_conll[argmax], self.parameters[
+            argmax], argmax
 
     def get_mean_conll_fscore(self):
         return {"f1score": np.mean(self.fscore_conll),
-                "precision":np.mean(self.precision_conll),
-                "recall":np.mean(self.recall_conll)}
+                "precision": np.mean(self.precision_conll),
+                "recall": np.mean(self.recall_conll)}
 
     @staticmethod
     def split_score(score):
@@ -110,7 +109,6 @@ class Score(object):
         print(" Correspondind recall:", recall_c)
         print(" Corresponding parameters:", param)
 
-
     def save_result_to_file(self, dir_output):
 
         fscore_c, precision_c, recall_c, param_c, argmax = self.get_max_conll_fscore()
@@ -126,7 +124,7 @@ class Score(object):
             conll["list_parameter"] = self.parameters
 
             json_data = {"infos": self.infos, "results": conll}
-            #pickle_data(json_data, dir_output, "best_conll_param.json")
+            # pickle_data(json_data, dir_output, "best_conll_param.json")
             json.dump(json_data, file, indent=2, separators=(',', ': '))
 
     @staticmethod

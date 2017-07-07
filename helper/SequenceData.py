@@ -1,9 +1,9 @@
 import collections
-import numpy as np
 import copy
 import os
 import pickle
-import sys
+
+import numpy as np
 
 
 class SequenceData(object):
@@ -56,11 +56,12 @@ class SequenceData(object):
 
         self.__initialize_sequencedata_attributes()
 
-    #def get_token_id(self):# TODO HEEEEEERE !!!!!!!!!!!!!!!!!!
+    # def get_token_id(self):# TODO HEEEEEERE !!!!!!!!!!!!!!!!!!
 
 
     def merge_sequence(self, sequence_to_merge):
-        self.sequence_pairs = np.append(self.sequence_pairs, sequence_to_merge.sequence_pairs, axis = 0) # TODO update all variable of self
+        self.sequence_pairs = np.append(self.sequence_pairs, sequence_to_merge.sequence_pairs,
+                                        axis=0)  # TODO update all variable of self
         return self
 
     def get_subsequence_pairs(self, start, end):
@@ -71,10 +72,10 @@ class SequenceData(object):
             copy_sequence.sequence_pairs = copy_sequence.sequence_pairs[start:end]
         return copy_sequence
 
-    def split_in_2_sequences(self,start,end):
+    def split_in_2_sequences(self, start, end):
         test = self.get_subsequence_pairs(start, end)
         train1 = self.get_subsequence_pairs(0, start)
-        train2 = self.get_subsequence_pairs(end,None)
+        train2 = self.get_subsequence_pairs(end, None)
         train1.sequence_pairs = np.append(train1.sequence_pairs, train2.sequence_pairs, axis=0)
         return train1, test
 
@@ -98,7 +99,7 @@ class SequenceData(object):
             labels[seq_num] = sequence[1]
             total_label += len(sequence[1])
             total_o += np.sum([s == 'O' for s in sequence[1]])
-        percentage_o = round(total_o/total_label*100, 2) if total_label > 0 else 0
+        percentage_o = round(total_o / total_label * 100, 2) if total_label > 0 else 0
         return labels, percentage_o
 
     def split_train_validation(self, train_ratio):
@@ -115,16 +116,16 @@ class SequenceData(object):
         :rtype:
         """
 
-        assert train_ratio <=1, " train ration should be less or equal to 1 "+train_ratio
-        validation_ratio = round(1-train_ratio,2)
+        assert train_ratio <= 1, " train ration should be less or equal to 1 " + train_ratio
+        validation_ratio = round(1 - train_ratio, 2)
         combine_sequence = copy.copy(self)
 
-        #randomize the sequence_pairs
+        # randomize the sequence_pairs
         np.random.shuffle(combine_sequence.sequence_pairs)
 
         total_sequence = len(combine_sequence.sequence_pairs)
-        train_sequence = combine_sequence.get_subsequence_pairs(start=0, end= int(train_ratio * total_sequence))
-        dev_sequence = combine_sequence.get_subsequence_pairs(start=int(train_ratio * total_sequence), end= None)
+        train_sequence = combine_sequence.get_subsequence_pairs(start=0, end=int(train_ratio * total_sequence))
+        dev_sequence = combine_sequence.get_subsequence_pairs(start=int(train_ratio * total_sequence), end=None)
 
         return train_sequence, dev_sequence
 
@@ -138,37 +139,39 @@ class SequenceData(object):
         :return:
         :rtype:
         """
-        sequence_pairs =[]
+        sequence_pairs = []
         if num_tokens is None:
             token_list = []
             labels_list = []
             for i, d in enumerate(self.sequence_pairs):
                 sentence = d[0]
                 labels = d[1]
-                sentence_tokens =[]
+                sentence_tokens = []
 
                 for position, (token, label) in enumerate(zip(sentence, labels)):
-                    token_list.append({'t':token, 'l':label, 'sent': i ,'position':position,'sent_token': str(i)+"_"+str(position)})
+                    token_list.append({'t': token, 'l': label, 'sent': i, 'position': position,
+                                       'sent_token': str(i) + "_" + str(position)})
                     labels_list.append(label)
 
-                    sentence_tokens.append({'t':token, 'l':label, 'sent': i ,'sent_token': str(i)+"_"+str(position)})
+                    sentence_tokens.append(
+                        {'t': token, 'l': label, 'sent': i, 'sent_token': str(i) + "_" + str(position)})
                 sequence_pairs.append([sentence_tokens, labels])
             sequence_copy = copy.copy(self)
             sequence_copy.sequence_pairs = sequence_pairs
 
         else:
-            #token_list = []
-            #labels_list = []
+            # token_list = []
+            # labels_list = []
             token_list = np.empty([num_tokens], dtype="<U6")
             labels_list = np.empty([num_tokens], dtype="<U6")
             counter = 0
             for i, d in enumerate(self.sequence_pairs):
                 sentence = d[0]
                 labels = d[1]
-                for position, (token, label) in enumerate(zip(sentence,labels)):
-                    #token_list.append({'t':token, 'l':label, 'sent':i, 'pos':position})
-                    #labels_list.append(label)
-                    token_list[counter]  = token
+                for position, (token, label) in enumerate(zip(sentence, labels)):
+                    # token_list.append({'t':token, 'l':label, 'sent':i, 'pos':position})
+                    # labels_list.append(label)
+                    token_list[counter] = token
                     labels_list[counter] = label
                     counter += 1
         return token_list, labels_list, sequence_copy
@@ -205,13 +208,13 @@ class SequenceData(object):
 		"""
         self.data_path = data_path
         token_index = 0
-        #defautl config
+        # defautl config
 
         pos_tag_index = 1
 
         if (self.language == 'de' or self.language == "deu") and "wikiner" not in data_path:
             encoding = "iso-8859-1"
-            #if "conll" in data_path:
+            # if "conll" in data_path:
             pos_tag_index = 2
         else:
             encoding = "utf-8"
@@ -238,9 +241,9 @@ class SequenceData(object):
                     word = tokens[token_index]
 
                     # the label is the 3td token, if it exists, otherwise label = None
-                    #if pos_tag:
+                    # if pos_tag:
                     #    label = None if len(tokens) == 2 else tokens[2] # TODO have a look for POS¨
-                    #else:
+                    # else:
                     #    label = None if len(tokens) == 1 else tokens[1]
                     label = tokens[-1]
                     pos_tag = tokens[pos_tag_index]
@@ -257,7 +260,6 @@ class SequenceData(object):
                 else:
                     # check if word_sequence is empty
                     if word_sequence:
-
                         # append word_sequence and label_sequence and pos_sequence to sequence_pairs
                         self.sequence_pairs.append([word_sequence, label_sequence, pos_sequence])
 
@@ -266,8 +268,8 @@ class SequenceData(object):
                         label_sequence = []
                         pos_sequence = []
 
-                        #if len(self.sequence_pairs) >= 45802 and ("train" in data_path or "combined" in data_path or "wikiner" in data_path): #TODO remove it. debug purpose
-                         #   break
+                        # if len(self.sequence_pairs) >= 45802 and ("train" in data_path or "combined" in data_path or "wikiner" in data_path): #TODO remove it. debug purpose
+                        #   break
 
             # file may not end with empty line
             # data of last sentence should be also be appended to sequence_pairs
@@ -350,7 +352,7 @@ class SequenceData(object):
             self.word_pos_count[word] = sorted(self.word_pos_count[word].items(),
                                                key=lambda pair: pair[1], reverse=True)
 
-    def save_prediction_to_file(self,pred_labels, dir_output, id="", list_tokens=False):
+    def save_prediction_to_file(self, pred_labels, dir_output, id="", list_tokens=False):
         # file to print all predictions
         file_name = os.path.join(dir_output, "predictions" + str(id) + ".txt")
         f1 = open(file_name, "w", encoding='utf-8')
@@ -375,17 +377,17 @@ class SequenceData(object):
                 # append pos tag (if exist) to the list of true pos tag
                 if len(labels_pos) == 2: true_pos_tags.append(labels_pos[1][i])
                 # create line to print in the file
-                if not list_tokens: # used in case of NN or CRF because pred_labels is a list of sentence : list[list[label]]
+                if not list_tokens:  # used in case of NN or CRF because pred_labels is a list of sentence : list[list[label]]
                     if type(words) == dict:
-                        #line = words[i]['t'] + " " + "POS" + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
+                        # line = words[i]['t'] + " " + "POS" + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
                         line = words[i]['t'] + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
                     else:
-                        #line = words[i] + " " + "POS" + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
-                        line = words[i] +  " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
+                        # line = words[i] + " " + "POS" + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
+                        line = words[i] + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
 
-                else: # use in case of svm: pred_labels is list of tokens
-                    #line = words[i] + " " + "POS" + " " + labels_pos[0][i] + " " + pred_labels[pred_idx] + "\n"
-                    line = words[i] + " "  + labels_pos[0][i] + " " + pred_labels[pred_idx] + "\n"
+                else:  # use in case of svm: pred_labels is list of tokens
+                    # line = words[i] + " " + "POS" + " " + labels_pos[0][i] + " " + pred_labels[pred_idx] + "\n"
+                    line = words[i] + " " + labels_pos[0][i] + " " + pred_labels[pred_idx] + "\n"
                 # write to file
                 f1.write(line)
                 pred_idx += 1

@@ -1,38 +1,30 @@
-#!/usr/bin/env python
-
-# Python version of the evaluation script from CoNLL'00-
-
-# Intentional differences:
-# - accept any space as delimiter by default
-# - optional file argument (default STDIN)
-# - option to set boundary (-b argument)
-# - LaTeX output (-l argument) not supported
-    # - raw tags (-r argument) not supported
-
-import sys
 import re
-
+import sys
 from collections import defaultdict, namedtuple
 
 ANY_SPACE = '<SPACE>'
 
+
 class FormatError(Exception):
     pass
 
+
 Metrics = namedtuple('Metrics', 'tp fp fn prec rec fscore')
+
 
 class EvalCounts(object):
     def __init__(self):
-        self.correct_chunk = 0    # number of correctly identified chunks
-        self.correct_tags = 0     # number of correct chunk tags
-        self.found_correct = 0    # number of chunks in corpus
-        self.found_guessed = 0    # number of identified chunks
-        self.token_counter = 0    # token counter (ignores sentence breaks)
+        self.correct_chunk = 0  # number of correctly identified chunks
+        self.correct_tags = 0  # number of correct chunk tags
+        self.found_correct = 0  # number of chunks in corpus
+        self.found_guessed = 0  # number of identified chunks
+        self.token_counter = 0  # token counter (ignores sentence breaks)
 
         # counts by type
         self.t_correct_chunk = defaultdict(int)
         self.t_found_correct = defaultdict(int)
         self.t_found_guessed = defaultdict(int)
+
 
 def parse_args(argv):
     import argparse
@@ -50,21 +42,23 @@ def parse_args(argv):
     arg('file', nargs='?', default=None)
     return parser.parse_args(argv)
 
+
 def parse_tag(t):
     m = re.match(r'^([^-]*)-(.*)$', t)
     return m.groups() if m else (t, '')
 
+
 def evaluate(iterable, options=None):
     if options is None:
-        options = parse_args([])    # use defaults
+        options = parse_args([])  # use defaults
 
     counts = EvalCounts()
-    num_features = None       # number of features per line
-    in_correct = False        # currently processed chunks is correct until now
-    last_correct = 'O'        # previous chunk tag in corpus
-    last_correct_type = ''    # type of previously identified chunk tag
-    last_guessed = 'O'        # previously identified chunk tag
-    last_guessed_type = ''    # type of previous chunk tag in corpus
+    num_features = None  # number of features per line
+    in_correct = False  # currently processed chunks is correct until now
+    last_correct = 'O'  # previous chunk tag in corpus
+    last_correct_type = ''  # type of previously identified chunk tag
+    last_guessed = 'O'  # previously identified chunk tag
+    last_guessed_type = ''  # type of previous chunk tag in corpus
 
     for line in iterable:
         line = line.rstrip('\r\n')
@@ -102,7 +96,7 @@ def evaluate(iterable, options=None):
 
         if in_correct:
             if (end_correct and end_guessed and
-                last_guessed_type == last_correct_type):
+                        last_guessed_type == last_correct_type):
                 in_correct = False
                 counts.correct_chunk += 1
                 counts.t_correct_chunk[last_correct_type] += 1
@@ -134,16 +128,19 @@ def evaluate(iterable, options=None):
 
     return counts
 
+
 def uniq(iterable):
-  seen = set()
-  return [i for i in iterable if not (i in seen or seen.add(i))]
+    seen = set()
+    return [i for i in iterable if not (i in seen or seen.add(i))]
+
 
 def calculate_metrics(correct, guessed, total):
-    tp, fp, fn = correct, guessed-correct, total-correct
-    p = 0 if tp + fp == 0 else 1.*tp / (tp + fp)
-    r = 0 if tp + fn == 0 else 1.*tp / (tp + fn)
+    tp, fp, fn = correct, guessed - correct, total - correct
+    p = 0 if tp + fp == 0 else 1. * tp / (tp + fp)
+    r = 0 if tp + fn == 0 else 1. * tp / (tp + fn)
     f = 0 if p + r == 0 else 2 * p * r / (p + r)
     return Metrics(tp, fp, fn, p, r, f)
+
 
 def metrics(counts):
     c = counts
@@ -157,6 +154,7 @@ def metrics(counts):
         )
     return overall, by_type
 
+
 def report(counts, out=None):
     if out is None:
         out = sys.stdout
@@ -166,28 +164,29 @@ def report(counts, out=None):
     c = counts
     out.write("ConllEval: \n")
     out.write('processed %d tokens with %d phrases; ' %
-             (c.token_counter, c.found_correct))
+              (c.token_counter, c.found_correct))
     out.write('found: %d phrases; correct: %d.\n' %
-             (c.found_guessed, c.correct_chunk))
+              (c.found_guessed, c.correct_chunk))
 
     if c.token_counter > 0:
         out.write('accuracy: %6.2f%%; ' %
-                 (100.*c.correct_tags/c.token_counter))
-        out.write('precision: %6.2f%%; ' % (100.*overall.prec))
-        out.write('recall: %6.2f%%; ' % (100.*overall.rec))
-        out.write('FB1: %6.2f\n' % (100.*overall.fscore))
+                  (100. * c.correct_tags / c.token_counter))
+        out.write('precision: %6.2f%%; ' % (100. * overall.prec))
+        out.write('recall: %6.2f%%; ' % (100. * overall.rec))
+        out.write('FB1: %6.2f\n' % (100. * overall.fscore))
 
     for i, m in sorted(by_type.items()):
         out.write('%17s: ' % i)
-        out.write('precision: %6.2f%%; ' % (100.*m.prec))
-        out.write('recall: %6.2f%%; ' % (100.*m.rec))
-        out.write('FB1: %6.2f  %d\n' % (100.*m.fscore, c.t_found_guessed[i]))
+        out.write('precision: %6.2f%%; ' % (100. * m.prec))
+        out.write('recall: %6.2f%%; ' % (100. * m.rec))
+        out.write('FB1: %6.2f  %d\n' % (100. * m.fscore, c.t_found_guessed[i]))
 
     conllEval = dict()
-    conllEval['precision'] = 100.*overall.prec
-    conllEval['recall'] = 100.*overall.rec
-    conllEval['f1score'] = 100.*overall.fscore
+    conllEval['precision'] = 100. * overall.prec
+    conllEval['recall'] = 100. * overall.rec
+    conllEval['f1score'] = 100. * overall.fscore
     return conllEval
+
 
 def end_of_chunk(prev_tag, tag, prev_type, type_):
     # check if a chunk ended between the previous and current word
@@ -213,6 +212,7 @@ def end_of_chunk(prev_tag, tag, prev_type, type_):
 
     return chunk_end
 
+
 def start_of_chunk(prev_tag, tag, prev_type, type_):
     # check if a chunk started between the previous and current word
     # arguments: previous and current chunk tags, previous and current types
@@ -237,6 +237,7 @@ def start_of_chunk(prev_tag, tag, prev_type, type_):
 
     return chunk_start
 
+
 def main(argv):
     args = parse_args(argv[1:])
 
@@ -247,14 +248,17 @@ def main(argv):
             counts = evaluate(f, args)
     report(counts)
 
+
 def conll_score(true_sequence, pred_sequence):
     counts = evaluate_from_sequence(true_sequence, pred_sequence)
     return report(counts)
+
 
 def conll_score_from_file(file):
     with open(file) as f:
         counts = evaluate(f)
     return report(counts)
+
 
 def evaluate_from_sequence(true_sequence, pred_sequence):
     counts = EvalCounts()
@@ -268,7 +272,6 @@ def evaluate_from_sequence(true_sequence, pred_sequence):
         for true_label, pred_label in zip(true_sentence, pred_sentence):
             guessed, guessed_type = parse_tag(true_label)
             correct, correct_type = parse_tag(pred_label)
-
 
             end_correct = end_of_chunk(last_correct, correct,
                                        last_correct_type, correct_type)
@@ -311,5 +314,3 @@ def evaluate_from_sequence(true_sequence, pred_sequence):
             counts.t_correct_chunk[last_correct_type] += 1
 
         return counts
-
-
