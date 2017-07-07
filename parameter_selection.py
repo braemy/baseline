@@ -8,7 +8,7 @@ from MinitaggerSVM import MinitaggerSVM
 
 from helper.score import Score
 
-from final_training import final_training
+from final_training import Final_training
 
 
 
@@ -22,41 +22,39 @@ class Parameter_selection(object):
     def __init__(self):
         self.minitagger=None
 
-    def parameter_selection_svm(self, train_data_path, test_data_path, language, model_name, feature_template, embedding_size=None, embedding_path=None, number_of_trial=20, seed=123456):
-        np.random.seed(seed=seed)
+    #def parameter_selection_svm(self, train_data_path, test_data_path, language, model_name, feature_template, embedding_size=None, embedding_path=None, number_of_trial=20, seed=123456):
+    def parameter_selection_svm(self, parameters):
+        #np.random.seed(seed=seed)
+        train_data_path = parameters["train_data_path"]
+        validation_data_path = parameters["validation_data_path"]
+        test_data_path = parameters["test_data_path"]
+        language = parameters["language"]
+        feature_template = parameters["feature_template"]
+        if feature_template == "embedding":
+            embedding_size = parameters["embedding_size"]
+            embedding_path = parameters["embedding_path"]
+        model_name = parameters["model_name"]
+        number_of_trial = parameters["number_of_trial"] if "number_of_trial" in parameters else 5
 
         minitagger = MinitaggerSVM()
 
-        sequence_data = SequenceData(train_data_path, pos_tag=True)
-        if test_data_path is not None:
-            test_sequence = SequenceData(test_data_path, pos_tag=True)
+        sequence_data = SequenceData(train_data_path, language=language, pos_tag=True)
+        test_sequence = SequenceData(test_data_path, language=language, pos_tag=True)
         minitagger.language = language
         minitagger.set_prediction_path(model_name)
         minitagger.set_model_path(model_name)
-        #minitagger.quiet = True
-
 
         # list of parameter:
         epsilon = np.logspace(-6, 0, number_of_trial * 3)
         cost = np.logspace(-5, 4, number_of_trial * 3)
 
-
-        self.display_info(len(sequence_data.sequence_pairs), language, model_name, feature_template, embedding_size, embedding_path)
-        infos = dict()
-        infos["algorithm"] = "SVM"
-        infos["train_data_path"] = train_data_path
-        infos["test_data_path"] = test_data_path
-        infos["language"] = language
-        infos["mpdel_name"] = model_name
-        infos["feature_template"] =  feature_template
-        infos["embedding_size"] = embedding_size
-        infos["embedding_path"] = embedding_path
+        self.display_info(len(sequence_data.sequence_pairs), parameters)
 
         parameter_aready_tested = []
 
         # initialize feature extractor with the right feature template
         feature_extractor = FeatureExtractor_CRF_SVM(feature_template, language,
-                                                         embedding_size if embedding_size else None)
+                                                         embedding_size if feature_template=="embedding" else None)
         # load bitstring or embeddings data
         if feature_template == "embedding":
             feature_extractor.load_word_embeddings(embedding_path, embedding_size)
@@ -64,7 +62,7 @@ class Parameter_selection(object):
         minitagger.equip_feature_extractor(feature_extractor)
         minitagger.extract_features(sequence_data,test_sequence)
 
-        score = Score("SVM_parameter_selection", infos)
+        score = Score("SVM_parameter_selection", parameters)
 
         for i in range(number_of_trial):
 
@@ -78,10 +76,16 @@ class Parameter_selection(object):
                     parameter_aready_tested.append(parameter)
                     ok = True
 
-            mean_fscore_conll, param = minitagger.cross_validation(i+1, sequence_data, feature_template, language,
-                                                                   embedding_path, embedding_size, data_test=None, n_fold=5)
+            mean_fscore_conll, param = minitagger.cross_validation(i+1,
+                                                                   sequence_data,
+                                                                   feature_template,
+                                                                   language,
+                                                                   embedding_path if feature_template == "embedding" else None,
+                                                                   embedding_size if feature_template == "embedding" else None,
+                                                                   data_test=None,
+                                                                   n_fold=5)
             score.add_scores(mean_fscore_conll, None, None, param)
-            score.save_result_to_file(infos, minitagger.model_path)
+            score.save_result_to_file(minitagger.model_path)
 
         score.display_results()
 
@@ -92,11 +96,11 @@ class Parameter_selection(object):
         _,_,_,best_param,_  = score.get_max_conll_fscore()
 
         validation_data_path = None
-        model_name = model_name+"_finale_score"
+        model_name = parameters["model_name"] +"_finale_score"
 
-        selection = final_training(train_data_path, validation_data_path, test_data_path, language, model_name,
-                                   feature_template, embedding_size, embedding_path)
-        selection.final_training("svm", best_param )
+        parameters["best_param"] = best_param
+        selection = Final_training(parameters)
+        selection.train()
 
 
     def parameter_selection_crf(self, train_data_path, validation_data_path, test_data_path, language, model_name, feature_template, embedding_size=None, embedding_path=None, number_of_trial=10, seed=123456):
@@ -156,9 +160,9 @@ class Parameter_selection(object):
 
         model_name = model_name + "_finale_score"
 
-        selection = final_training(train_data_path, validation_data_path, test_data_path, language, model_name,
+        selection = Final_training(train_data_path, validation_data_path, test_data_path, language, model_name,
                                    feature_template, embedding_size, embedding_path)
-        selection.final_training("crf", best_param)
+        selection.train("crf", best_param)
 
     def cv_crf(self, i):
         algorithm = "lbfgs"
@@ -211,13 +215,13 @@ class Parameter_selection(object):
         print(" Corresponding parameters:", conll_parameters[argmax])
    
     @staticmethod    
-    def display_info(number_of_sentence, language, model_name, feature_template, embedding_size=None,embedding_path=None):
+    def display_info(number_of_sentence, parameters):
         print("Number of sentences: ", number_of_sentence)
-        print("Language: ", language)
-        print("Model name: ", model_name)
-        print("Feature template:", feature_template)
-        if feature_template == "embedding":
-            print("Embedding size: ", embedding_size)
+        print("Language: ", parameters["language"])
+        print("Model name: ", parameters["model_name"])
+        print("Feature template:", parameters["feature_template"])
+        if parameters["feature_template"] == "embedding":
+            print("Embedding size: ", parameters["embedding_size"])
 
         
     def save_to_file(self, conll_fscore, conll_precision, conll_recall, conll_parameters, infos, model_name):
@@ -281,6 +285,5 @@ if __name__ == "__main__":
     #                                 embedding_size,embedding_path, number_of_trial = number_of_trial)
 
     #if algorithm == "SVM":
-    selection.parameter_selection_svm(train_data_path,test_data_path,
-                                      language, "SVM"+model_name, feature_template,
-                                      embedding_size,embedding_path, number_of_trial=number_of_trial)
+    parameters = load_parameters("test")
+    selection.parameter_selection_svm(parameters)

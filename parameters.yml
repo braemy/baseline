@@ -1,0 +1,71 @@
+conll_de:
+  language: de
+  train_data_path: ../../ner/nerc-conll2003/deu.train
+  validation_data_path: ../../ner/nerc-conll2003/deu.testa
+  test_data_path: ../../ner/nerc-conll2003/deu.testb
+  feature_template: baseline
+  method: SVM
+  model_name: SVM_conll_baseline_finale_score_small_feature_name
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+  train_with_step: False
+
+wikiner_de:
+  language: de
+  train_data_path: ../../wikiner_dataset/aij-wikiner-de-wp2-simplified_without_pperEntity
+  validation_data_path: ../../ner/nerc-conll2003/deu.testa
+  test_data_path: ../../ner/nerc-conll2003/deu.testb
+  feature_template: baseline
+  method: SVM
+  model_name: SVM_wikiner_de_baseline_finale_score_without_pperEntity
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+  train_with_step: False
+
+conll_wikiner_de:
+  language: de
+  train_data_path: ../../wikiner_dataset/wiki_conll_without_pperEntity
+  validation_data_path: ../../ner/nerc-conll2003/deu.testa
+  test_data_path: ../../ner/nerc-conll2003/deu.testb
+  feature_template: baseline
+  method: SVM
+  model_name: SVM_wikiner_conll_de_baseline_finale_score_without_pperEntity
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+  train_with_step: False
+
+new:
+  language: en
+  train_data_path: "../../new_dataset/wp0/combined_wp0_1.0_football_team.txt"
+  validation_data_path: ../../ner/nerc-conll2003/eng.testa
+  test_data_path: ../../ner/nerc-conll2003/eng.testb
+  feature_template: baseline
+  method: SVM
+  model_name: SVM_new_baseline_finale_1.0_football_team
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+  train_with_step: False
+
+parameter_selection:
+  language: en
+  train_data_path: ../../ner/nerc-conll2003/eng.train
+  validation_data_path: ../../ner/nerc-conll2003/eng.testa
+  test_data_path: ../../ner/nerc-conll2003/eng.testb
+  feature_template: baseline
+  method: SVM
+  model_name: SCV_parameter_selection_text
+  number_of_trial: 5
+
+
+
+
+
+
+
+
+
+

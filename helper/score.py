@@ -111,7 +111,7 @@ class Score(object):
         print(" Corresponding parameters:", param)
 
 
-    def save_result_to_file(self, infos, dir_output):
+    def save_result_to_file(self, dir_output):
 
         fscore_c, precision_c, recall_c, param_c, argmax = self.get_max_conll_fscore()
         with open(os.path.join(dir_output, "best_conll_param.json"), "w") as file:
@@ -125,7 +125,7 @@ class Score(object):
             conll["list_recall"] = self.recall_conll
             conll["list_parameter"] = self.parameters
 
-            json_data = {"infos": infos, "results": conll}
+            json_data = {"infos": self.infos, "results": conll}
             #pickle_data(json_data, dir_output, "best_conll_param.json")
             json.dump(json_data, file, indent=2, separators=(',', ': '))
 

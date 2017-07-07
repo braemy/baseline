@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+import helper.utils as utils
 
 #from MinitaggerCRF import MinitaggerCRF
 from MinitaggerSVM import MinitaggerSVM
@@ -15,19 +16,14 @@ ABSENT_GOLD_LABEL = "<NO_GOLD_LABEL>"
 
 
 def main(args):
-    # train or use a tagger model on the given data.
-    # if "svm" in args.model_name:
-    #     minitagger = MinitaggerSVM()
-    # elif "crf" in args.model_name:
-    #     minitagger = MinitaggerCRF()
-    # else:
-    #     print("Unrecognized model name")
-    #     sys.exit(1)
     minitagger = MinitaggerSVM()
-    sequence_data = SequenceData(args.train_data_path,args.pos_tag)
+    sequence_data = SequenceData(args.train_data_path,args.pos_tag, language=args.language)
 
     minitagger.language = args.language
-    minitagger.set_prediction_path(args.model_name)
+    if args.train:
+        minitagger.set_prediction_path(args.model_name)
+    else:
+        minitagger.set_prediction_path(args.model_name+ "_"+args.prediction_name)
     minitagger.set_model_path(args.model_name)
     if args.wikiner:
         minitagger.wikiner = True
@@ -93,6 +89,22 @@ def main(args):
 
 
 if __name__ == "__main__":
+
+
+    argument = dict()
+    argument["model_name"] ="_wikiner_baseline_finale_score"
+    argument["train"] = False
+    argument["feature_template"] = "baseline"
+    argument["train_data_path"] = "../../ner/nerc-conll2003/deu.testb"#"test_data/deu_test2.txt"
+    argument["language"] = "de"
+    argument["prediction_name"] = "conll_b"
+    argument = utils.dotdict(argument)
+    main(argument)
+    print("done")
+    sys.exit()
+
+
+
     argparser = argparse.ArgumentParser()
     argparser.add_argument("--train_data_path", type=str, help="path to data (used for training/testing)", required=False)
     argparser.add_argument("--model_name", type=str, help="name used to store the model and the predictions", required=False, default='svm')
@@ -116,6 +128,9 @@ if __name__ == "__main__":
 
 
     parsed_args = argparser.parse_args()
+
+
+
 
     main(parsed_args)
 

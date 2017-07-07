@@ -208,18 +208,15 @@ class SequenceData(object):
         #defautl config
 
         pos_tag_index = 1
-        label_index = 2
 
         if (self.language == 'de' or self.language == "deu") and "wikiner" not in data_path:
             encoding = "iso-8859-1"
             #if "conll" in data_path:
             pos_tag_index = 2
-            label_index = 4
         else:
             encoding = "utf-8"
             if "conll" in data_path:
                 pos_tag_index = 1
-                label_index = 3
 
         with open(data_path, "r", encoding=encoding) as input_file:
             word_sequence = []

@@ -333,17 +333,17 @@ def report_fscore(true_label, pred_label, wikiner=False, quiet=True):
         fn_exact += fn
         total_seq += seq
 
-    print("TP exact: ", tp_exact)
-    print("TN exact: ", tn_exact)
-    print("FP exact: ", fp_exact)
-    print("FN exact: ", fn_exact)
-    print("seq: ", total_seq)
-    print()
-    print("TP inexact: ", tp_inexact)
-    print("TN inexact: ", tn_inexact)
-    print("FP inexact: ", fp_inexact)
-    print("FN inexact: ", fn_inexact)
-    print()
+    #print("TP exact: ", tp_exact)
+    #print("TN exact: ", tn_exact)
+    #print("FP exact: ", fp_exact)
+    #print("FN exact: ", fn_exact)
+    #print("seq: ", total_seq)
+    #print()
+    #print("TP inexact: ", tp_inexact)
+    #print("TN inexact: ", tn_inexact)
+    #print("FP inexact: ", fp_inexact)
+    #print("FN inexact: ", fn_inexact)
+    #print()
 
     exact_score=dict()
     precision = estimate_precision(tp_exact, fp_exact)
