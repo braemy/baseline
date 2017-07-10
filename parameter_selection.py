@@ -14,7 +14,8 @@ class Parameter_selection(object):
     def __init__(self):
         self.minitagger = None
 
-    #def parameter_selection_svm(self, train_data_path, test_data_path, language, model_name, feature_template, embedding_size=None, embedding_path=None, number_of_trial=20, seed=123456):
+    # def parameter_selection_svm(self, train_data_path, test_data_path, language, model_name, feature_template,
+    # embedding_size=None, embedding_path=None, number_of_trial=20, seed=123456):
     def parameter_selection_svm(self, parameters):
         #np.random.seed(seed=seed)
         train_data_path = parameters["train_data_path"]
@@ -36,8 +37,6 @@ class Parameter_selection(object):
         minitagger.set_prediction_path(model_name)
         minitagger.set_model_path(model_name)
         # minitagger.quiet = True
-
-
         # list of parameter:
         epsilon = np.logspace(-6, 0, number_of_trial * 3)
         cost = np.logspace(-5, 4, number_of_trial * 3)
@@ -185,10 +184,10 @@ class Parameter_selection(object):
 
         print("Step", str(i + 1), ":")
 
-        return self.minitagger.cross_validation(i + 1,
-                                                self.sequence_data,
-                                                feature_template, language, embedding_path,
-                                                embedding_size, data_test=None, n_fold=5)
+        # return self.minitagger.cross_validation(i + 1,
+        #                                         self.sequence_data,
+        #                                         feature_template, language, embedding_path,
+        #                                         embedding_size, data_test=None, n_fold=5)
         # exact_score, inexact_score, conllEval = self.minitagger.train(self.sequence_data, self.test_sequence,
         #                                                        feature_already_extracted=True, id=i)
 
@@ -243,45 +242,8 @@ class Parameter_selection(object):
 
 
 if __name__ == "__main__":
-    """
-    TO BE REMOVED
-    a = "wikiner"
-    language = "de"
-    embedding_size = 300
-    if a == "test":
-        train_data_path = "../../ner/small_datasets/eng-simplified.train"
-        validation_data_path = "../../ner/small_datasets/eng-simplified.testa"
-        test_data_path = "../../ner/small_datasets/eng-simplified.testb"
-
-        feature_template = "baseline"
-        embedding_path = "../../word_embeddings/glove"
-        model_name = "_test_baseline_parameter_selection_2"
-        number_of_trial = 2
-
-    elif a == "wikiner":
-        train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/training_data/de"
-        validation_data_path = None
-        test_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/external_api_test/de_simplified.testb"
-        feature_template = "baseline"
-        embedding_path = None
-        model_name = "de_parameter_selection"
-        number_of_trial = 5
-    elif a == "conll":
-        train_data_path = "../../ner/nerc-conll2003/eng-simplified.train"
-        validation_data_path = None
-        test_data_path = "../../ner/nerc-conll2003/eng-simplified.testa"
-        feature_template = "embedding"
-        embedding_path = "../../word_embeddings/glove"
-        model_name = "_conll_emb" + str(embedding_size) + "_parameter_selection_1"
-        number_of_trial = 10
-    """
     selection = Parameter_selection()
-
-    # elif algorithm == "CRF":
-    # selection.parameter_selection_crf(train_data_path,validation_data_path, test_data_path,
-    #                                 language, "CRF"+model_name, feature_template,
-    #                                 embedding_size,embedding_path, number_of_trial = number_of_trial)
-
     #if algorithm == "SVM":
-    parameters = load_parameters("test")
+    parameters = load_parameters("parameter_selection")
     selection.parameter_selection_svm(parameters)
+    print ()
