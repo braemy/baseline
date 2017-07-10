@@ -6,10 +6,10 @@ import numpy as np
 
 class SequenceData(object):
     """
-	Represents a data set of sequences of words with labels
-	The sequences can be partially labeled
-	The data be loaded from a text file or a list
-	"""
+    Represents a data set of sequences of words with labels
+    The sequences can be partially labeled
+    The data be loaded from a text file or a list
+    """
 
     def __init__(self, given_data, pos_tag):
         # path to the data
@@ -52,10 +52,9 @@ class SequenceData(object):
 
     def get_sequence_average_length(self):
         """
-		Calculates the average length of the sequences
-
-		@return: average length of sequences (sentences) in the given data set
-		"""
+        Calculates the average length of the sequences
+        @return: average length of sequences (sentences) in the given data set
+        """
 
         length_sum = 0
         for word_sequence, _ in self.sequence_pairs:
@@ -64,17 +63,17 @@ class SequenceData(object):
 
     def __initialize_sequence_pairs_from_file(self, data_path, pos_tag):
         """
-		Initializes sequences from a text file
-		The format of the file should be [word] [Part-of-Speech tagging (if present)] [true label] [predicted label]
-		True and predicted labels are optional
-		Empty lines indicate sequence boundaries
+        Initializes sequences from a text file
+        The format of the file should be [word] [Part-of-Speech tagging (if present)] [true label] [predicted label]
+        True and predicted labels are optional
+        Empty lines indicate sequence boundaries
+        
+        @type data_path: str
+        @param data_path: the path to the data
+        @type pos_tag: boolean
+        @param pos_tag: boolean that say if the files containt part of speech tagging or not
 
-		@type data_path: str
-		@param data_path: the path to the data
-		@type pos_tag: boolean
-		@param pos_tag: boolean that say if the files containt part of speech tagging or not
-
-		"""
+        """
 
         self.data_path = data_path
         with open(data_path, "r", encoding='utf-8') as input_file:
@@ -138,15 +137,15 @@ class SequenceData(object):
 
     def __initialize_sequence_pairs_from_list(self, sequence_list):
         """
-		Initializes sequences from a given list
-		Absent labels are denoted with None
-
-		@type sequence_list: list
-		@param sequence_list: the list contains sequence of words with their
-		respective labels. Each element of the given list should have the
-		following form:
-		sequence_list[i] = [word_sequence, label_sequence]
-		"""
+        Initializes sequences from a given list
+        Absent labels are denoted with None
+    
+        @type sequence_list: list
+        @param sequence_list: the list contains sequence of words with their
+        respective labels. Each element of the given list should have the
+        following form:
+        sequence_list[i] = [word_sequence, label_sequence]
+        """
 
         for sequence_pair in sequence_list:
             assert (len(sequence_pair) == 2), "Each sequence pair should have a length of 2"
@@ -161,9 +160,9 @@ class SequenceData(object):
 
     def __initialize_sequencedata_attributes(self):
         """
-		Initializes the SequenceData attributes from the loaded sequence_pairs list
-		that is built either from file or list
-		"""
+        Initializes the SequenceData attributes from the loaded sequence_pairs list
+        that is built either from file or list
+        """
 
         # iterate through all sentences and through all words|labels (|pos_tag)in the sequence_pairs list
         # label and pos_tag are unpack together.  then we access the label with label_sequence[0] and pos tag with
@@ -224,10 +223,9 @@ class SequenceData(object):
     # overrides str method for SequenceData object
     def __str__(self):
         """
-		String representation of sequence pairs
-
-		@return: a string that represents the SequenceData object
-		"""
+        String representation of sequence pairs
+        @return: a string that represents the SequenceData object
+        """
 
         string_rep = ""
         # build a string representation such that each line is of the form:

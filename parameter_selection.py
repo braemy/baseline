@@ -17,7 +17,6 @@ class Parameter_selection(object):
     # def parameter_selection_svm(self, train_data_path, test_data_path, language, model_name, feature_template,
     # embedding_size=None, embedding_path=None, number_of_trial=20, seed=123456):
     def parameter_selection_svm(self, parameters):
-        #np.random.seed(seed=seed)
         train_data_path = parameters["train_data_path"]
         validation_data_path = parameters["validation_data_path"]
         test_data_path = parameters["test_data_path"]
@@ -36,7 +35,6 @@ class Parameter_selection(object):
         minitagger.language = language
         minitagger.set_prediction_path(model_name)
         minitagger.set_model_path(model_name)
-        # minitagger.quiet = True
         # list of parameter:
         epsilon = np.logspace(-6, 0, number_of_trial * 3)
         cost = np.logspace(-5, 4, number_of_trial * 3)
@@ -199,7 +197,6 @@ class Parameter_selection(object):
         print("Results")
         print("=================================")
         print("F1score", conll_fscore)
-        # print("Std", conll_stds)
         print()
         print("=================================")
         print("Best results")
@@ -209,7 +206,6 @@ class Parameter_selection(object):
         print(" Corresponding conll precision:", conll_precision[argmax])
         print(" Corresponding conll recall:", conll_recall[argmax])
         print(" Corresponding id:", argmax)
-        # print(" Correspondind std:", conll_stds[argmax])
         print(" Corresponding parameters:", conll_parameters[argmax])
    
     @staticmethod    
@@ -229,12 +225,10 @@ class Parameter_selection(object):
             conll["fscore"] = conll_fscore[argmax]
             conll["precision"] = conll_precision[argmax]
             conll["recall"] = conll_recall[argmax]
-            # conll["std"] = conll_stds[argmax]
             conll["parameter"] = conll_parameters[argmax]
             conll["list_fscore"] = conll_fscore
             conll["list_precision"] = conll_precision
             conll["list_recall"] = conll_recall
-            # conll["list_std"] = conll_stds
             conll["list_parameter"] = conll_parameters
 
             json_data = {"infos": infos, "results": conll}
@@ -243,7 +237,6 @@ class Parameter_selection(object):
 
 if __name__ == "__main__":
     selection = Parameter_selection()
-    #if algorithm == "SVM":
     parameters = load_parameters("parameter_selection")
     selection.parameter_selection_svm(parameters)
     print ()
