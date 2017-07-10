@@ -178,14 +178,13 @@ class MinitaggerSVM(Minitagger):
 
     def load(self, model_path):
         """
-		Loads the model from the directory at the given path
-
-		@type model_path: str
-		@param model_path: path to load the trained model
-		"""
+        Loads the model from the directory at the given path
+        @type model_path: str
+        @param model_path: path to load the trained model
+        """
 
         # load feature_extractor object (used to extract features for the test set)
-        ## if-else statement added on 06.02.2017
+        # if-else statement added on 06.02.2017
 
         # if (self.__feature_extractor.feature_template == "relational") and (self.__feature_extractor.parser_type == "spacy"):
         # 	print("Relational model with spaCy parser cannot be loaded")
@@ -204,13 +203,12 @@ class MinitaggerSVM(Minitagger):
 
     def predict(self):
         """
-		Predicts tags in the given data
-		It reports the accuracy if the data is fully labeled
-
-		@type data_test: SequenceData
-		@param data_test: the test data set
-		@return: the predicted labels, the accuracy, the f1_score
-		"""
+        Predicts tags in the given data
+        It reports the accuracy if the data is fully labeled
+        @type data_test: SequenceData
+        @param data_test: the test data set
+        @return: the predicted labels, the accuracy, the f1_score
+        """
 
         # keep starting timestamp
         start_time = time.time()

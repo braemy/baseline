@@ -212,14 +212,15 @@ class SequenceData(object):
 
         pos_tag_index = 1
 
-        if (self.language == 'de' or self.language == "deu") and "wikiner" not in data_path:
-            encoding = "iso-8859-1"
-            # if "conll" in data_path:
-            pos_tag_index = 2
-        else:
-            encoding = "utf-8"
-            if "conll" in data_path:
-                pos_tag_index = 1
+        # if (self.language == 'de' or self.language == "deu") and "wikiner" not in data_path:
+        #     encoding = "iso-8859-1"
+        #     # if "conll" in data_path:
+        #     pos_tag_index = 2
+        # else:
+        #     encoding = "utf-8"
+        #     if "conll" in data_path:
+        #         pos_tag_index = 1
+        encoding='utf-8'
 
         with open(data_path, "r", encoding=encoding) as input_file:
             word_sequence = []
@@ -231,20 +232,10 @@ class SequenceData(object):
                 if "-DOCSTART-" in line:
                     continue
                 tokens = line.split()
-                # if not pos_tag:
-                #    assert (len(tokens) < 3), "Each line should contain no more than 3 columns"
-                # if pos_tag:
-                #    assert (len(tokens) < 4), "Each line should contains no more than 4 columns"
-                # if line is not empty
                 if tokens:
                     # the word is the 1st token
                     word = tokens[token_index]
 
-                    # the label is the 3td token, if it exists, otherwise label = None
-                    # if pos_tag:
-                    #    label = None if len(tokens) == 2 else tokens[2] # TODO have a look for POS¨
-                    # else:
-                    #    label = None if len(tokens) == 1 else tokens[1]
                     label = tokens[-1]
                     pos_tag = tokens[pos_tag_index]
                     if label is None:
@@ -267,9 +258,6 @@ class SequenceData(object):
                         word_sequence = []
                         label_sequence = []
                         pos_sequence = []
-
-                        # if len(self.sequence_pairs) >= 45802 and ("train" in data_path or "combined" in data_path or "wikiner" in data_path): #TODO remove it. debug purpose
-                        #   break
 
             # file may not end with empty line
             # data of last sentence should be also be appended to sequence_pairs

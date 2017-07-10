@@ -145,16 +145,17 @@ class FeatureExtractor(object):
 
     def _get_features(self, word_sequence, position, pos_tag=None, numeric_feature=False):
         """
-		Finds the integer IDs of the extracted features for a word at a given position in a sequence (=sentence)
+            Finds the integer IDs of the extracted features for a word at a given position in a sequence (=sentence)
+    
+            @type word_sequence: list
+            @param word_sequence: sequence of words
+            @type position: int
+            @param position: position in the sequence of words
+            @type pos_tag: list
+            @param: sequence of pos tag
+            @return: a dictionary of numeric features (key = feature id, value = value for the specific feature)
+        """
 
-		@type word_sequence: list
-		@param word_sequence: sequence of words
-		@type position: int
-		@param position: position in the sequence of words
-		@type pos_tag: list
-		@param: sequence of pos tag
-		@return: a dictionary of numeric features (key = feature id, value = value for the specific feature)
-		"""
         position = position
         # Extract raw features depending on the given feature template
         if self.feature_template == "baseline":
@@ -173,12 +174,12 @@ class FeatureExtractor(object):
 
     def _map_raw_to_numeric_features(self, raw_features):
         """
-		Maps raw features to numeric
-
-		@type raw_features: dict
-		@param raw_features: dictionary of raw features (key = feature string, value = feature value)
-		@return: a numeric dictionary (key = feature id, value = feature value)
-		"""
+            Maps raw features to numeric
+    
+            @type raw_features: dict
+            @param raw_features: dictionary of raw features (key = feature string, value = feature value)
+            @return: a numeric dictionary (key = feature id, value = feature value)
+        """
 
         numeric_features = {}
         # iterate through all given features
@@ -361,10 +362,6 @@ class FeatureExtractor(object):
         if self.morphological_features is not None:
             features.update(self._spelling_features(word, 0))
 
-        # extract pos_tag features
-        if pos_tag_sequence is not None:
-            features.update(self.__get_pos_features(word_sequence, position, pos_tag_sequence=pos_tag_sequence))
-
         # identify word
         if self.token_features0:
             if self.morphological_features == "regular":
@@ -395,14 +392,10 @@ class FeatureExtractor(object):
             features.update(self._spelling_features(word_right, i))
             features.update(self._spelling_features(word_left, -i))
 
-        # features["chunk(-1_0)={0}".format(get_chunk(word_sequence,position-1,position))] = 1
-        # features["chunk(0_1)={0}".format(get_chunk(word_sequence,position,position+1))] = 1
-
         # if pos_tag_sequence:
-        assert pos_tag_sequence is not None, "need pos_tag_sequence"
-        features.update(self.__get_pos_features(pos_tag_sequence, position))
-        # if word == "Brann":
-        #    pprint(features)
+
+        if pos_tag_sequence is not None:
+            features.update(self.__get_pos_features(pos_tag_sequence=pos_tag_sequence, position=position))
 
         return features
 
@@ -414,7 +407,6 @@ class FeatureExtractor(object):
         :param pos_tag_sequence:
         :return:
         """
-        # TODO implement pos features
         pos = get_pos(pos_tag_sequence, position)
         pos_left1 = get_pos(pos_tag_sequence, position - 1)
         pos_left2 = get_pos(pos_tag_sequence, position - 2)
@@ -428,9 +420,6 @@ class FeatureExtractor(object):
         features["pos(0) = {0}".format(pos)] = 1
         features["pos(+1) = {0}".format(pos_right1)] = 1
         features["pos(+2) = {0}".format(pos_right2)] = 1
-
-        # TODO add pos1&pos2 ???
-        # TODO         features["pos(position) = {0}".format(pos)] = 1
 
         return features
 
