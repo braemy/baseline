@@ -1,7 +1,6 @@
 import sys
 from pprint import pprint
 
-from MinitaggerCRF_tf import MinitaggerCRF_tf
 from MinitaggerSVM import MinitaggerSVM
 
 sys.path.insert(0, 'helper')
