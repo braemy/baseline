@@ -212,14 +212,15 @@ class SequenceData(object):
 
         pos_tag_index = 1
 
-        if (self.language == 'de' or self.language == "deu") and "wikiner" not in data_path:
-            encoding = "iso-8859-1"
-            # if "conll" in data_path:
-            pos_tag_index = 2
-        else:
-            encoding = "utf-8"
-            if "conll" in data_path:
-                pos_tag_index = 1
+        # if (self.language == 'de' or self.language == "deu") and "wikiner" not in data_path:
+        #     encoding = "iso-8859-1"
+        #     # if "conll" in data_path:
+        #     pos_tag_index = 2
+        # else:
+        #     encoding = "utf-8"
+        #     if "conll" in data_path:
+        #         pos_tag_index = 1
+        encoding='utf-8'
 
         with open(data_path, "r", encoding=encoding) as input_file:
             word_sequence = []
@@ -231,20 +232,10 @@ class SequenceData(object):
                 if "-DOCSTART-" in line:
                     continue
                 tokens = line.split()
-                # if not pos_tag:
-                #    assert (len(tokens) < 3), "Each line should contain no more than 3 columns"
-                # if pos_tag:
-                #    assert (len(tokens) < 4), "Each line should contains no more than 4 columns"
-                # if line is not empty
                 if tokens:
                     # the word is the 1st token
                     word = tokens[token_index]
 
-                    # the label is the 3td token, if it exists, otherwise label = None
-                    # if pos_tag:
-                    #    label = None if len(tokens) == 2 else tokens[2] # TODO have a look for POS¨
-                    # else:
-                    #    label = None if len(tokens) == 1 else tokens[1]
                     label = tokens[-1]
                     pos_tag = tokens[pos_tag_index]
                     if label is None:
@@ -268,9 +259,6 @@ class SequenceData(object):
                         label_sequence = []
                         pos_sequence = []
 
-                        # if len(self.sequence_pairs) >= 45802 and ("train" in data_path or "combined" in data_path or "wikiner" in data_path): #TODO remove it. debug purpose
-                        #   break
-
             # file may not end with empty line
             # data of last sentence should be also be appended to sequence_pairs
             if word_sequence:
@@ -281,15 +269,15 @@ class SequenceData(object):
 
     def __initialize_sequence_pairs_from_list(self, sequence_list):
         """
-		Initializes sequences from a given list
-		Absent labels are denoted with None
+        Initializes sequences from a given list
+        Absent labels are denoted with None
 
-		@type sequence_list: list
-		@param sequence_list: the list contains sequence of words with their
-		respective labels. Each element of the given list should have the
-		following form:
-		sequence_list[i] = [word_sequence, label_sequence]
-		"""
+        @type sequence_list: list
+        @param sequence_list: the list contains sequence of words with their
+        respective labels. Each element of the given list should have the
+        following form:
+        sequence_list[i] = [word_sequence, label_sequence]
+        """
 
         for sequence_pair in sequence_list:
             assert (len(sequence_pair) == 2), "Each sequence pair should have a length of 2"
@@ -304,9 +292,9 @@ class SequenceData(object):
 
     def __initialize_sequencedata_attributes(self):
         """
-		Initializes the SequenceData attributes from the loaded sequence_pairs list
-		that is built either from file or list
-		"""
+        Initializes the SequenceData attributes from the loaded sequence_pairs list
+        that is built either from file or list
+        """
 
         # iterate through all sentences and through all words|labels (|pos_tag)in the sequence_pairs list
         # label and pos_tag are unpack together.  then we access the label with label_sequence[0] and pos tag with
@@ -423,10 +411,9 @@ class SequenceData(object):
     # overrides str method for SequenceData object
     def __str__(self):
         """
-		String representation of sequence pairs
-
-		@return: a string that represents the SequenceData object
-		"""
+        String representation of sequence pairs
+        @return: a string that represents the SequenceData object
+        """
 
         string_rep = ""
         # build a string representation such that each line is of the form:

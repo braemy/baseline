@@ -92,7 +92,7 @@ class Final_training(object):
             self.minitagger.train()
 
     def crf_tf(self, best_param, train_with_step):
-        self.minitagger = MinitaggerCRF_tf()
+        self.minitagger = None # MinitaggerCRF_tf()
         self.minitagger.language = self.language
         self.minitagger.quiet = True
         self.minitagger.set_prediction_path(self.model_name)
