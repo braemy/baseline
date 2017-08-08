@@ -11,8 +11,8 @@ from helper.FeatureExtractor import FeatureExtractor
 
 class FeatureExtractor_CRF_SVM(FeatureExtractor):
     """
-	Extracts features from sequence data
-	"""
+    Extracts features from sequence data
+    """
 
     def __init__(self, feature_template, language, embedding_size=None):
         FeatureExtractor.__init__(self, feature_template, language
@@ -78,6 +78,7 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
             # if so, build relational info for the current word_sequence
             label_sequence = label_pos_sequence[0]
             pos_sequence = None if len(label_pos_sequence) == 1 else label_pos_sequence[1]
+            pos_sequence = None
             for position, label in enumerate(label_sequence):
                 # only use labeled instances unless extract_all=True.
                 if (label is not None) or extract_all:
@@ -92,19 +93,19 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
 
     def extract_features_crf(self, tokens_list, label_list, extract_all):
         """
-    		Extracts features from the given sequence data.
+        Extracts features from the given sequence data.
+        @type sequence_data: SequenceData object
+        @param sequence_data: contains all word sequences and label sequences
+        @type extract_all: bool
+        @param extract_all: specifies if features should be extracted for all words or not.  Unless specified
+        extract_all=True, it extracts features only from labeled instances
+        @type skip_list: list
+        @param skip_list: skips extracting features from examples specified by skip_list.
+        This is used for active learning. (Pass [] to not skip any example.)
+        @return: list of labels, list of features, list of locations (i.e. position in the corpus where each label is
+        found)
+        """
 
-    		@type sequence_data: SequenceData object
-    		@param sequence_data: contains all word sequences and label sequences
-    		@type extract_all: bool
-    		@param extract_all: specifies if features should be extracted for all words or not.  Unless specified
-    		extract_all=True, it extracts features only from labeled instances
-    		@type skip_list: list
-    		@param skip_list: skips extracting features from examples specified by skip_list.
-    		This is used for active learning. (Pass [] to not skip any example.)
-    		@return: list of labels, list of features, list of locations (i.e. position in the corpus where each label is
-    		found)
-    		"""
         self.length = [0] * len(tokens_list)
         # list for labels
         self.label_list = [None] * len(tokens_list)

@@ -1,7 +1,5 @@
 import argparse
 import os
-import sys
-import helper.utils as utils
 
 from FeatureExtractor_CRF_SVM import FeatureExtractor_CRF_SVM
 # from MinitaggerCRF import MinitaggerCRF
@@ -15,13 +13,13 @@ ABSENT_GOLD_LABEL = "<NO_GOLD_LABEL>"
 
 def main(args):
     minitagger = MinitaggerSVM()
-    sequence_data = SequenceData(args.train_data_path,args.pos_tag, language=args.language)
+    sequence_data = SequenceData(args.train_data_path, args.pos_tag, language=args.language)
 
     minitagger.language = args.language
     if args.train:
         minitagger.set_prediction_path(args.model_name)
     else:
-        minitagger.set_prediction_path(args.model_name+ "_"+args.prediction_name)
+        minitagger.set_prediction_path(args.model_name + "_" + args.prediction_name)
     minitagger.set_model_path(args.model_name)
     if args.wikiner:
         minitagger.wikiner = True
@@ -88,22 +86,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-
-
-    #argument = dict()
-    #argument["model_name"] ="_wikiner_baseline_finale_score"
-    #argument["train"] = False
-    #argument["feature_template"] = "baseline"
-    #argument["train_data_path"] = "../../ner/nerc-conll2003/deu.testb"#"test_data/deu_test2.txt"
-    #argument["language"] = "de"
-    #argument["prediction_name"] = "conll_b"
-    #argument = utils.dotdict(argument)
-    #main(argument)
-    #print("done")
-    #sys.exit()
-
-
-
     argparser = argparse.ArgumentParser()
     argparser.add_argument("--train_data_path", type=str, help="path to data (used for training/testing)",
                            required=False)
@@ -123,14 +105,10 @@ if __name__ == "__main__":
     argparser.add_argument("--pos_tag", action="store_true",
                            help="indicate if the part-of-speech tag is present or not")
     argparser.add_argument("--project_dir", type=str, help="directory of the path")
+    argparser.add_argument("--prediction_name", type=str, help="path to store predictions")
     argparser.add_argument("--wikiner", action="store_true",
                            help="if we are using wikiner dataset, use this arg to use appropriate scoring function")
 
     parsed_args = argparser.parse_args()
 
     main(parsed_args)
-
-    # from model_evaluation import report_fscore
-
-    # report_fscore("test_predictions.txt", wikiner=True)
-    # report_fscore("../old_model_and_prediction/predictions/en/predictions_wikiner/predictions_wrong.txt", wikiner =True)

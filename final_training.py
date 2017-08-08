@@ -26,8 +26,6 @@ class Final_training(object):
         self.train_with_step = parameters["train_with_step"] if "train_with_step" in parameters else None
         self.parameters = parameters
 
-        create_recursive_folder(["parameters", self.model_name])
-
         if self.feature_template == "embedding":
             self.embedding_size = parameters["embedding_size"]
             self.embedding_path = parameters["embedding_path"]
@@ -114,8 +112,8 @@ class Final_training(object):
             self.minitagger.epsilon = self.best_param['epsilon']
             self.minitagger.cost = self.best_param['cost']
         else:
-            self.minitagger.epsilon =7.196856730011514e-06
-            self.minitagger.cost =  0.016378937069540647
+            self.minitagger.epsilon = 7.196856730011514e-06
+            self.minitagger.cost = 0.016378937069540647
 
         if self.train_with_step:
             self.minitagger.train_with_step(self.train_sequence, self.test_sequence)
@@ -128,75 +126,8 @@ class Final_training(object):
 
 if __name__ == "__main__":
 
-    #parameters = load_parameters("conll_de")
-    #parameters = load_parameters("wikiner_de")
-    parameters = load_parameters("new")
+    parameters = load_parameters("english_final_training")
     training = Final_training(parameters=parameters)
     training.train()
 
-
     sys.exit()
-
-    #=========================================================
-    # Everything below is not use anymore, move your configurations
-    # in the parameter files, then you can remove everything
-    #=========================================================
-
-    a = "conll"
-    language = "de"
-    embedding_size = 300
-    if a == "new_dataset":
-        filter = "0.01"
-        dataset_method = "wp0"
-        #train_data_path = "../../new_dataset/"+dataset_method+"/combined_"+str(filter)+".txt"
-        train_data_path = "../../new_dataset/"+dataset_method+"/combined_"+dataset_method+"_"+str(filter)+".txt"
-        #train_data_path = "../../new_dataset/"+dataset_method+"/combined_wp0_0.005_moreORG.txt"
-        validation_data_path = "../../ner/nerc-conll2003/eng.testa"
-        test_data_path = "../../ner/nerc-conll2003/eng.testb"
-        feature_template = "baseline"
-        #feature_template = "embedding"
-        #embedding_path = "../../word_embeddings/glove"
-        embedding_size = 50
-        embedding_path = "../../word_embeddings/glove"
-        method = "SVM"
-
-        model_name = "_new_dataset_"+dataset_method+"_"+str(filter)+"_finale_score"
-
-    elif a == "wikiner":
-        # train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/wikiner_dataset/aij-wikiner-it-wp2-simplified"
-        train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/toy_dataset"
-        validation_data_path = None  # "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/conll_dataset/nerc-conll2003/deu-simplified.testa"
-        test_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/toy_exp"
-        feature_template = "baseline"
-        embedding_path = "../../word_embeddings/glove"
-        #model_name = "SVM_wikiner_emb" + str(embedding_size) + "_finale_score"
-        model_name = "_wikiner_baseline_finale_score"
-        method = "SVM"
-    elif a == "conll":
-        language = "de"
-        if language == "en":
-            file_name = "eng"
-        elif language == "de":
-            file_name = "deu"
-        #train_data_path = "../../ner/nerc-conll2003/deu-simplified.train"
-        train_data_path = "../../ner/nerc-conll2003/"+file_name+".train"
-        #validation_data_path = "../../ner/nerc-conll2003/deu-simplified.testa"
-        validation_data_path = "../../ner/nerc-conll2003/"+file_name+".testa"
-        #test_data_path = "../../ner/nerc-conll2003/deu-simplified.testb"
-        test_data_path = "../../ner/nerc-conll2003/"+file_name+".testb"
-        feature_template = "embedding"
-        feature_template = "baseline"
-        embedding_path = "../../word_embeddings/glove"
-        #embedding_size = 300
-        method = "SVM"
-        if feature_template == "baseline":
-            model_name = method + "_conll_baseline_finale_score_small_feature_name"
-        else:
-            model_name = method + "_conll_emb" + str(embedding_size) + "_finale_score"
-
-
-    selection = final_training(train_data_path, validation_data_path, test_data_path, language, model_name,
-                               feature_template, embedding_size, embedding_path)
-
-    best_params = {'epsilon': 0.00017782794100389227, 'cost': 1e-05}
-    selection.final_training("svm", best_param=best_params)

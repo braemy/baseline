@@ -15,9 +15,9 @@ from liblinear.python import liblinearutil
 
 class MinitaggerSVM(Minitagger):
     """
-	Represents the Minitagger model and can be used to train a classifier and make predictions.
-	Also it includes the active learning feature
-	"""
+    Represents the Minitagger model and can be used to train a classifier and make predictions.
+    Also it includes the active learning feature
+    """
 
     def __init__(self):
 
@@ -56,14 +56,13 @@ class MinitaggerSVM(Minitagger):
 
     def train(self):
         """
-		Trains Minitagger on the given train data. If test data is given, it reports the accuracy of the trained model
-		and the F1_score (macro average of f1_score of each label)
-
-		@type data_train: SequenceData
-		@param data_train: the training data set
-		@type data_test: SequenceData
-		@param data_test: the test data set
-		"""
+        Trains Minitagger on the given train data. If test data is given, it reports the accuracy of the trained model
+        and the F1_score (macro average of f1_score of each label)
+        @type data_train: SequenceData
+        @param data_train: the training data set
+        @type data_test: SequenceData
+        @param data_test: the test data set
+        """
 
         # keep the training start timestamp
         start_time = time.time()
@@ -165,12 +164,11 @@ class MinitaggerSVM(Minitagger):
 
     def save(self, model_path):
         """
-		Saves the model as a directory at the given path
-
-		@type model_path: str
-		@param model_path: path to save the trained model
-		"""
-        ## if-else statement added on 06.02.2017
+        Saves the model as a directory at the given path
+        @type model_path: str
+        @param model_path: path to save the trained model
+        """
+        # if-else statement added on 06.02.2017
         pickle.dump(self.feature_extractor, open(os.path.join(self.model_path, "feature_extractor"), "wb"),
                     protocol=pickle.HIGHEST_PROTOCOL)
         # save trained model in the model_path directory
@@ -195,7 +193,7 @@ class MinitaggerSVM(Minitagger):
         try:
             print(self.model_path)
             self.feature_extractor = pickle.load(open(os.path.join(self.model_path, "feature_extractor"), "rb"))
-            # self.feature_extractor.save_json_format(os.path.join(self.model_path, "feature_extractor_json"))
+            self.feature_extractor.save_json_format(os.path.join(self.model_path, "feature_extractor_json"))
             # load trained model
             self.__liblinear_model = liblinearutil.load_model(os.path.join(self.model_path, "liblinear_model"))
         except:

@@ -12,9 +12,9 @@ from helper.score import Score
 
 class MinitaggerCRF(Minitagger):
     """
-	Represents the Minitagger model and can be used to train a classifier and make predictions.
-	Also it includes the active learning feature
-	"""
+    Represents the Minitagger model and can be used to train a classifier and make predictions.
+    Also it includes the active learning feature
+    """
 
     def __init__(self):
         Minitagger.__init__(self)
@@ -69,15 +69,14 @@ class MinitaggerCRF(Minitagger):
 
     def train(self):
         """
-		Trains Minitagger on the given train data. If test data is given, it reports the accuracy of the trained model
-		and the F1_score (macro average of f1_score of each label)
-		@type train_sequence: SequenceData
-		@param train_sequence: the training data set
-		@type test_sequence: SequenceData
-		@param test_sequence: the test data set
-		"""
+        Trains Minitagger on the given train data. If test data is given, it reports the accuracy of the trained model
+        and the F1_score (macro average of f1_score of each label)
+        @type train_sequence: SequenceData
+        @param train_sequence: the training data set
+        @type test_sequence: SequenceData
+        @param test_sequence: the test data set
+        """
         # keep the training start timestamp
-
 
         if not self.quiet:
             print("Number of sentences train: ", len(self.train_labels_sequence))
