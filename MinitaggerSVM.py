@@ -193,7 +193,7 @@ class MinitaggerSVM(Minitagger):
         try:
             print(self.model_path)
             self.feature_extractor = pickle.load(open(os.path.join(self.model_path, "feature_extractor"), "rb"))
-            #self.feature_extractor.save_json_format(os.path.join(self.model_path, "feature_extractor_json"))
+            self.feature_extractor.save_json_format(os.path.join(self.model_path, "feature_extractor_json"))
             # load trained model
             self.__liblinear_model = liblinearutil.load_model(os.path.join(self.model_path, "liblinear_model"))
         except:
