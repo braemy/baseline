@@ -279,7 +279,7 @@ class FeatureExtractor(object):
             #    features["a_d({0})".format(relative_position)] = int(has_numbers(word))
             if is_all_nonalphanumeric(word):
                 # check if all chars are nonalphanumeric
-                features["non_alpha({0})".format(relative_position)] = int(is_all_nonalphanumeric(word))
+                features["nonalpha({0})".format(relative_position)] = int(is_all_nonalphanumeric(word))
             if is_float(word):
                 # check if word can be converted to float, i.e. word is a number
                 features["f({0})".format(relative_position)] = int(is_float(word))
