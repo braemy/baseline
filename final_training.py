@@ -126,7 +126,7 @@ class Final_training(object):
 
 if __name__ == "__main__":
 
-    parameters = load_parameters("italian_final_training")
+    parameters = load_parameters("german_final_training")
     training = Final_training(parameters=parameters)
     training.train()
 
