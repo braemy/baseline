@@ -1,10 +1,12 @@
+# -*- coding: utf-8 -*-
+
 import collections
 import copy
 import os
 import pickle
 
 import numpy as np
-
+from helper.utils_data import is_float, is_int
 
 class SequenceData(object):
     """
@@ -41,6 +43,7 @@ class SequenceData(object):
         self.convert_to_id = False
 
         self.language = language
+        self.vocabulary = set()
 
         # check if given data is a path to file, i.e. a string
         if isinstance(given_data, str):
@@ -180,13 +183,15 @@ class SequenceData(object):
         size = len(self.sequence_pairs) if len(self.sequence_pairs) < num_of_sentences else num_of_sentences
         list_tokens_sequence = [None] * size
         list_labels_sequence = [None] * size
-        for sequence_num, (word_sequence, *label_pos_sequence) in enumerate(self.sequence_pairs):
+        list_pos_sequence = [None] * size
+        for sequence_num, (word_sequence, label_sequence, pos_sequence) in enumerate(self.sequence_pairs):
             if sequence_num >= size:
                 break
             list_tokens_sequence[sequence_num] = word_sequence
-            list_labels_sequence[sequence_num] = label_pos_sequence[0]
+            list_labels_sequence[sequence_num] = label_sequence
+            list_pos_sequence[sequence_num] = pos_sequence
 
-        return list_tokens_sequence, list_labels_sequence
+        return list_tokens_sequence, list_labels_sequence, list_pos_sequence
 
     def __load_vocab(self):
         file_name = "../../word_embeddings/en/vocab_word_embeddings_50.p"
@@ -211,16 +216,15 @@ class SequenceData(object):
         # defautl config
 
         pos_tag_index = 1
+        if "combined" in data_path:
+            label_index = 2
+        else:
+            label_index = -1
+        if "ner" in data_path and "deu" in data_path:
+            label_index = -1
+            pos_tag_index = 2
 
-        # if (self.language == 'de' or self.language == "deu") and "wikiner" not in data_path:
-        #     encoding = "iso-8859-1"
-        #     # if "conll" in data_path:
-        #     pos_tag_index = 2
-        # else:
-        #     encoding = "utf-8"
-        #     if "conll" in data_path:
-        #         pos_tag_index = 1
-        encoding='utf-8'
+        encoding = "utf-8"
 
         with open(data_path, "r", encoding=encoding) as input_file:
             word_sequence = []
@@ -236,11 +240,16 @@ class SequenceData(object):
                     # the word is the 1st token
                     word = tokens[token_index]
 
-                    label = tokens[-1]
+                    label = tokens[label_index]
                     pos_tag = tokens[pos_tag_index]
                     if label is None:
                         # set the partially labeled flag to True
                         self.is_partially_labeled = True
+                    if  is_float(word):
+                        word = "_FLOAT_"
+                    elif is_int(word):
+                        word = "_INT_"
+
                     # build sequence of words
                     word_sequence.append(word)
                     # build sequence of labels
@@ -251,6 +260,7 @@ class SequenceData(object):
                 else:
                     # check if word_sequence is empty
                     if word_sequence:
+                        self.vocabulary.update(word_sequence)
                         # append word_sequence and label_sequence and pos_sequence to sequence_pairs
                         self.sequence_pairs.append([word_sequence, label_sequence, pos_sequence])
 
@@ -262,6 +272,7 @@ class SequenceData(object):
             # file may not end with empty line
             # data of last sentence should be also be appended to sequence_pairs
             if word_sequence:
+                self.vocabulary.update(word_sequence)
                 if pos_tag:
                     self.sequence_pairs.append([word_sequence, label_sequence, pos_sequence])
                 else:

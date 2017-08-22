@@ -125,3 +125,59 @@ class Minitagger(object):
         for row in cm:
             print(row)
             # plot_confusion_matrix(cm, labels_list)
+
+    def __save_prediction_to_file(self, data_test, pred_labels):
+        # file to print all predictions
+        file_name = os.path.join(self.prediction_path, "predictions.txt")
+        f1 = open(file_name, "w", encoding='utf-8')
+        # file to print only sentences that contain at least one wrong label after classification
+        file_name = os.path.join(self.prediction_path, "predictions_wrong.txt")
+        f2 = open(file_name, "w", encoding='utf-8')
+        # file to print only sentences whose labels are predicted 100% correctly
+        file_name = os.path.join(self.prediction_path, "predictions_correct.txt")
+        f3 = open(file_name, "w", encoding='utf-8')
+        # index for prediction label
+        pred_idx = 0
+        # list to store all true labels
+        true_labels = []
+        true_pos_tags = []
+        # iterate through the test set
+        # labels_pos: [[labels]. [pos tag]] => labels = labels_pos[0] / pos_tag = labels_pos[1]
+        for words, *labels_pos in data_test.sequence_pairs:
+            # prediction sequence for each sentence
+            pred_sequence = []
+            for i in range(len(words)):
+                # append label to the prediction sequence
+                pred_sequence = pred_labels[pred_idx]
+                # append label to the list of true labels
+                true_labels.append(labels_pos[0][i])
+                # append pos tag (if exist) to the list of true pos tag
+                if len(labels_pos) == 2: true_pos_tags.append(labels_pos[1][i])
+                # create line to print in the file
+                line = words[i] + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
+                # write to file
+                f1.write(line)
+
+            pred_idx += 1
+            # separate sentences with empty lines
+            f1.write("\n")
+            # check if classification error occurred
+            if labels_pos[0] != pred_sequence:
+                for i in range(len(labels_pos[0])):
+                    # create line to print to file
+                    line = words[i] + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
+                    f2.write(line)
+                # separate sentences with empty lines
+                f2.write("\n")
+            else:
+                for i in range(len(labels_pos[0])):
+                    # create line to print to file
+                    line = words[i] + " " + labels_pos[0][i] + " " + pred_sequence[i] + "\n"
+                    f3.write(line)
+                # separate sentences with empty lines
+                f3.write("\n")
+        # close files
+        f1.close()
+        f2.close()
+        f3.close()
+        return true_labels

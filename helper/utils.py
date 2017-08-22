@@ -1,7 +1,10 @@
 import os
 import pickle
 
+import datetime
+import time
 import yaml
+
 
 
 def create_folder(folder_name):
@@ -29,6 +32,18 @@ def load_pickle(dir, file_name):
 def load_parameters(name):
     with open("parameters.yml", 'r') as ymlfile:
         return yaml.load(ymlfile)[name]
+
+def get_current_time_in_miliseconds():
+    '''
+    http://stackoverflow.com/questions/5998245/get-current-time-in-milliseconds-in-python
+    '''
+    return(get_current_time_in_seconds() + '-' + str(datetime.datetime.now().microsecond))
+
+def get_current_time_in_seconds():
+    '''
+    http://stackoverflow.com/questions/415511/how-to-get-current-time-in-python
+    '''
+    return(time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime()))
 
 
 class dotdict(dict):

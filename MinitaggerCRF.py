@@ -1,7 +1,11 @@
+# -*- coding: utf-8 -*-
+
+
 import os
 import pickle
 import time
 
+import datetime
 import numpy as np
 import sklearn_crfsuite
 
@@ -28,8 +32,8 @@ class MinitaggerCRF(Minitagger):
         self.validation_ratio = 0.05
         print("CRF (sklearn)")
 
-    def extract_features(self, train_sequence, test_sequence, validation_sequence=None, data_to_use=20000):
-        if validation_sequence is None:
+    def extract_features(self, train_sequence, test_sequence, validation_sequence=None, data_to_use=10000):
+        if not validation_sequence and train_sequence:
             train_sequence, validation_sequence = train_sequence.split_train_validation(
                 train_ratio=1 - 0.05)
             if not self.quiet:
@@ -38,36 +42,41 @@ class MinitaggerCRF(Minitagger):
         # Extract feature of the training set
         if not self.quiet:
             print("Extract features")
-        # split sequence pairs => easier to use
-        train_tokens_sequence, self.train_labels_sequence = train_sequence.split_token_label(
+        if train_sequence:
+            # split sequence pairs => easier to use
+            train_tokens_sequence, self.train_labels_sequence, train_pos_sequence = train_sequence.split_token_label(
+                num_of_sentences=data_to_use)
+            assert (self.feature_extractor.is_training), "In order to train, is_training flag should be True"
+            self.train_features, _, _ = self.feature_extractor.extract_features_crf(train_tokens_sequence,
+                                                                                    self.train_labels_sequence,
+                                                                                    train_pos_sequence,
+                                                                                    extract_all=True)
+            #self.__save_features(self.train_features, self.model_path, "train_features")
+
+        test_tokens_sequence, self.test_labels_sequence, test_pos_sequence = test_sequence.split_token_label(
             num_of_sentences=data_to_use)
-        validation_tokens_sequence, self.validation_labels_sequence = validation_sequence.split_token_label(
-            num_of_sentences=data_to_use)
-        test_tokens_sequence, self.test_labels_sequence = test_sequence.split_token_label(num_of_sentences=data_to_use)
         self.test_sequence = test_sequence
 
-        assert (self.feature_extractor.is_training), "In order to train, is_training flag should be True"
-        self.train_features, _, _ = self.feature_extractor.extract_features_crf(train_tokens_sequence,
-                                                                                self.train_labels_sequence,
-                                                                                extract_all=True)
-
-        self.__save_features(self.train_features, self.model_path, "train_features")
         if not self.quiet:
             print("Extract test features")
         self.feature_extractor.is_training = False
 
         if validation_sequence is not None:
+            validation_tokens_sequence, self.validation_labels_sequence, valid_pos_sequence = validation_sequence.split_token_label(
+                num_of_sentences=data_to_use)
             self.validation_features, _, _ = self.feature_extractor.extract_features_crf(validation_tokens_sequence,
                                                                                          self.validation_labels_sequence,
+                                                                                         valid_pos_sequence,
                                                                                          extract_all=True)
             self.__save_features(self.validation_features, self.model_path, "validation_features")
 
         self.test_features, _, _ = self.feature_extractor.extract_features_crf(test_tokens_sequence,
                                                                                self.test_labels_sequence,
+                                                                               test_pos_sequence,
                                                                                extract_all=True)
         self.__save_features(test_tokens_sequence, self.model_path, "test_features")
 
-    def train(self):
+    def train(self, max_iteration=100):
         """
 		Trains Minitagger on the given train data. If test data is given, it reports the accuracy of the trained model
 		and the F1_score (macro average of f1_score of each label)
@@ -77,7 +86,7 @@ class MinitaggerCRF(Minitagger):
 		@param test_sequence: the test data set
 		"""
         # keep the training start timestamp
-
+        start = time.time()
 
         if not self.quiet:
             print("Number of sentences train: ", len(self.train_labels_sequence))
@@ -90,11 +99,12 @@ class MinitaggerCRF(Minitagger):
             c1=self.c1,
             c2=self.c2,
             epsilon=self.epsilon,
-            # max_iterations=10000,
+            max_iterations=max_iteration,
             all_possible_transitions=self.all_possible_transition,
             all_possible_states=self.all_possible_state,
-            #    verbose= not self.quiet
+            verbose= not self.quiet
         )
+
 
         if not self.quiet:
             print("Train model")
@@ -107,17 +117,18 @@ class MinitaggerCRF(Minitagger):
         if not self.quiet:
             print("Predict")
         y_pred = crf.predict(self.test_features)
-        self.test_sequence.save_prediction_to_file(y_pred, self.prediction_path, id)
+        self.test_sequence.save_prediction_to_file(y_pred, self.prediction_path)
         exact_score, inexact_score, conllEval = report_fscore_from_file(
-            self.prediction_path + "/predictions" + str(id) + ".txt",
+            self.prediction_path + "/predictions.txt",
             wikiner=self.wikiner, quiet=True)
         if not self.quiet:
             self.display_results("Conll", conllEval)
             self.display_results("Exact", exact_score)
             self.display_results("Inexact", inexact_score)
 
-        self.save_results(conllEval, exact_score, inexact_score, id)
+        self.save_results(conllEval, exact_score, inexact_score)
         self.__save_model(crf)
+        print("Training time:", str(datetime.timedelta(seconds=time.time()-start)))
         return exact_score, inexact_score, conllEval
 
     def train_with_step(self):
@@ -183,7 +194,11 @@ class MinitaggerCRF(Minitagger):
         with open(os.path.join(self.model_path, "crf_model.p"), 'wb') as fid:
             pickle.dump(model, fid)
 
-    def cross_validation(self, id_, data_train, feature_template, language, embedding_path, embedding_size,
+    def load_model(self):
+        with open(os.path.join(self.model_path, "crf_model.p"), 'rb') as fid:
+            self.crf =  pickle.load(fid)
+
+    def cross_validation(self, id_, data_train,
                          data_test=None, n_fold=2):
         """
         compute the cross validation on the data_train.
@@ -235,7 +250,7 @@ class MinitaggerCRF(Minitagger):
             self.feature_extractor.reset()
             train_set, test_set = data_train.split_in_2_sequences(start=k * test_size, end=(k + 1) * test_size)
             self.extract_features(train_set, test_set)
-            exact_score, inexact_score, conllEval = self.train()
+            exact_score, inexact_score, conllEval = self.train(max_iteration=50)
             score.add_scores(conllEval, exact_score, inexact_score, parameter)
         print("Mean conll fscore: ", score.get_mean_conll_fscore())
         return score.get_mean_conll_fscore(), parameter

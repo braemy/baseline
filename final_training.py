@@ -1,7 +1,11 @@
+import argparse
+import json
 import sys
 from pprint import pprint
 
+from MinitaggerCRF_tf import MinitaggerCRF_tf
 from MinitaggerSVM import MinitaggerSVM
+from helper import utils
 
 sys.path.insert(0, 'helper')
 
@@ -12,14 +16,15 @@ from MinitaggerCRF import MinitaggerCRF
 from FeatureExtractor_CRF_SVM import FeatureExtractor_CRF_SVM
 
 
+
 class Final_training(object):
     def __init__(self, parameters):
-        self.validation_data_path = parameters["validation_data_path"]
+        self.validation_data_path = parameters["validation_data_path"] if "validation_data_path" in parameters else None
         self.train_data_path = parameters["train_data_path"]
-        self.test_data_path = parameters["test_data_path"]
+        self.test_data_path = parameters["test_data_path"] if "test_data_path" in parameters else None
         self.minitagger = None
         self.language = parameters["language"]
-        self.model_name = parameters["model_name"]
+        self.model_name = parameters["model_name"] + "_" + utils.get_current_time_in_miliseconds()
         self.feature_template = parameters["feature_template"]
         self.method = parameters["method"]
         self.best_param = parameters["best_param"] if "best_param" in parameters else None
@@ -40,17 +45,25 @@ class Final_training(object):
         # initialize feature extractor with the right feature template
         self.feature_extractor = FeatureExtractor_CRF_SVM(self.feature_template, self.language,
                                                          self.embedding_size if self.feature_template=="embedding" else None)
+        #if self.feature_template == "embedding":
+        #    self.feature_extractor.embedding_type = parameters['embedding_type']
 
         self.train_sequence = SequenceData(self.train_data_path,language=self.language, pos_tag=True)
-        self.validation_sequence = SequenceData(self.validation_data_path,language=self.language, pos_tag=True) if self.validation_data_path is not None else None
-        self.test_sequence = SequenceData(self.test_data_path,language=self.language, pos_tag=True)
+        self.validation_sequence = SequenceData(self.validation_data_path,language=self.language, pos_tag=True) if self.validation_data_path else None
+        self.test_sequence = SequenceData(self.test_data_path,language=self.language, pos_tag=True) if self.test_data_path else None
 
         # load bitstring or embeddings data
         if self.feature_template == "embedding":
-            self.feature_extractor.load_word_embeddings(self.embedding_path, self.embedding_size)
+            if self.test_sequence and self.validation_sequence:
+                vocabulary = self.train_sequence.vocabulary.union(self.test_sequence.vocabulary).union(self.validation_sequence.vocabulary)
+            else:
+                vocabulary = self.train_sequence.vocabulary
+            self.feature_extractor.load_word_embeddings(self.embedding_path, self.embedding_size, vocabulary)
 
         print("Number of sentences in training dataset:", len(self.train_sequence.sequence_pairs))
-        print("Number of sentences in testing dataset:", len(self.test_sequence.sequence_pairs))
+        if self.test_sequence:
+            print("Number of sentences in testing dataset:", len(self.test_sequence.sequence_pairs))
+
         if self.method == "CRF":
             self.crf()
         elif self.method == "SVM":
@@ -68,6 +81,11 @@ class Final_training(object):
         self.minitagger.set_prediction_path(self.model_name)
         self.minitagger.set_model_path(self.model_name)
 
+        parameter_file = os.path.join(self.minitagger.model_path, "parameters.yml")
+        with open(parameter_file, "w", encoding="utf-8") as file:
+            yaml.dump(self.parameters, file)
+        print("model name:", self.minitagger.model_path)
+
         # equip Minitagger with the appropriate feature extractor
         self.minitagger.equip_feature_extractor(self.feature_extractor)
 
@@ -75,7 +93,7 @@ class Final_training(object):
         if self.best_param is not None:
             self.minitagger.c1 = self.best_param['c1']
             self.minitagger.c2 = self.best_param['c2']
-            self.minitagger.epsilon = self.best_param['epsilon']
+            self.minitagger.epsilon = self.best_param['epsilon_crf']
         else:
             self.minitagger.c1 = 0.1282051282051282
             self.minitagger.c2 = 0.23076923076923075
@@ -84,22 +102,26 @@ class Final_training(object):
         self.minitagger.all_possible_state = True
         self.minitagger.all_possible_transitions = True
 
-        self.minitagger.extract_features(self.train_sequence, self.test_sequence, self.validation_sequence)
         if self.train_with_step:
+            self.minitagger.extract_features(self.train_sequence, self.test_sequence, self.validation_sequence)
             self.minitagger.train_with_step()
         else:
-            self.minitagger.quiet = False
-            self.minitagger.train()
+            if self.test_sequence:
+                self.minitagger.extract_features(self.train_sequence, self.test_sequence, self.validation_sequence)
+                self.minitagger.quiet = False
+                self.minitagger.train(max_iteration=60)
+            else:
+                self.minitagger.cross_validation(0, self.train_sequence, n_fold=3)
 
-    def crf_tf(self, best_param, train_with_step):
-        self.minitagger = None # MinitaggerCRF_tf()
+    def crf_tf(self):
+        self.minitagger = MinitaggerCRF_tf()
         self.minitagger.language = self.language
         self.minitagger.quiet = True
         self.minitagger.set_prediction_path(self.model_name)
         self.minitagger.set_model_path(self.model_name)
         self.minitagger.equip_feature_extractor(self.feature_extractor)
 
-        self.minitagger.extract_features(self.train_sequence, self.test_sequence, self.validation_sequence)
+        #self.minitagger.extract_features(self.train_sequence, self.test_sequence, self.validation_sequence)
         self.minitagger.train()
 
     def svm(self):
@@ -109,6 +131,10 @@ class Final_training(object):
         self.minitagger.equip_feature_extractor(self.feature_extractor)
         self.minitagger.set_prediction_path(self.model_name)
         self.minitagger.set_model_path(self.model_name)
+
+        parameter_file = os.path.join(self.minitagger.model_path, "parameters.yml")
+        with open(parameter_file, "w", encoding="utf-8") as file:
+            yaml.dump(self.parameters, file)
 
         if self.best_param is not None:
             self.minitagger.epsilon = self.best_param['epsilon']
@@ -127,76 +153,15 @@ class Final_training(object):
 
 
 if __name__ == "__main__":
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument("--conf", type=str, help="name of the configuration in the parameter file",
+                           required=True)
 
     #parameters = load_parameters("conll_de")
     #parameters = load_parameters("wikiner_de")
-    parameters = load_parameters("new")
+    parsed_args = argparser.parse_args()
+    parameters = load_parameters(parsed_args.conf)
     training = Final_training(parameters=parameters)
     training.train()
 
 
-    sys.exit()
-
-    #=========================================================
-    # Everything below is not use anymore, move your configurations
-    # in the parameter files, then you can remove everything
-    #=========================================================
-
-    a = "conll"
-    language = "de"
-    embedding_size = 300
-    if a == "new_dataset":
-        filter = "0.01"
-        dataset_method = "wp0"
-        #train_data_path = "../../new_dataset/"+dataset_method+"/combined_"+str(filter)+".txt"
-        train_data_path = "../../new_dataset/"+dataset_method+"/combined_"+dataset_method+"_"+str(filter)+".txt"
-        #train_data_path = "../../new_dataset/"+dataset_method+"/combined_wp0_0.005_moreORG.txt"
-        validation_data_path = "../../ner/nerc-conll2003/eng.testa"
-        test_data_path = "../../ner/nerc-conll2003/eng.testb"
-        feature_template = "baseline"
-        #feature_template = "embedding"
-        #embedding_path = "../../word_embeddings/glove"
-        embedding_size = 50
-        embedding_path = "../../word_embeddings/glove"
-        method = "SVM"
-
-        model_name = "_new_dataset_"+dataset_method+"_"+str(filter)+"_finale_score"
-
-    elif a == "wikiner":
-        # train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/wikiner_dataset/aij-wikiner-it-wp2-simplified"
-        train_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/toy_dataset"
-        validation_data_path = None  # "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/conll_dataset/nerc-conll2003/deu-simplified.testa"
-        test_data_path = "/Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/toy_exp"
-        feature_template = "baseline"
-        embedding_path = "../../word_embeddings/glove"
-        #model_name = "SVM_wikiner_emb" + str(embedding_size) + "_finale_score"
-        model_name = "_wikiner_baseline_finale_score"
-        method = "SVM"
-    elif a == "conll":
-        language = "de"
-        if language == "en":
-            file_name = "eng"
-        elif language == "de":
-            file_name = "deu"
-        #train_data_path = "../../ner/nerc-conll2003/deu-simplified.train"
-        train_data_path = "../../ner/nerc-conll2003/"+file_name+".train"
-        #validation_data_path = "../../ner/nerc-conll2003/deu-simplified.testa"
-        validation_data_path = "../../ner/nerc-conll2003/"+file_name+".testa"
-        #test_data_path = "../../ner/nerc-conll2003/deu-simplified.testb"
-        test_data_path = "../../ner/nerc-conll2003/"+file_name+".testb"
-        feature_template = "embedding"
-        feature_template = "baseline"
-        embedding_path = "../../word_embeddings/glove"
-        #embedding_size = 300
-        method = "SVM"
-        if feature_template == "baseline":
-            model_name = method + "_conll_baseline_finale_score_small_feature_name"
-        else:
-            model_name = method + "_conll_emb" + str(embedding_size) + "_finale_score"
-
-
-    selection = final_training(train_data_path, validation_data_path, test_data_path, language, model_name,
-                               feature_template, embedding_size, embedding_path)
-
-    best_params = {'epsilon': 0.00017782794100389227, 'cost': 1e-05}
-    selection.final_training("svm", best_param=best_params)

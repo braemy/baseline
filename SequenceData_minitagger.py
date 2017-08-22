@@ -1,5 +1,6 @@
 import collections
 import copy
+import random
 
 import numpy as np
 
@@ -212,13 +213,21 @@ class SequenceData(object):
         size = len(self.sequence_pairs) if len(self.sequence_pairs) < num_of_sentences else num_of_sentences
         list_tokens_sequence = [None] * size
         list_labels_sequence = [None] * size
-        for sequence_num, (word_sequence, *label_pos_sequence) in enumerate(self.sequence_pairs):
+        list_pos_sequence = [None] * size
+        args = list(range(len(list_tokens_sequence)))
+        random.shuffle(args)
+        list_tokens_sequence = np.array(list_tokens_sequence)[args]
+        list_labels_sequence = np.array(list_labels_sequence)[args]
+        list_pos_sequence = np.array(list_pos_sequence)[args]
+
+        for sequence_num, (word_sequence, label_sequence, pos_sequence) in enumerate(self.sequence_pairs):
             if sequence_num >= size:
                 break
             list_tokens_sequence[sequence_num] = word_sequence
-            list_labels_sequence[sequence_num] = label_pos_sequence[0]
+            list_labels_sequence[sequence_num] = label_sequence
+            list_pos_sequence[sequence_num] = label_sequence
 
-        return list_tokens_sequence, list_labels_sequence
+        return list_tokens_sequence, list_labels_sequence, list_pos_sequence
 
     # overrides str method for SequenceData object
     def __str__(self):

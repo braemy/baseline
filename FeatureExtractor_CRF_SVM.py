@@ -3,6 +3,8 @@ import os
 import pickle
 
 import fasttext
+import subprocess
+
 import numpy as np
 from tqdm import tqdm
 
@@ -45,7 +47,7 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
             self.embedding_end = np.ones(self.embedding_size) / np.linalg.norm(np.ones(self.embedding_size))
 
         self.block_size = 50000
-        self.quiet = True
+        self.quiet = False
         self.embedding_type = None
 
     def extract_features_svm(self, sequence_data, extract_all):
@@ -90,7 +92,7 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
                     location_list.append((sequence_num, position))
         return self.features_list, label_list, location_list
 
-    def extract_features_crf(self, tokens_list, label_list, extract_all):
+    def extract_features_crf(self, tokens_list, label_list, pos_list, extract_all):
         """
     		Extracts features from the given sequence data.
 
@@ -114,14 +116,14 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
         self.location_list = [None] * len(tokens_list)
         # iterate through all sequences (=sentences) and all words in each sentence
         for sequence_num, (word_sequence, labels_sequence, pos_sequence) in tqdm(
-                enumerate(zip(tokens_list, label_list)), "Feature extraction", miniters=200, mininterval=2,
+                enumerate(zip(tokens_list, label_list, pos_list)), "Feature extraction", miniters=200, mininterval=2,
                 disable=self.quiet):
 
             sentence_features = [None] * len(labels_sequence)
             sentence_labels = [None] * len(labels_sequence)
             sentence_locations = [None] * len(labels_sequence)
 
-            for position, label, pos_tags in enumerate(zip(labels_sequence, pos_sequence)):
+            for position, (label, pos_tags) in enumerate(zip(labels_sequence, pos_sequence)):
 
                 # only use labeled instances unless extract_all=True.
                 if (label is not None) or extract_all:
@@ -140,7 +142,7 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
 
         return self.features_list, self.label_list, self.length
 
-    def load_word_embeddings(self, embedding_path, embedding_length):
+    def load_word_embeddings(self, embedding_path, embedding_length, vocabulary):
         """
         Loads word embeddings from a file in the given path
 
@@ -180,8 +182,26 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
         else:
             print("Loading fasttext ...")
             self.embedding_type = "fasttext"
-            print(os.path.join(embedding_path, self.language, "wiki.en.bin"))
-            self._word_embeddings = fasttext.load_model(os.path.join(embedding_path, self.language, "wiki.en.bin"))
+            embedding_path = os.path.join(embedding_path, self.language, "wiki.{0}.bin".format(self.language))
+            print(os.path.join(embedding_path))
+            fasttext_script = os.path.join("fastText", "fasttext")
+            vocabulary = set(map(lambda r: r.lower(), vocabulary))
+            with open("tmp.txt", "w", encoding="utf-8") as file:
+                file.write(" ".join(vocabulary))
+            self._word_embeddings = dict()
+            shell_command = '{0} print-word-vectors {1} < {2}'.format(fasttext_script,embedding_path, "tmp.txt")
+            output = subprocess.check_output(shell_command, shell=True)
+            for voc, emb in zip(vocabulary, output.decode().split("\n")):
+                self._word_embeddings[voc] = list(
+                    map(float, emb.split()[-self.embedding_size:]))
+
+
+                #self._word_embeddings = os.path.join(embedding_path, self.language, "wiki.en.bin")
+            #print(self._word_embeddings)
+            #subprocess.call("pwd", shell=True)
+            #subprocess.call("ls "+self._word_embeddings, shell=True)
+
+            #subprocess.call("screen -dmLS fasttext bash -c \"fastText/fasttext print-word-vectors ../../word_embeddings/fasttext/en/wiki.en.bin;exec bash\"", shell=True)
 
     def is_training(self):
         return self.is_training

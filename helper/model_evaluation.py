@@ -291,6 +291,7 @@ def split_prediction_true_label(file_name):
 
 
 def report_fscore_from_file(prediction_file, wikiner=False, quiet=True):
+    print(prediction_file)
     true_label, pred_label = split_prediction_true_label(prediction_file)
     with open(prediction_file, encoding='utf-8') as f:
         counts = evaluate(f, None)

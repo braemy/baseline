@@ -5,6 +5,7 @@ import helper.utils as utils
 
 from FeatureExtractor_CRF_SVM import FeatureExtractor_CRF_SVM
 # from MinitaggerCRF import MinitaggerCRF
+from MinitaggerCRF import MinitaggerCRF
 from MinitaggerSVM import MinitaggerSVM
 from helper.SequenceData import SequenceData
 from helper.model_evaluation import report_fscore_from_file
@@ -14,15 +15,20 @@ ABSENT_GOLD_LABEL = "<NO_GOLD_LABEL>"
 
 
 def main(args):
-    minitagger = MinitaggerSVM()
+    if "SVM" in args.model_name:
+        minitagger = MinitaggerSVM()
+    else:
+        minitagger = MinitaggerCRF()
     sequence_data = SequenceData(args.train_data_path,args.pos_tag, language=args.language)
 
     minitagger.language = args.language
+    minitagger.set_model_path(args.model_name)
     if args.train:
         minitagger.set_prediction_path(args.model_name)
     else:
-        minitagger.set_prediction_path(args.model_name+ "_"+args.prediction_name)
-    minitagger.set_model_path(args.model_name)
+        print(args.model_name)
+        minitagger.set_prediction_path(args.model_name+"_"+args.prediction_name)
+
     if args.wikiner:
         minitagger.wikiner = True
 
@@ -37,8 +43,7 @@ def main(args):
         feature_extractor.token_features1 = True
         feature_extractor.feature_template = "baseline"
 
-        if feature_extractor.feature_template == "embedding":
-            feature_extractor.load_word_embeddings(args.embedding_path, args.embedding_size)
+
 
         # equip Minitagger with the appropriate feature extractor
         minitagger.equip_feature_extractor(feature_extractor)
@@ -49,7 +54,10 @@ def main(args):
         minitagger.debug = args.debug
         if minitagger.debug:
             assert args.prediction_path, "Path for prediction should be specified"
-        # normal training, no active learning used
+
+        if feature_extractor.feature_template == "embedding":
+            vocabulary = sequence_data.vocabulary.union(test_data.vocabulary)
+            feature_extractor.load_word_embeddings(args.embedding_path, args.embedding_size, vocabulary)
 
         # minitagger.feature_extractor.all_features = False
         minitagger.train(sequence_data, test_data)
@@ -60,12 +68,31 @@ def main(args):
         # minitagger.cross_validation(sequence_data, test_data, 5)
     # predict labels in the given data.
     else:
+        feature_extractor = FeatureExtractor_CRF_SVM(args.feature_template, args.language,
+                                                     args.embedding_size if args.embedding_size else None)
+        if args.feature_template == "embedding":
+            feature_extractor.load_word_embeddings(args.embedding_path, args.embedding_size, sequence_data.vocabulary)
 
-        minitagger.load(minitagger.model_path)
-        minitagger.set_is_training(False)
-        minitagger.extract_features(None, sequence_data)
-        pred_labels, _ = minitagger.predict()
-        report_fscore_from_file(os.path.join(minitagger.prediction_path, "predictions.txt"), quiet=False)
+        minitagger.equip_feature_extractor(feature_extractor)
+        if "CRF" in args.model_name:
+            minitagger.extract_features(None, sequence_data)
+            minitagger.load_model()
+            pred_labels = minitagger.crf.predict(minitagger.test_features)
+            minitagger.test_sequence.save_prediction_to_file(pred_labels, minitagger.prediction_path)
+            exact_score, inexact_score, conllEval = report_fscore_from_file(
+                os.path.join(minitagger.prediction_path, "predictions.txt"),
+                wikiner=minitagger.wikiner, quiet=True)
+
+            minitagger.display_results("Conll", conllEval)
+            minitagger.display_results("Exact", exact_score)
+            minitagger.display_results("Inexact", inexact_score)
+
+        else:
+            minitagger.load(minitagger.model_path)
+            minitagger.set_is_training(False)
+            minitagger.extract_features(None, sequence_data)
+            pred_labels, _ = minitagger.predict()
+            report_fscore_from_file(os.path.join(minitagger.prediction_path, "predictions.txt"), quiet=False)
 
 
 
@@ -123,6 +150,7 @@ if __name__ == "__main__":
     argparser.add_argument("--pos_tag", action="store_true",
                            help="indicate if the part-of-speech tag is present or not")
     argparser.add_argument("--project_dir", type=str, help="directory of the path")
+    argparser.add_argument("--prediction_name", type=str, help="name of the prediction")
     argparser.add_argument("--wikiner", action="store_true",
                            help="if we are using wikiner dataset, use this arg to use appropriate scoring function")
 

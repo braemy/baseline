@@ -1,4 +1,5 @@
 import math
+import subprocess
 
 import fasttext
 import numpy as np
@@ -50,7 +51,7 @@ class FeatureExtractor(object):
         self.token_features1 = True
         self.token_features0 = True
 
-        self.window_size = 2
+        self.window_size = 1
 
     def get_feature_dim(self):
         return len(self._map_feature_str2num.keys())
@@ -217,6 +218,7 @@ class FeatureExtractor(object):
             with open(file_name, "rb") as file:
                 self._word_embeddings = pickle.load(file)
         if "fasttext" in embedding_path:
+            print("YOu should have start a screen with fasttext")
             print("Loading FastText word embeddings...")
             # fasttext supports only word embeddings with 300 dimensionality
             assert (embedding_length == 300), "Embedding length should be 300 when using FastText"
@@ -423,7 +425,7 @@ class FeatureExtractor(object):
 
         return features
 
-    def __get_word_embeddings(self, word_sequence, position, offset, features, name="emb"):
+    def __get_word_embeddings(self, word_sequence, position, offset, features, name="wb"):
         """
 		Gets embeddings for a given word using the embeddings dictionary
 

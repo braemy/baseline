@@ -1,4 +1,3 @@
-from helper.SequenceData import SequenceData
 
 
 def get_word(word_sequence, position):
@@ -136,6 +135,19 @@ def is_float(word):
     except ValueError:
         return False
 
+def is_int(word):
+    """
+    Checks if the word be converted to a float
+
+    @type word: str
+    @param word: word to be checked
+    @return: True of False
+    """
+    try:
+        int(word)
+        return True
+    except ValueError:
+        return False
 
 def is_prediction_file(data_path):
     """
