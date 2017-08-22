@@ -10,8 +10,8 @@ from helper.utils_data import *
 
 class FeatureExtractor(object):
     """
-	Extracts features from sequence data
-	"""
+    Extracts features from sequence data
+    """
 
     def __init__(self, feature_template, language, embedding_size=None):
         # dictionary with all spelling features
@@ -85,33 +85,30 @@ class FeatureExtractor(object):
 
     def num_feature_types(self):
         """
-		Finds the number of distinct feature types
-
-		@return: the number of distinct feature types
-		"""
-
+        Finds the number of distinct feature types
+        @return: the number of distinct feature types
+        """
         return len(self._map_feature_str2num)
 
     def get_feature_string(self, feature_number):
         """
-		Converts a numeric feature ID to a string
+        Converts a numeric feature ID to a string
 
-		@type feature_number: int
-		@param feature_number: numeric id of feature
-		@return: given a feature number, it returns the respective feature string
-		"""
+        @type feature_number: int
+        @param feature_number: numeric id of feature
+        @return: given a feature number, it returns the respective feature string
+        """
 
         assert (feature_number in self._map_feature_num2str), "Feature id not in featureID-to-string dictionary"
         return self._map_feature_num2str[feature_number]
 
     def get_label_string(self, label_number):
         """
-		Converts a numeric label ID to a string
-
-		@type label_number: int
-		@param label_number: numeric id of id
-		@return: the label string that corresponds to the given label number
-		"""
+        Converts a numeric label ID to a string
+        @type label_number: int
+        @param label_number: numeric id of id
+        @return: the label string that corresponds to the given label number
+        """
 
         assert (label_number in self._map_label_num2str), "Label id not in labelID-to-string dictionary"
         # if label_number not in self._map_label_num2str:
@@ -120,24 +117,22 @@ class FeatureExtractor(object):
 
     def get_feature_number(self, feature_string):
         """
-		Converts a feature string to a numeric ID
-
-		@type feature_string: str
-		@param feature_string: feature in string format
-		@return: the numeric feature id given the feature string
-		"""
+        Converts a feature string to a numeric ID
+        @type feature_string: str
+        @param feature_string: feature in string format
+        @return: the numeric feature id given the feature string
+        """
 
         assert (feature_string in self._map_feature_str2num), "Feature string not in featureString-to-ID dictionary"
         return self._map_feature_str2num[feature_string]
 
     def get_label_number(self, label_string):
         """
-		Converts a label string to a numeric ID
-
-		@type label_string: str
-		@param label_string: label in string format
-		@return: the numeric label id given the label string
-		"""
+        Converts a label string to a numeric ID
+        @type label_string: str
+        @param label_string: label in string format
+        @return: the numeric label id given the label string
+        """
 
         assert (label_string in self._map_label_str2num), "Label string not in labelString-to-ID dictionary"
         # if label_string not in self._map_feature_str2num:
@@ -251,14 +246,13 @@ class FeatureExtractor(object):
 
     def _spelling_features(self, word, relative_position):
         """
-		Extracts spelling features about the given word. Also, it considers the word's relative position.
-
-		@type word: str
-		@param word: given word to extract spelling features
-		@type relative_position: int
-		@param relative_position: relative position of word in the word sequence
-		@return: a copy of the spelling_feature_cache for the specific (word, relative_position)
-		"""
+        Extracts spelling features about the given word. Also, it considers the word's relative position.
+        @type word: str
+        @param word: given word to extract spelling features
+        @type relative_position: int
+        @param relative_position: relative position of word in the word sequence
+        @return: a copy of the spelling_feature_cache for the specific (word, relative_position)
+        """
 
         if (word, relative_position) not in self.spelling_feature_cache:
             features = dict()
@@ -279,20 +273,20 @@ class FeatureExtractor(object):
             if word.isupper():
                 # is the word all in upper case? HELLO
                 features["up({0})".format(relative_position)] = int(word.isupper())
-            if word.isdigit():
+            # if word.isdigit():
                 # does the word contain only digit? 12334
-                features["o_d({0})".format(relative_position)] = int(word.isdigit())
-            if has_numbers(word):
+            #    features["o_d({0})".format(relative_position)] = int(word.isdigit())
+            # if has_numbers(word):
                 # does the word contains at least one digit? joe
-                features["a_d({0})".format(relative_position)] = int(has_numbers(word))
+            #    features["a_d({0})".format(relative_position)] = int(has_numbers(word))
             if is_all_nonalphanumeric(word):
                 # check if all chars are nonalphanumeric
-                features["non_alpa({0})".format(relative_position)] = int(is_all_nonalphanumeric(word))
+                features["nonalpha({0})".format(relative_position)] = int(is_all_nonalphanumeric(word))
             if is_float(word):
                 # check if word can be converted to float, i.e. word is a number
                 features["f({0})".format(relative_position)] = int(is_float(word))
             # character_length
-            features["c_l({0})".format(relative_position)] = float(1) / len(word)
+            # features["c_l({0})".format(relative_position)] = float(1) / len(word)
 
             # build suffixes and preffixes for each word (up to a length of 4)
             if self.morphological_features == "regular":
@@ -368,7 +362,7 @@ class FeatureExtractor(object):
         if self.token_features0:
             if self.morphological_features == "regular":
                 # the word in lower case
-                features["w_l({0})={1}".format(position, word.lower())] = 1
+                #features["w_l({0})={1}".format(position, word.lower())] = 1
                 # the word like it appears in the text
                 features["w({0})={1}".format(position, word)] = 1
             elif self.morphological_features == "embeddings":
@@ -378,7 +372,7 @@ class FeatureExtractor(object):
                 raise ("Unrecognized feature type")
         # get 2 words on the left and right¨
         # add features for the words on the left and right side
-        for i in range(1, 4 + 1):
+        for i in range(1, 2 + 1):
             word_right = get_word(word_sequence, position + i)
             word_left = get_word(word_sequence, position - i)
             if self.morphological_features == "regular":
@@ -391,8 +385,8 @@ class FeatureExtractor(object):
             else:
                 raise ("Unrecognized feature type")
 
-            features.update(self._spelling_features(word_right, i))
-            features.update(self._spelling_features(word_left, -i))
+            # features.update(self._spelling_features(word_right, i))
+            # features.update(self._spelling_features(word_left, -i))
 
         # if pos_tag_sequence:
 
@@ -427,17 +421,17 @@ class FeatureExtractor(object):
 
     def __get_word_embeddings(self, word_sequence, position, offset, features, name="wb"):
         """
-		Gets embeddings for a given word using the embeddings dictionary
+        Gets embeddings for a given word using the embeddings dictionary
 
-		@type word_sequence: list
-		@param word_sequence: sequence of words
-		@type position: int
-		@param position: position in the sequence of words
-		@type offset: int
-		@param offset: offset relative to position
-		@type features: dict
-		@param features: dictionary with features
-		"""
+        @type word_sequence: list
+        @param word_sequence: sequence of words
+        @type position: int
+        @param position: position in the sequence of words
+        @type offset: int
+        @param offset: offset relative to position
+        @type features: dict
+        @param features: dictionary with features
+        """
 
         # get current word
         if position + offset < 0:
@@ -464,15 +458,14 @@ class FeatureExtractor(object):
 
     def _get_embedding_features(self, word_sequence, position, pos_tags):
         """
-		Extract embedding features = normalized baseline features + (normalized) embeddings
-		of current, left, and right words.
-
-		@type word_sequence: list
-		@param word_sequence: sequence of words
-		@type position: int
-		@param position: position in the sequence of words
-		@return: full dict of features
-		"""
+        Extract embedding features = normalized baseline features + (normalized) embeddings
+        of current, left, and right words.
+        @type word_sequence: list
+        @param word_sequence: sequence of words
+        @type position: int
+        @param position: position in the sequence of words
+        @return: full dict of features
+        """
         # compute the baseline feature vector and normalize its length to 1
         features = self._get_baseline_features(word_sequence, position, pos_tags)
         # assumes binary feature values
@@ -539,7 +532,7 @@ class FeatureExtractor(object):
 
     def __load_features(self, dir, file_name):
         i = 0
-        tmè = np.empty(0)
+        tmp = np.empty(0)
         while os.path.exists(os.path.join(dir, file_name + str(i) + ".p")):
             with open(os.path.join(dir, file_name + str(i) + ".p"), "rb") as file:
                 tmp = np.append(tmp, pickle.load(file), axis=0)

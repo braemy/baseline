@@ -13,9 +13,9 @@ from helper.utils import create_recursive_folder
 
 class Minitagger(object):
     """
-	Represents the Minitagger model and can be used to train a classifier and make predictions.
-	Also it includes the active learning feature
-	"""
+    Represents the Minitagger model and can be used to train a classifier and make predictions.
+    Also it includes the active learning feature
+    """
 
     def __init__(self):
         # feature extractor that is used (it is a SequenceDataFeatureExtractor object)
@@ -31,7 +31,7 @@ class Minitagger(object):
         # path to output the predictions
         self.model_path = ""
         # path of the project
-        self.project_dir = "."
+        self.project_dir = "../models_and_predictions/"
         # language of the model
         self.language = ""
         # wikiner dataset
@@ -42,11 +42,10 @@ class Minitagger(object):
 
     def equip_feature_extractor(self, feature_extractor):
         """
-		Equips the Minitagger with a feature extractor
-
-		@type feature_extractor: SequenceDataFeatureExtractor
-		@param feature_extractor: contains the feature extraction object
-		"""
+        Equips the Minitagger with a feature extractor
+        @type feature_extractor: SequenceDataFeatureExtractor
+        @param feature_extractor: contains the feature extraction object
+        """
         self.feature_extractor = feature_extractor
 
     def set_is_training(self, is_training):
@@ -54,7 +53,7 @@ class Minitagger(object):
 
     def set_prediction_path(self, model_name):
         create_recursive_folder([self.project_dir, "predictions", self.language, model_name])
-        self.prediction_path = os.path.join("predictions", self.language, model_name)
+        self.prediction_path = os.path.join(self.project_dir, "predictions", self.language, model_name)
 
     def set_model_path(self, model_path):
         create_recursive_folder([self.project_dir, "models_path", self.language, model_path])

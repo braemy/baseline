@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-
 import os
 import pickle
 import time
@@ -16,9 +14,9 @@ from helper.score import Score
 
 class MinitaggerCRF(Minitagger):
     """
-	Represents the Minitagger model and can be used to train a classifier and make predictions.
-	Also it includes the active learning feature
-	"""
+    Represents the Minitagger model and can be used to train a classifier and make predictions.
+    Also it includes the active learning feature
+    """
 
     def __init__(self):
         Minitagger.__init__(self)
@@ -72,19 +70,18 @@ class MinitaggerCRF(Minitagger):
 
         self.test_features, _, _ = self.feature_extractor.extract_features_crf(test_tokens_sequence,
                                                                                self.test_labels_sequence,
-                                                                               test_pos_sequence,
                                                                                extract_all=True)
         self.__save_features(test_tokens_sequence, self.model_path, "test_features")
 
     def train(self, max_iteration=100):
         """
-		Trains Minitagger on the given train data. If test data is given, it reports the accuracy of the trained model
-		and the F1_score (macro average of f1_score of each label)
-		@type train_sequence: SequenceData
-		@param train_sequence: the training data set
-		@type test_sequence: SequenceData
-		@param test_sequence: the test data set
-		"""
+        Trains Minitagger on the given train data. If test data is given, it reports the accuracy of the trained model
+        and the F1_score (macro average of f1_score of each label)
+        @type train_sequence: SequenceData
+        @param train_sequence: the training data set
+        @type test_sequence: SequenceData
+        @param test_sequence: the test data set
+        """
         # keep the training start timestamp
         start = time.time()
 

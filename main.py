@@ -115,22 +115,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-
-
-    #argument = dict()
-    #argument["model_name"] ="_wikiner_baseline_finale_score"
-    #argument["train"] = False
-    #argument["feature_template"] = "baseline"
-    #argument["train_data_path"] = "../../ner/nerc-conll2003/deu.testb"#"test_data/deu_test2.txt"
-    #argument["language"] = "de"
-    #argument["prediction_name"] = "conll_b"
-    #argument = utils.dotdict(argument)
-    #main(argument)
-    #print("done")
-    #sys.exit()
-
-
-
     argparser = argparse.ArgumentParser()
     argparser.add_argument("--train_data_path", type=str, help="path to data (used for training/testing)",
                            required=False)
@@ -157,8 +141,3 @@ if __name__ == "__main__":
     parsed_args = argparser.parse_args()
 
     main(parsed_args)
-
-    # from model_evaluation import report_fscore
-
-    # report_fscore("test_predictions.txt", wikiner=True)
-    # report_fscore("../old_model_and_prediction/predictions/en/predictions_wikiner/predictions_wrong.txt", wikiner =True)

@@ -3,7 +3,6 @@ import json
 import sys
 from pprint import pprint
 
-from MinitaggerCRF_tf import MinitaggerCRF_tf
 from MinitaggerSVM import MinitaggerSVM
 from helper import utils
 
@@ -14,8 +13,6 @@ from helper.utils import *
 
 from MinitaggerCRF import MinitaggerCRF
 from FeatureExtractor_CRF_SVM import FeatureExtractor_CRF_SVM
-
-
 
 class Final_training(object):
     def __init__(self, parameters):
@@ -45,8 +42,6 @@ class Final_training(object):
         # initialize feature extractor with the right feature template
         self.feature_extractor = FeatureExtractor_CRF_SVM(self.feature_template, self.language,
                                                          self.embedding_size if self.feature_template=="embedding" else None)
-        #if self.feature_template == "embedding":
-        #    self.feature_extractor.embedding_type = parameters['embedding_type']
 
         self.train_sequence = SequenceData(self.train_data_path,language=self.language, pos_tag=True)
         self.validation_sequence = SequenceData(self.validation_data_path,language=self.language, pos_tag=True) if self.validation_data_path else None

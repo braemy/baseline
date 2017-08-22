@@ -1,50 +1,118 @@
-conll_de:
-  language: de
-  train_data_path: ../../ner/nerc-conll2003/deu.train
-  validation_data_path: ../../ner/nerc-conll2003/deu.testa
-  test_data_path: ../../ner/nerc-conll2003/deu.testb
-  feature_template: baseline
-  method: SVM
-  model_name: SVM_conll_baseline_finale_score_small_feature_name
-  best_param:
-    epsilon: 7.196856730011514e-06
-    cost: 0.016378937069540647
-  train_with_step: False
-
-wikiner_de:
-  language: de
-  train_data_path: ../../wikiner_dataset/aij-wikiner-de-wp2-simplified_without_pperEntity
-  validation_data_path: ../../ner/nerc-conll2003/deu.testa
-  test_data_path: ../../ner/nerc-conll2003/deu.testb
-  feature_template: baseline
-  method: SVM
-  model_name: SVM_wikiner_de_baseline_finale_score_without_pperEntity
-  best_param:
-    epsilon: 7.196856730011514e-06
-    cost: 0.016378937069540647
-  train_with_step: False
-
-conll_wikiner_de:
-  language: de
-  train_data_path: ../../wikiner_dataset/wiki_conll_without_pperEntity
-  validation_data_path: ../../ner/nerc-conll2003/deu.testa
-  test_data_path: ../../ner/nerc-conll2003/deu.testb
-  feature_template: baseline
-  method: SVM
-  model_name: SVM_wikiner_conll_de_baseline_finale_score_without_pperEntity
-  best_param:
-    epsilon: 7.196856730011514e-06
-    cost: 0.016378937069540647
-  train_with_step: False
-
-new:
+english_final_training:
   language: en
-  train_data_path: "../../new_dataset/wp0/combined_wp0_1.0_football_team.txt"
-  validation_data_path: ../../ner/nerc-conll2003/eng.testa
-  test_data_path: ../../ner/nerc-conll2003/eng.testb
+  train_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test/en.train
+  validation_data_path:
+  test_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test/en.testb
   feature_template: baseline
   method: SVM
-  model_name: SVM_new_baseline_finale_1.0_football_team
+  model_name: SVM_final
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+  train_with_step: False
+
+german_final_training:
+  language: de
+  train_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test/de.train
+  validation_data_path:
+  test_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test/de.testb
+  feature_template: baseline
+  method: SVM
+  model_name: SVM_final
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+  train_with_step: False
+
+
+french_final_training:
+  language: fr
+  train_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test/fr.train
+  validation_data_path:
+  test_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test/fr.train
+  feature_template: baseline
+  method: SVM
+  model_name: SVM_final
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+  train_with_step: False
+
+italian_final_training:
+  language: it
+  train_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test/it.train
+  validation_data_path:
+  test_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test/it.train
+  feature_template: baseline
+  method: SVM
+  model_name: SVM_final
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+  train_with_step: False
+
+
+english_small_training:
+  language: en
+  train_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test_small/en.train
+  validation_data_path:
+  test_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test_small/en.testb
+  feature_template: baseline
+  method: SVM
+  model_name: SVM_small
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+  train_with_step: False
+
+german_small_training:
+  language: de
+  train_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test_small/de.train
+  validation_data_path:
+  test_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test_small/de.testb
+  feature_template: baseline
+  method: SVM
+  model_name: SVM_small
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+  train_with_step: False
+
+
+french_small_training:
+  language: fr
+  train_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test_small/fr.train
+  validation_data_path:
+  test_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test_small/fr.train
+  feature_template: baseline
+  method: SVM
+  model_name: SVM_small
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+  train_with_step: False
+
+italian_small_training:
+  language: it
+  train_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test_small/it.train
+  validation_data_path:
+  test_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test_small/it.train
+  feature_template: baseline
+  method: SVM
+  model_name: SVM_small
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+  train_with_step: False
+
+test_final_training:
+  language: en
+  train_data_path: /Users/taaalwi1/Documents/ner/datasets/conll/nerc-conll2003/eng-simplified.train
+  validation_data_path:
+  test_data_path: /Users/taaalwi1/Documents/ner/datasets/conll/nerc-conll2003/eng-simplified.testa
+  feature_template: baseline
+  method: SVM
+  model_name: SVM_final
   best_param:
     epsilon: 7.196856730011514e-06
     cost: 0.016378937069540647
