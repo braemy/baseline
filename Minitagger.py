@@ -31,7 +31,7 @@ class Minitagger(object):
         # path to output the predictions
         self.model_path = ""
         # path of the project
-        self.project_dir = "../models_and_predictions/"
+        self.project_dir = "."
         # language of the model
         self.language = ""
         # wikiner dataset
@@ -58,6 +58,7 @@ class Minitagger(object):
     def set_model_path(self, model_path):
         create_recursive_folder([self.project_dir, "models_path", self.language, model_path])
         self.model_path = os.path.join(self.project_dir, "models_path", self.language, model_path)
+        print("Model path:", self.model_path)
 
     @staticmethod
     def display_results(title, dict):

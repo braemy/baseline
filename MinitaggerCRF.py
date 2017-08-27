@@ -59,7 +59,7 @@ class MinitaggerCRF(Minitagger):
 
         if not self.quiet:
             print("Extract test features")
-        self.feature_extractor.is_training = False
+        #self.feature_extractor.is_training = False
 
         if validation_sequence is not None:
             validation_tokens_sequence, self.validation_labels_sequence, valid_pos_sequence = validation_sequence.split_token_label(
@@ -193,6 +193,7 @@ class MinitaggerCRF(Minitagger):
     def __save_model(self, model):
         with open(os.path.join(self.model_path, "crf_model.p"), 'wb') as fid:
             pickle.dump(model, fid)
+            print("model saved in ", self.model_path)
 
     def load_model(self):
         with open(os.path.join(self.model_path, "crf_model.p"), 'rb') as fid:

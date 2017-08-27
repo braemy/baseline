@@ -14,17 +14,14 @@ parameters:
 
 models:
   CoNLL_en: None
-  CoNLL_de: ../output/de_deu_2017-08-10_18-45-42-177588/model/model_00014.ckpt
+  CoNLL_de: CRF_conll_emb300_finale_score_2017-08-27_18-15-59-125062
   WikiNER_en: None
   WikiNER_de: None
   en: None
-  #de: ../output/de_combined_wp3_0.3_2017-08-23_13-43-26-72157/model/model_001.028.ckpt #gpu1-4
-  #de: ../output/de_combined_wp3_0.3_2017-08-23_13-43-26-72157/model/model_001.032.ckpt #gpu1-4
-  de: ../output/de_combined_wp3_0.3_2017-08-23_13-43-26-72157/model/model_001.128.ckpt #gpu1-4
-  it: ../output/it_combined_wp3_0.3_2017-08-23_20-40-29-220420/model/model_003.004.ckpt #gpu1-4
-  fr: ../output/fr_combined_wp3_0.3_2017-08-25_06-53-59-673027//model/model_001.007.ckpt #gpu1-4
+  de: CRF_de_emb_2017-08-27_18-55-53-602241
   pt: None
   es: None
+  als: CRF_als_emb_2017-08-27_17-26-16-488087
 
 training:
   CoNLL_en: ../../../ner/nerc-conll2003/eng.train
@@ -39,50 +36,52 @@ training:
   en: ../../../new_dataset/en/wp3/combined_wp3_0.3.train
 
 datasets:
-  CoNLL_en: ../../../ner/nerc-conll2003/eng.testb
-  CoNLL_de: ../../../ner/nerc-conll2003/deu.testb
-  WikiNER_en: ../../../wikiner_dataset/aij-wikiner-en-wp2-simplified.test
-  WikiNER_de: ../../../wikiner_dataset/aij-wikiner-de-wp2-simplified.test
-  WikiNER_fr: ../../../wikiner_dataset/aij-wikiner-fr-wp2-simplified.test
-  WikiNER_it: ../../../wikiner_dataset/aij-wikiner-it-wp2-simplified.test
+  CoNLL_en: ../../ner/nerc-conll2003/eng.testb
+  CoNLL_de: ../../ner/nerc-conll2003/deu.testb
+  WikiNER_en: ../../wikiner_dataset/aij-wikiner-en-wp2-simplified.test
+  WikiNER_de: ../../wikiner_dataset/aij-wikiner-de-wp2-simplified.test
+  WikiNER_fr: ../../wikiner_dataset/aij-wikiner-fr-wp2-simplified.test
+  WikiNER_it: ../../wikiner_dataset/aij-wikiner-it-wp2-simplified.test
   #english
-  en: ../../../new_dataset/en/wp3/combined_wp3_0.1.test
+  en: ../../new_dataset/en/wp3/combined_wp3_0.1.test
   #german
-  de: ../../../new_dataset/de/wp3/combined_wp3_0.3.test
-  als: ../../../new_dataset/als/wp3/combined_wp3_1.0.txt
-  als_b: ../../../new_dataset/als/wp3/combined_wp3_1.0_b.txt
-  lb: ../../../new_dataset/lb/wp3/combined_wp3_1.0.txt
-  lb_b: ../../../new_dataset/lb/wp3/combined_wp3_1.0_b.txt
-  nds: ../../../new_dataset/nds/wp3/combined_wp3_1.0.txt
-  nds_b: ../../../new_dataset/nds/wp3/combined_wp3_1.0_b.txt
-  ksh: ../../../new_dataset/ksh/wp3/combined_wp3_1.0.txt
-  ksh_b: ../../../new_dataset/ksh/wp3/combined_wp3_1.0_b.txt
-  pfl: ../../../new_dataset/pfl/wp3/combined_wp3_1.0.txt
-  pfl_b: ../../../new_dataset/pfl/wp3/combined_wp3_1.0_b.txt
-  pdc: ../../../new_dataset/pdc/wp3/combined_wp3_1.0.txt
-  pdc_b: ../../../new_dataset/pdc/wp3/combined_wp3_1.0_b.txt
+  de: ../../new_dataset/de/wp3/combined_wp3_0.3.test
+  als: ../../new_dataset/als/wp3/combined_wp3_1.0.txt
+  als_b: ../../new_dataset/als/wp3/combined_wp3_1.0_b.txt
+  als_test: ../../new_dataset/als/wp3/combined_wp3_1.0.test
+
+  lb: ../../new_dataset/lb/wp3/combined_wp3_1.0.txt
+  lb_b: ../../new_dataset/lb/wp3/combined_wp3_1.0_b.txt
+  nds: ../../new_dataset/nds/wp3/combined_wp3_1.0.txt
+  nds_b: ../../new_dataset/nds/wp3/combined_wp3_1.0_b.txt
+  ksh: ../../new_dataset/ksh/wp3/combined_wp3_1.0.txt
+  ksh_b: ../../new_dataset/ksh/wp3/combined_wp3_1.0_b.txt
+  pfl: ../../new_dataset/pfl/wp3/combined_wp3_1.0.txt
+  pfl_b: ../../new_dataset/pfl/wp3/combined_wp3_1.0_b.txt
+  pdc: ../../new_dataset/pdc/wp3/combined_wp3_1.0.txt
+  pdc_b: ../../new_dataset/pdc/wp3/combined_wp3_1.0_b.txt
   #italian
-  it: ../../../new_dataset/it/wp3/combined_wp3_0.3.test
-  pms: ../../../new_dataset/pms/wp3/combined_wp3_1.0.txt
-  pms_b: ../../../new_dataset/pms/wp3/combined_wp3_1.0_b.txt
-  lmo: ../../../new_dataset/lmo/wp3/combined_wp3_1.0.txt
-  lmo_b: ../../../new_dataset/lmo/wp3/combined_wp3_1.0_b.txt
-  scn: ../../../new_dataset/scn/wp3/combined_wp3_1.0.txt
-  scn_b: ../../../new_dataset/scn/wp3/combined_wp3_1.0_b.txt
-  vec: ../../../new_dataset/vec/wp3/combined_wp3_1.0.txt
-  vec_b: ../../../new_dataset/vec/wp3/combined_wp3_1.0_b.txt
-  nap: ../../../new_dataset/nap/wp3/combined_wp3_1.0.txt
-  nap_b: ../../../new_dataset/nap/wp3/combined_wp3_1.0_b.txt
-  sc: ../../../new_dataset/sc/wp3/combined_wp3_1.0.txt
-  sc_b: ../../../new_dataset/sc/wp3/combined_wp3_1.0_b.txt
-  co: ../../../new_dataset/co/wp3/combined_wp3_1.0.txt
-  co_b: ../../../new_dataset/co/wp3/combined_wp3_1.0_b.txt
-  rm: ../../../new_dataset/rm/wp3/combined_wp3_1.0.txt
-  rm_b: ../../../new_dataset/rm/wp3/combined_wp3_1.0_b.txt
-  lij: ../../../new_dataset/lij/wp3/combined_wp3_1.0.txt
-  lij_b: ../../../new_dataset/lij/wp3/combined_wp3_1.0_b.txt
-  fur: ../../../new_dataset/fur/wp3/combined_wp3_1.0.txt
-  fur_b: ../../../new_dataset/fur/wp3/combined_wp3_1.0_b.txt
+  it: ../../new_dataset/it/wp3/combined_wp3_0.3.test
+  pms: ../../new_dataset/pms/wp3/combined_wp3_1.0.txt
+  pms_b: ../../new_dataset/pms/wp3/combined_wp3_1.0_b.txt
+  lmo: ../../new_dataset/lmo/wp3/combined_wp3_1.0.txt
+  lmo_b: ../../new_dataset/lmo/wp3/combined_wp3_1.0_b.txt
+  scn: ../../new_dataset/scn/wp3/combined_wp3_1.0.txt
+  scn_b: ../../new_dataset/scn/wp3/combined_wp3_1.0_b.txt
+  vec: ../../new_dataset/vec/wp3/combined_wp3_1.0.txt
+  vec_b: ../../new_dataset/vec/wp3/combined_wp3_1.0_b.txt
+  nap: ../../new_dataset/nap/wp3/combined_wp3_1.0.txt
+  nap_b: ../../new_dataset/nap/wp3/combined_wp3_1.0_b.txt
+  sc: ../../new_dataset/sc/wp3/combined_wp3_1.0.txt
+  sc_b: ../../new_dataset/sc/wp3/combined_wp3_1.0_b.txt
+  co: ../../new_dataset/co/wp3/combined_wp3_1.0.txt
+  co_b: ../../new_dataset/co/wp3/combined_wp3_1.0_b.txt
+  rm: ../../new_dataset/rm/wp3/combined_wp3_1.0.txt
+  rm_b: ../../new_dataset/rm/wp3/combined_wp3_1.0_b.txt
+  lij: ../../new_dataset/lij/wp3/combined_wp3_1.0.txt
+  lij_b: ../../new_dataset/lij/wp3/combined_wp3_1.0_b.txt
+  fur: ../../new_dataset/fur/wp3/combined_wp3_1.0.txt
+  fur_b: ../../new_dataset/fur/wp3/combined_wp3_1.0_b.txt
   #French:
   oc: ../../../new_dataset/oc/wp3/combined_wp3_1.0.test
   ht: ../../../new_dataset/ht/wp3/combined_wp3_1.0.test
@@ -95,7 +94,13 @@ datasets:
   pt: None
   es: None
 
+language: de
 experiments:
+  CoNLL_de:
+    - [CoNLL_de, CoNLL_de]
+    - [CoNLL_de,de]
+    - [CoNLL_de,als_test]
+    - [CoNLL_de,WikiNER_de]
   de_b:
     - [de,als_b]
     - [de,ksh_b]
@@ -104,14 +109,14 @@ experiments:
     - [de,nds_b]
     - [de,lb_b]
   de:
-    - [de, WikiNER_de]
-    - [de,als]
+    #- [de, WikiNER_de]
+    #- [de,de]
+    #- [de,als]
     - [de,ksh]
     - [de,pfl]
     - [de,pdc]
     - [de,nds]
     - [de,lb]
-    - [de,de]
     - [de,en]
   it:
     - [it, fur]
@@ -157,6 +162,12 @@ experiments:
     - [fr, frp]
     - [fr, fr]
     - [fr, WikiNER_fr]
+
+  als:
+    - [als,als_test]
+    - [als, CoNLL_de]
+    - [als,de]
+    - [als,WikiNER_de]
 
 
 
