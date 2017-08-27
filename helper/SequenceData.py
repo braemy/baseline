@@ -5,6 +5,8 @@ import copy
 import os
 import pickle
 
+import sys
+from tqdm import tqdm
 import numpy as np
 from helper.utils_data import is_float, is_int
 
@@ -232,15 +234,18 @@ class SequenceData(object):
             label_sequence = []
             id_token = []
             capitalized = np.random.rand()
-            for line in input_file:
+            for line in tqdm(input_file):
                 if "-DOCSTART-" in line:
                     continue
-                tokens = line.split()
-                if tokens:
+                if line.strip():
+                    tokens = line.strip().split(" ")
                     # the word is the 1st token
                     word = tokens[token_index]
-
-                    label = tokens[label_index]
+                    try:
+                        label = tokens[label_index]
+                    except:
+                        print(line)
+                        sys.exit()
                     pos_tag = tokens[pos_tag_index]
                     if label is None:
                         # set the partially labeled flag to True
@@ -254,6 +259,7 @@ class SequenceData(object):
                     word_sequence.append(word)
                     # build sequence of labels
                     label_sequence.append(label)
+
                     # build_sequence of pos tags
                     pos_sequence.append(pos_tag)
                 # line is empty means that a new sentence if about to start

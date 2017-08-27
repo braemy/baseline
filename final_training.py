@@ -52,7 +52,7 @@ class Final_training(object):
             if self.test_sequence and self.validation_sequence:
                 vocabulary = self.train_sequence.vocabulary.union(self.test_sequence.vocabulary).union(self.validation_sequence.vocabulary)
             else:
-                vocabulary = self.train_sequence.vocabulary
+                vocabulary = self.train_sequence.vocabulary.union(self.test_sequence.vocabulary)
             self.feature_extractor.load_word_embeddings(self.embedding_path, self.embedding_size, vocabulary)
 
         print("Number of sentences in training dataset:", len(self.train_sequence.sequence_pairs))
@@ -149,14 +149,12 @@ class Final_training(object):
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
-    argparser.add_argument("--conf", type=str, help="name of the configuration in the parameter file",
+    argparser.add_argument("--confs",nargs='+', type=str, help="list of names of the configuration in the parameter file",
                            required=True)
-
-    #parameters = load_parameters("conll_de")
-    #parameters = load_parameters("wikiner_de")
     parsed_args = argparser.parse_args()
-    parameters = load_parameters(parsed_args.conf)
-    training = Final_training(parameters=parameters)
-    training.train()
+    for conf in parsed_args.confs:
+        parameters = load_parameters(conf)
+        training = Final_training(parameters=parameters)
+        training.train()
 
 

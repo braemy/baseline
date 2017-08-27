@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 import os
 import pickle
@@ -132,7 +133,7 @@ class FeatureExtractor_CRF_SVM(FeatureExtractor):
                     sentence_labels[position] = (self._get_label(label))
                     # append feature id in features list
                     sentence_features[position] = (
-                        self._get_features(word_sequence, position, pos_tag=pos_tags, numeric_feature=False))
+                        self._get_features(word_sequence, position, pos_tag=pos_sequence, numeric_feature=False))
                     # append location in locations list
                     sentence_locations[position] = ((sequence_num, position))
 

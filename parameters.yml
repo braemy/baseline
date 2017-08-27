@@ -1,3 +1,416 @@
+crf_conll_de:
+  language: de
+  train_data_path: ../../ner/nerc-conll2003/deu.train
+  validation_data_path: ../../ner/nerc-conll2003/deu.testa
+  test_data_path: ../../ner/nerc-conll2003/deu.testb
+  feature_template: baseline
+  method: CRF
+  model_name: CRF_conll_baseline_finale_score
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+
+conll_en:
+  language: en
+  train_data_path: ../../ner/nerc-conll2003/eng.train
+  validation_data_path: ../../ner/nerc-conll2003/eng.testa
+  test_data_path: ../../ner/nerc-conll2003/eng.testb
+  feature_template: baseline
+  method: CRF
+  model_name: CRF_conll_baseline_finale_score
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+conll_en_emb:
+  language: en
+  train_data_path: ../../ner/nerc-conll2003/eng.train
+  validation_data_path: ../../ner/nerc-conll2003/eng.testa
+  test_data_path: ../../ner/nerc-conll2003/eng.testb
+  feature_template: embedding
+  embedding_size: 300
+  embedding_type: fasttext
+  embedding_path: ../../word_embeddings/fasttext
+  #embedding_path: ../../word_embeddings/glove
+  method: CRF
+  model_name: CRF_conll_emb300_finale_score
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+conll_de_emb:
+  language: de
+  train_data_path: ../../ner/nerc-conll2003/deu.train
+  validation_data_path: ../../ner/nerc-conll2003/deu.testa
+  test_data_path: ../../ner/nerc-conll2003/deu.testb
+  feature_template: embedding
+  embedding_size: 300
+  embedding_type: fasttext
+  embedding_path: ../../word_embeddings/fasttext
+  #embedding_path: ../../word_embeddings/glove
+  method: CRF
+  model_name: CRF_conll_emb300_finale_score
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+
+
+wikiner_de:
+  language: de
+  train_data_path: ../../wikiner_dataset/aij-wikiner-de-wp2-simplified_without_pperEntity
+  validation_data_path: ../../ner/nerc-conll2003/deu.testa
+  test_data_path: ../../ner/nerc-conll2003/deu.testb
+  feature_template: baseline
+  method: SVM
+  model_name: SVM_wikiner_de_baseline_finale_score_without_pperEntity
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+  train_with_step: False
+
+wikiner_de_crf:
+  language: de
+  train_data_path: ../../wikiner_dataset/aij-wikiner-de-wp2-simplified.train
+  validation_data_path: ../../ner/nerc-conll2003/deu.testa
+  test_data_path: ../../ner/nerc-conll2003/deu.testb
+  feature_template: baseline
+  method: CRF
+  model_name: CRF_wikiner_de_baseline
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+
+  train_with_step: False
+
+wikiner_en:
+  language: en
+  train_data_path: ../../wikiner_dataset/aij-wikiner-en-wp2-simplified
+  validation_data_path: ../../ner/nerc-conll2003/eng.testa
+  test_data_path: ../../ner/nerc-conll2003/eng.testb
+  feature_template: baseline
+  method: SVM
+  model_name: SVM_wikiner_en_baseline_finale_score
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+  train_with_step: False
+
+wikiner_en_crf:
+  language: en
+  train_data_path: ../../wikiner_dataset/aij-wikiner-en-wp2-simplified.train
+  #validation_data_path: ../../new_dataset/de/wp3/combined_wp3_1.0.valid
+  #test_data_path: ../../new_dataset/de/wp3/combined_wp3_1.0.test
+  validation_data_path: ../../ner/nerc-conll2003/eng.testa
+  test_data_path: ../../ner/nerc-conll2003/eng.testb
+  feature_template: baseline
+  method: CRF
+  model_name: CRF_wikiner_en_baseline_finale_score
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+wikiner_en_crf_emb:
+  language: en
+  train_data_path: ../../wikiner_dataset/aij-wikiner-en-wp2-simplified.train
+  validation_data_path: ../../ner/nerc-conll2003/eng.testa
+  test_data_path: ../../ner/nerc-conll2003/eng.testb
+  feature_template: embedding
+  embedding_size: 300
+  embedding_type: fasttext
+  embedding_path: ../../word_embeddings/fasttext
+  #embedding_path: ../../word_embeddings/glove
+  method: CRF
+  model_name: CRF_wikiner_emb300_finale_score
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+wikiner_de_crf_emb:
+  language: de
+  train_data_path: ../../wikiner_dataset/aij-wikiner-de-wp2-simplified.train
+  validation_data_path: ../../ner/nerc-conll2003/deu.testa
+  test_data_path: ../../ner/nerc-conll2003/deu.testb
+  feature_template: embedding
+  embedding_size: 300
+  embedding_type: fasttext
+  embedding_path: ../../word_embeddings/fasttext
+  #embedding_path: ../../word_embeddings/glove
+  method: CRF
+  model_name: CRF_wikiner_emb300_finale_score
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+new:
+  language: en
+  train_data_path: ../../new_dataset/en/wp3/combined_wp3_0.001.txt
+  model_name: SVM_new_baseline_finale_wp3_0.001
+  validation_data_path: ../../ner/nerc-conll2003/eng.testa
+  test_data_path: ../../ner/nerc-conll2003/eng.testb
+  feature_template: baseline
+  method: SVM
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+  train_with_step: False
+
+
+new_crf_en:
+  language: en
+  train_data_path: ../../new_dataset/en/wp3/combined_wp3_0.005.train
+  validation_data_path: ../../ner/nerc-conll2003/eng.testa
+  test_data_path: ../../ner/nerc-conll2003/eng.testb
+  feature_template: baseline
+  method: CRF
+  model_name: CRF_en_new_en_baseline
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+new_crf_en_emb:
+  language: en
+  train_data_path: ../../new_dataset/en/wp3/combined_wp3_0.1.train
+  validation_data_path: ../../ner/nerc-conll2003/eng.testa
+  test_data_path: ../../ner/nerc-conll2003/eng.testb
+  feature_template: embedding
+  method: CRF
+  model_name: CRF_en_new_en_emb
+  embedding_size: 300
+  embedding_path: ../../word_embeddings/fasttext
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+de_crf_emb:
+  language: de
+  train_data_path: ../../new_dataset/de/wp3/combined_wp3_0.3.train
+  #validation_data_path: ../../ner/nerc-conll2003/deu.testa
+  test_data_path: ../../ner/nerc-conll2003/deu.testb
+  feature_template: embedding
+  method: CRF
+  model_name: CRF_de_emb
+  embedding_size: 300
+  embedding_path: ../../word_embeddings/fasttext
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+it_crf_emb:
+  language: it
+  train_data_path: ../../new_dataset/it/wp3/combined_wp3_0.3.train
+  #validation_data_path:  ../../new_dataset/it/wp3/combined_wp3_0.3.valid
+  test_data_path:  ../../new_dataset/it/wp3/combined_wp3_0.3.test
+  feature_template: embedding
+  method: CRF
+  model_name: CRF_it_emb
+  embedding_size: 300
+  embedding_path: ../../word_embeddings/fasttext
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+fr_crf_emb:
+  language: fr
+  train_data_path: ../../new_dataset/fr/wp3/combined_wp3_0.3.train
+  #validation_data_path: ../../new_dataset/fr/wp3/combined_wp3_0.3.valid
+  test_data_path: ../../new_dataset/fr/wp3/combined_wp3_0.3.test
+  feature_template: embedding
+  method: CRF
+  model_name: CRF_fr_emb
+  embedding_size: 300
+  embedding_path: ../../word_embeddings/fasttext
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+als_crf_emb:
+  language: de
+  train_data_path: ../../new_dataset/als/wp3/combined_wp3_1.0.train
+  validation_data_path: ../../new_dataset/als/wp3/combined_wp3_1.0.valid
+  test_data_path: ../../new_dataset/als/wp3/combined_wp3_1.0.test
+  feature_template: embedding
+  method: CRF
+  model_name: CRF_als_emb
+  embedding_size: 300
+  embedding_path: ../../word_embeddings/fasttext
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+nds_crf_emb:
+  language: de
+  train_data_path: ../../new_dataset/nds/wp3/combined_wp3_1.0.train
+  validation_data_path: ../../new_dataset/nds/wp3/combined_wp3_1.0.valid
+  test_data_path: ../../new_dataset/nds/wp3/combined_wp3_1.0.test
+  feature_template: embedding
+  method: CRF
+  model_name: CRF_nds_emb
+  embedding_size: 300
+  embedding_path: ../../word_embeddings/fasttext
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+new_crf_de:
+  language: de
+  train_data_path: ../../new_dataset/de/wp3/combined_wp3_1.0.train
+  validation_data_path: ../../new_dataset/de/wp3/combined_wp3_1.0.valid
+  test_data_path: ../../new_dataset/de/wp3/combined_wp3_1.0.test
+  feature_template: baseline
+  method: CRF
+  model_name: CRF_de_new_en_baseline
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+new_crf_als:
+  language: de
+  train_data_path: ../../new_dataset/als/wp3/combined_wp3_1.0.txt
+  validation_data_path: ../../new_dataset/de/wp3/combined_wp3_1.0.valid
+  test_data_path: ../../new_dataset/de/wp3/combined_wp3_1.0.test
+  feature_template: baseline
+  method: CRF
+  model_name: CRF_als_new_en_baseline
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+new_crf_als_emb:
+  language: de
+  train_data_path: ../../new_dataset/als/wp3/combined_wp3_1.0.txt
+  validation_data_path: ../../ner/nerc-conll2003/deu.testa
+  test_data_path: ../../ner/nerc-conll2003/deu.testb
+  feature_template: embedding
+  method: CRF
+  model_name: CRF_als_emb
+  embedding_size: 300
+  embedding_path: ../../word_embeddings/fasttext
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+
+new_crf_als_proc_emb:
+  language: de
+  train_data_path: ../../new_dataset/als/wp3/combined_processed_wp3_1.0.txt
+  #validation_data_path: ../../ner/nerc-conll2003/deu.testa
+  #test_data_path: ../../ner/nerc-conll2003/deu.testb
+  feature_template: embedding
+  method: CRF
+  model_name: CRF_als_proc_emb
+  embedding_size: 300
+  embedding_path: ../../word_embeddings/fasttext
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+
+
+new_crf_als_proc:
+  language: de
+  train_data_path: ../../new_dataset/als/wp3/combined_processed_wp3_1.0.txt
+  validation_data_path: ../../new_dataset/de/wp3/combined_wp3_1.0.valid
+  test_data_path: ../../new_dataset/de/wp3/combined_wp3_1.0.test
+  feature_template: baseline
+  method: CRF
+  model_name: CRF_als_proc_new_en_baseline
+  best_param:
+    epsilon: 7.196856730011514e-06
+    cost: 0.016378937069540647
+    c1: 0.1282051282051282
+    c2: 0.23076923076923075
+    epsilon_crf: 0.0008376776400682924
+  train_with_step: False
+
+parameter_selection:
+  language: de
+  train_data_path: /Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/training_data/de
+  validation_data_path: None
+  test_data_path: /Users/taaalwi1/Documents/Swisscom/named_entity_recognition/data/external_api_test/de_simplified.testb
+  feature_template: baseline
+  method: SVM
+  model_name: SCV_parameter_selection
+  number_of_trial: 2
+
+
+
 english_final_training:
   language: en
   train_data_path: /Users/taaalwi1/Documents/ner/datasets/train_test/en.train
@@ -136,4 +549,6 @@ parameter_selection:
 
 
 
+#/usr/bin/python3 main.py --train_data_path ../../new_dataset/en/wp3/combined_wp3_1.0.test --model_name CRF__en_new_en_baseline_2017-08-11_15-04-01-146496 --language en --prediction_name test_new_en
 
+#/usr/bin/python3 main.py --train_data_path ../../new_dataset/als/wp3/combined_wp3_1.0.txt --model_name CRF_wikiner_emb300_finale_score_2017-08-13_23-13-19-362909 --language de --prediction_name wikiner_als --embedding_path ../../word_embeddings/fasttext/ --embedding_size 300 --feature_template embeddin

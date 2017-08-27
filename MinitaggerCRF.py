@@ -10,6 +10,8 @@ import sklearn_crfsuite
 from Minitagger import Minitagger
 from helper.model_evaluation import report_fscore_from_file
 from helper.score import Score
+import sys
+
 
 
 class MinitaggerCRF(Minitagger):
@@ -31,11 +33,11 @@ class MinitaggerCRF(Minitagger):
         print("CRF (sklearn)")
 
     def extract_features(self, train_sequence, test_sequence, validation_sequence=None, data_to_use=10000):
-        if not validation_sequence and train_sequence:
-            train_sequence, validation_sequence = train_sequence.split_train_validation(
-                train_ratio=1 - 0.05)
-            if not self.quiet:
-                print("Split: ", "train: ", 1 - 0.05, "dev:", self.validation_ratio)
+        #if not validation_sequence and train_sequence:
+        #    train_sequence, validation_sequence = train_sequence.split_train_validation(
+        #        train_ratio=1 - 0.05)
+        #    if not self.quiet:
+        #        print("Split: ", "train: ", 1 - 0.05, "dev:", self.validation_ratio)
 
         # Extract feature of the training set
         if not self.quiet:
@@ -67,9 +69,10 @@ class MinitaggerCRF(Minitagger):
                                                                                          valid_pos_sequence,
                                                                                          extract_all=True)
             self.__save_features(self.validation_features, self.model_path, "validation_features")
-
+        self.feature_extractor.is_training = False
         self.test_features, _, _ = self.feature_extractor.extract_features_crf(test_tokens_sequence,
                                                                                self.test_labels_sequence,
+                                                                               test_pos_sequence,
                                                                                extract_all=True)
         self.__save_features(test_tokens_sequence, self.model_path, "test_features")
 
@@ -107,9 +110,9 @@ class MinitaggerCRF(Minitagger):
             print("Train model")
         crf.fit(
             self.train_features,
-            self.train_labels_sequence,
-            X_dev=self.validation_features,
-            y_dev=self.validation_labels_sequence)
+            self.train_labels_sequence)
+            #X_dev=self.validation_features,
+            #y_dev=self.validation_labels_sequence)
 
         if not self.quiet:
             print("Predict")
