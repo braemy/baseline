@@ -18,8 +18,11 @@ crf_conll_de:
 conll_en:
   language: en
   train_data_path: ../../ner/nerc-conll2003/eng.train
+  #train_data_path: ../../ner/small_datasets/eng-simplified.train
   validation_data_path: ../../ner/nerc-conll2003/eng.testa
+  #validation_data_path: ../../ner/small_datasets/eng-simplified.testa
   test_data_path: ../../ner/nerc-conll2003/eng.testb
+  #test_data_path: ../../ner/small_datasets/eng-simplified.testb
   feature_template: baseline
   method: CRF
   model_name: CRF_conll_baseline_finale_score
@@ -31,16 +34,33 @@ conll_en:
     epsilon_crf: 0.0008376776400682924
   train_with_step: False
 
+conll_tf_en:
+  language: en
+  #train_data_path: ../../ner/nerc-conll2003/eng.train
+  train_data_path: ../../ner/small_datasets/eng-simplified.train
+  #validation_data_path: ../../ner/nerc-conll2003/eng.testa
+  validation_data_path: ../../ner/small_datasets/eng-simplified.testa
+  #test_data_path: ../../ner/nerc-conll2003/eng.testb
+  test_data_path: ../../ner/small_datasets/eng-simplified.testb
+  feature_template: embedding
+  embedding_size: 300
+  embedding_type: fasttext
+  embedding_path: ../../word_embeddings
+  method: CRF_TF
+  model_name: CRF_conllTF_finale_score
+  batch_size: 32
+  learning_rate: 0.0004
+  early_stopping: 5
+
 conll_en_emb:
   language: en
   train_data_path: ../../ner/nerc-conll2003/eng.train
   validation_data_path: ../../ner/nerc-conll2003/eng.testa
   test_data_path: ../../ner/nerc-conll2003/eng.testb
-  feature_template: embedding
+  feature_template: fasttext
   embedding_size: 300
-  embedding_type: fasttext
-  embedding_path: ../../word_embeddings/fasttext
-  #embedding_path: ../../word_embeddings/glove
+  embedding_type: polyglot
+  embedding_path: ../../word_embeddings/
   method: CRF
   model_name: CRF_conll_emb300_finale_score
   best_param:
@@ -59,7 +79,7 @@ conll_de_emb:
   feature_template: embedding
   embedding_size: 300
   embedding_type: fasttext
-  embedding_path: ../../word_embeddings/fasttext
+  embedding_path: ../../word_embeddings/
   #embedding_path: ../../word_embeddings/glove
   method: CRF
   model_name: CRF_conll_emb300_finale_score
@@ -142,7 +162,7 @@ wikiner_en_crf_emb:
   feature_template: embedding
   embedding_size: 300
   embedding_type: fasttext
-  embedding_path: ../../word_embeddings/fasttext
+  embedding_path: ../../word_embeddings/
   #embedding_path: ../../word_embeddings/glove
   method: CRF
   model_name: CRF_wikiner_emb300_finale_score
@@ -162,7 +182,7 @@ wikiner_de_crf_emb:
   feature_template: embedding
   embedding_size: 300
   embedding_type: fasttext
-  embedding_path: ../../word_embeddings/fasttext
+  embedding_path: ../../word_embeddings/
   #embedding_path: ../../word_embeddings/glove
   method: CRF
   model_name: CRF_wikiner_emb300_finale_score
@@ -213,7 +233,7 @@ new_crf_en_emb:
   method: CRF
   model_name: CRF_en_new_en_emb
   embedding_size: 300
-  embedding_path: ../../word_embeddings/fasttext
+  embedding_path: ../../word_embeddings/
   best_param:
     epsilon: 7.196856730011514e-06
     cost: 0.016378937069540647
@@ -231,7 +251,7 @@ de_crf_emb:
   method: CRF
   model_name: CRF_de_emb
   embedding_size: 300
-  embedding_path: ../../word_embeddings/fasttext
+  embedding_path: ../../word_embeddings/polyglot
   best_param:
     epsilon: 7.196856730011514e-06
     cost: 0.016378937069540647
@@ -249,7 +269,8 @@ it_crf_emb:
   method: CRF
   model_name: CRF_it_emb
   embedding_size: 300
-  embedding_path: ../../word_embeddings/fasttext
+  embedding_type:
+  embedding_path: ../../word_embeddings/
   best_param:
     epsilon: 7.196856730011514e-06
     cost: 0.016378937069540647
@@ -257,6 +278,66 @@ it_crf_emb:
     c2: 0.23076923076923075
     epsilon_crf: 0.0008376776400682924
   train_with_step: False
+
+lmo_crf_tf_emb:
+  language: lmo
+  train_data_path: ../../new_dataset/lmo/wp3/combined_wp3_1.0.train
+  validation_data_path:  ../../new_dataset/lmo/wp3/combined_wp3_1.0.valid
+  test_data_path:  ../../new_dataset/lmo/wp3/combined_wp3_1.0.test
+  feature_template: embedding
+  method: CRF_TF
+  model_name: CRF_TF_lmo_fast_emb
+  embedding_size: 300
+  embedding_type: fasttext
+  embedding_path: ../../word_embeddings/
+  batch_size: 32
+  learning_rate: 0.0004
+  early_stopping: 5
+
+lmo_crf_tf_noOOV:
+  language: lmo
+  train_data_path: ../../new_dataset/lmo/wp3/combined_wp3_1.0.train
+  validation_data_path:  ../../new_dataset/lmo/wp3/combined_wp3_1.0.valid
+  test_data_path:  ../../new_dataset/lmo/wp3/combined_wp3_1.0.test
+  feature_template: embedding
+  method: CRF_TF
+  model_name: CRF_TF_lmo_fast_noOOV
+  embedding_size: 300
+  embedding_type: fasttext_noOOV
+  embedding_path: ../../word_embeddings/
+  batch_size: 32
+  learning_rate: 0.0004
+  early_stopping: 5
+
+it_crf_tf_emb:
+  language: it
+  train_data_path: ../../new_dataset/it/wp3/combined_wp3_0.3.train
+  validation_data_path:  ../../new_dataset/it/wp3/combined_wp3_0.3.valid
+  test_data_path:  ../../new_dataset/it/wp3/combined_wp3_0.3.test
+  feature_template: embedding
+  method: CRF_TF
+  model_name: CRF_TF_it_fasttext
+  embedding_size: 300
+  embedding_type: fasttext
+  embedding_path: ../../word_embeddings/
+  batch_size: 32
+  learning_rate: 0.0004
+  early_stopping: 5
+
+it_crf_tf_emb_noOOV:
+  language: it
+  train_data_path: ../../new_dataset/it/wp3/combined_wp3_0.3.train
+  validation_data_path:  ../../new_dataset/it/wp3/combined_wp3_0.3.valid
+  test_data_path:  ../../new_dataset/it/wp3/combined_wp3_0.3.test
+  feature_template: embedding
+  method: CRF_TF
+  model_name: CRF_TF_it_fasttext_noOOV
+  embedding_size: 300
+  embedding_type: fasttext_noOOV
+  embedding_path: ../../word_embeddings/
+  batch_size: 32
+  learning_rate: 0.0004
+  early_stopping: 5
 
 fr_crf_emb:
   language: fr
@@ -267,7 +348,7 @@ fr_crf_emb:
   method: CRF
   model_name: CRF_fr_emb
   embedding_size: 300
-  embedding_path: ../../word_embeddings/fasttext
+  embedding_path: ../../word_embeddings/
   best_param:
     epsilon: 7.196856730011514e-06
     cost: 0.016378937069540647
@@ -285,7 +366,7 @@ als_crf_emb:
   method: CRF
   model_name: CRF_als_emb
   embedding_size: 300
-  embedding_path: ../../word_embeddings/fasttext
+  embedding_path: ../../word_embeddings/
   best_param:
     epsilon: 7.196856730011514e-06
     cost: 0.016378937069540647
@@ -303,7 +384,7 @@ nds_crf_emb:
   method: CRF
   model_name: CRF_nds_emb
   embedding_size: 300
-  embedding_path: ../../word_embeddings/fasttext
+  embedding_path: ../../word_embeddings/
   best_param:
     epsilon: 7.196856730011514e-06
     cost: 0.016378937069540647
@@ -353,7 +434,7 @@ new_crf_als_emb:
   method: CRF
   model_name: CRF_als_emb
   embedding_size: 300
-  embedding_path: ../../word_embeddings/fasttext
+  embedding_path: ../../word_embeddings
   best_param:
     epsilon: 7.196856730011514e-06
     cost: 0.016378937069540647
@@ -372,7 +453,7 @@ new_crf_als_proc_emb:
   method: CRF
   model_name: CRF_als_proc_emb
   embedding_size: 300
-  embedding_path: ../../word_embeddings/fasttext
+  embedding_path: ../../word_embeddings
   best_param:
     epsilon: 7.196856730011514e-06
     cost: 0.016378937069540647
@@ -551,4 +632,4 @@ parameter_selection:
 
 #/usr/bin/python3 main.py --train_data_path ../../new_dataset/en/wp3/combined_wp3_1.0.test --model_name CRF__en_new_en_baseline_2017-08-11_15-04-01-146496 --language en --prediction_name test_new_en
 
-#/usr/bin/python3 main.py --train_data_path ../../new_dataset/als/wp3/combined_wp3_1.0.txt --model_name CRF_wikiner_emb300_finale_score_2017-08-13_23-13-19-362909 --language de --prediction_name wikiner_als --embedding_path ../../word_embeddings/fasttext/ --embedding_size 300 --feature_template embeddin
+#/usr/bin/python3 main.py --train_data_path ../../new_dataset/als/wp3/combined_wp3_1.0.txt --model_name CRF_wikiner_emb300_finale_score_2017-08-13_23-13-19-362909 --language de --prediction_name wikiner_als --embedding_path ../../word_embeddings/ --embedding_size 300 --feature_template embeddin

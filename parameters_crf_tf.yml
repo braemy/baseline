@@ -1,0 +1,8 @@
+path:
+  conll: ../../ner/nerc-conll2003/
+  wikiner: ../../wikiner_dataset/
+  new_dataset: ../../new_dataset/
+
+language: en
+embedding_type: fasttext
+embeddin_path:

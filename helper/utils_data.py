@@ -1,6 +1,6 @@
+import numpy as np
 
-
-def get_word(word_sequence, position):
+def  get_word(word_sequence, position):
     """
     Gets the word at the specified position
 
@@ -278,3 +278,51 @@ def analyze_data(data_path):
     if is_prediction:
         print("Per-instance accuracy: {0:.3f}%".format(per_instance_accuracy))
         print("Per-sequence accuracy: {0:.3f}%".format(per_sequence_accuracy))
+
+
+def pad_batch(features,features_embedding_indexes, labels, lengths, sub_sequence_index, o_label_num):
+    sentences_features = np.array(features)[sub_sequence_index]
+    sentences_features_embedding_indexes = np.array(features_embedding_indexes)[sub_sequence_index]
+    sentences_features_list = [0] * len(sentences_features)
+    sentences_features_embedding_indexes_list = [0] * len(sentences_features)
+    sequences_length = np.array(lengths)[sub_sequence_index]
+
+    max_length = max(sequences_length)
+    num_features = len(features[0][0])
+    padding_value = [0]* num_features
+    num_embedding_indexes = len(features_embedding_indexes[0][0])
+    padding_embedding_indexes_value = [0] * num_embedding_indexes
+    for sentence_id in range(0, len(sentences_features)):
+        sentence_f = sentences_features[sentence_id]
+        sentence_embedding_indexes = sentences_features_embedding_indexes[sentence_id]
+        #sent_array = [0] * len(sentence_f)
+        #for word_id in range(0, len(sentence_f)):
+            #word_f = sentence_f[word_id]
+            #tmp = [0] * num_features
+
+            #for k,v in enumerate(word_f): #TODO remove
+            #    tmp[k] = v
+            #for k, v in word_f.items():
+            #    tmp[k] = v
+            #sent_array[word_id] = tmp
+        #sent_array = pad_list(sent_array, max_length, padding_value)
+        sent_array = pad_list(sentence_f, max_length, padding_value)
+        sentence_embedding_indexes = pad_list(sentence_embedding_indexes, max_length, padding_embedding_indexes_value)
+
+        sentences_features_list[sentence_id] = sent_array
+        sentences_features_embedding_indexes_list[sentence_id] = sentence_embedding_indexes
+
+    labels = np.array(labels)[sub_sequence_index]
+    labels = [pad_list(label_sent, max_length, o_label_num) for label_sent in labels]
+    return sentences_features_list,sentences_features_embedding_indexes_list, labels, sequences_length
+
+
+def pad_list(old_list, padding_size, padding_value):
+    '''
+    http://stackoverflow.com/questions/3438756/some-built-in-to-pad-a-list-in-python
+    Example: pad_list([6,2,3], 5, 0) returns [6,2,3,0,0]
+    '''
+    assert padding_size >= len(old_list), "padding_size = " + str(padding_size) + "  len(old_list) = " + str(len(old_list))
+    if padding_size-len(old_list) == 0:
+        return old_list
+    return old_list + [padding_value] * (padding_size-len(old_list))

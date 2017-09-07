@@ -1,10 +1,9 @@
 import json
 import os
-
 import numpy as np
 from sklearn.metrics import confusion_matrix
 
-from helper.utils import create_recursive_folder
+from helper.utils import create_recursive_folder, get_current_time_in_miliseconds
 
 
 # LIBLINEAR_PATH = os.path.join(os.path.dirname(__file__), "liblinear/python")
@@ -35,7 +34,6 @@ class Minitagger(object):
         # language of the model
         self.language = ""
         # wikiner dataset
-        self.wikiner = ""
 
         # Parameters:
         self.epsilon = 0.1
@@ -52,12 +50,12 @@ class Minitagger(object):
         self.feature_extractor.is_training = is_training
 
     def set_prediction_path(self, model_name):
-        create_recursive_folder([self.project_dir, "predictions", self.language, model_name])
-        self.prediction_path = os.path.join(self.project_dir, "predictions", self.language, model_name)
-
+        self.prediction_path = os.path.join(self.project_dir, "predictions", self.language, model_name+"_" + get_current_time_in_miliseconds())
+        os.makedirs(self.prediction_path)
     def set_model_path(self, model_path):
-        create_recursive_folder([self.project_dir, "models_path", self.language, model_path])
-        self.model_path = os.path.join(self.project_dir, "models_path", self.language, model_path)
+        self.model_path = os.path.join(self.project_dir, "models_path", self.language, model_path +"_" + get_current_time_in_miliseconds())
+        os.makedirs(self.model_path)
+
         print("Model path:", self.model_path)
 
     @staticmethod
@@ -181,3 +179,4 @@ class Minitagger(object):
         f2.close()
         f3.close()
         return true_labels
+

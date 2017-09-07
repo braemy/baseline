@@ -12,16 +12,20 @@ from helper.SequenceData import SequenceData
 from helper.utils import *
 
 from MinitaggerCRF import MinitaggerCRF
+from MinitaggerCRF_tf import MinitaggerCRF_tf
 from FeatureExtractor_CRF_SVM import FeatureExtractor_CRF_SVM
+from FeatureExtractor_CRF_tf import FeatureExtractor_CRF_tf
+from helper.constants import dataset_type
 
 class Final_training(object):
-    def __init__(self, parameters):
+    def __init__(self, conf):
+        parameters = load_parameters(conf)
         self.validation_data_path = parameters["validation_data_path"] if "validation_data_path" in parameters else None
         self.train_data_path = parameters["train_data_path"]
         self.test_data_path = parameters["test_data_path"] if "test_data_path" in parameters else None
         self.minitagger = None
         self.language = parameters["language"]
-        self.model_name = parameters["model_name"] + "_" + utils.get_current_time_in_miliseconds()
+        self.model_name = parameters["model_name"]
         self.feature_template = parameters["feature_template"]
         self.method = parameters["method"]
         self.best_param = parameters["best_param"] if "best_param" in parameters else None
@@ -36,24 +40,29 @@ class Final_training(object):
 
         pprint(parameters, depth=2)
 
-        #self.CV = CV
-
     def train(self):
-        # initialize feature extractor with the right feature template
-        self.feature_extractor = FeatureExtractor_CRF_SVM(self.feature_template, self.language,
-                                                         self.embedding_size if self.feature_template=="embedding" else None)
-
         self.train_sequence = SequenceData(self.train_data_path,language=self.language, pos_tag=True)
         self.validation_sequence = SequenceData(self.validation_data_path,language=self.language, pos_tag=True) if self.validation_data_path else None
         self.test_sequence = SequenceData(self.test_data_path,language=self.language, pos_tag=True) if self.test_data_path else None
 
+
+        if self.method in ["CRF", "SVM"]:
+            self.feature_extractor = FeatureExtractor_CRF_SVM(self.feature_template, self.language,
+                                                          self.embedding_size if self.feature_template == "embedding" else None)
+        elif self.method == "CRF_TF":
+            self.feature_extractor = FeatureExtractor_CRF_tf(self.feature_template, self.language,
+                                                             self.embedding_size if self.feature_template == "embedding" else None, self.train_sequence.part_of_speach_set )
+        else:
+            raise("Method unknown")
+
         # load bitstring or embeddings data
         if self.feature_template == "embedding":
             if self.test_sequence and self.validation_sequence:
-                vocabulary = self.train_sequence.vocabulary.union(self.test_sequence.vocabulary).union(self.validation_sequence.vocabulary)
+                vocabulary = self.train_sequence.vocabulary.union(self.test_sequence.vocabulary).union(
+                    self.validation_sequence.vocabulary)
             else:
                 vocabulary = self.train_sequence.vocabulary.union(self.test_sequence.vocabulary)
-            self.feature_extractor.load_word_embeddings(self.embedding_path, self.embedding_size, vocabulary)
+            self.feature_extractor.load_word_embeddings(self.parameters, vocabulary)
 
         print("Number of sentences in training dataset:", len(self.train_sequence.sequence_pairs))
         if self.test_sequence:
@@ -109,14 +118,17 @@ class Final_training(object):
                 self.minitagger.cross_validation(0, self.train_sequence, n_fold=3)
 
     def crf_tf(self):
-        self.minitagger = MinitaggerCRF_tf()
-        self.minitagger.language = self.language
-        self.minitagger.quiet = True
-        self.minitagger.set_prediction_path(self.model_name)
-        self.minitagger.set_model_path(self.model_name)
+        self.minitagger = MinitaggerCRF_tf(self.parameters,self.train_sequence, self.test_sequence, self.validation_sequence)
+
+        #self.feature_extractor.morphological_features = "embeddings"
+
+        self.feature_extractor.token_features2 = True
+        self.feature_extractor.morphological_features = "embedding"
+        self.feature_extractor.token_features1 = True
+        self.feature_extractor.token_features0 = True
         self.minitagger.equip_feature_extractor(self.feature_extractor)
 
-        #self.minitagger.extract_features(self.train_sequence, self.test_sequence, self.validation_sequence)
+        self.minitagger.extract_features()
         self.minitagger.train()
 
     def svm(self):
@@ -153,8 +165,7 @@ if __name__ == "__main__":
                            required=True)
     parsed_args = argparser.parse_args()
     for conf in parsed_args.confs:
-        parameters = load_parameters(conf)
-        training = Final_training(parameters=parameters)
+        training = Final_training(conf)
         training.train()
 
 

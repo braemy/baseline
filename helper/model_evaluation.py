@@ -1,5 +1,9 @@
 from helper.conlleval import evaluate, report
 
+"""
+Functions used to compute the exact Fscore, Ineact F1score and ConllFesocre
+The main function to use is the "report_fscore_from_file" that will apply all the fscore on the given file
+"""
 
 def estimate_inexact_fscore(y_true, y_pred, b_equals_i=False):
     label_list = ["B-PER", "I-PER", "B-LOC", "I-LOC", "B-ORG", "I-ORG", "B-MISC", "I-MISC"]
@@ -124,127 +128,6 @@ def estimate_exact_fscore(y_true, y_pred):
 
     return tp, tn, fp, fn, total_seq
 
-
-def estimate_exact_fscore_wikiner(y_true, y_pred):
-    """
-    This function compute the fscore with the wikiner dataset. in wikiner I and B are not used correctly
-    It seems that there are using B on is 2 different entity are following each others.
-
-    When we see I- we must if the next one is I-same class => sequence
-    if B or I-other class => end of sequence
-
-    :param y_true:
-    :type y_true:
-    :param y_pred:
-    :type y_pred:
-    :return:
-    :rtype:
-    """
-
-    pairs = []
-    start = False
-    end = False
-
-    tp = 0
-    tn = 0
-    fp = 0
-    fn = 0
-    total_seq = 0
-
-    for i in range(len(y_true)):
-        if y_true[i] == "O":
-            if y_pred[i] == "O":
-                tn += 1
-            else:
-                fp += 1
-        else:
-            assert "-" in y_true[i], "true label " + y_true[i] + " should contains '-'"
-            true_b_i, true_class = y_true[i].split("-")
-
-            if true_b_i == "I":
-                # next label is the same=> start a sequence or continue one
-                if i < len(y_true) - 1 and y_true[i] == y_true[i + 1]:
-                    if start:
-                        continue
-                    else:
-                        start_index = i
-                        start = True
-                        total_seq += 1
-                else:
-                    # next token begin with I but other class => end of the sequence or just one token
-                    if i == len(y_true) - 1:
-                        end_index = i + 1
-                    else:
-                        # not at the end, next token is I but other class
-                        end_index = i
-                    if start:
-                        start = False
-                        pairs.append((start_index, end_index + 1))
-                    else:
-                        start_index = i
-                        pairs.append((start_index,))
-
-            elif true_b_i == "B":
-                if i == len(y_true) - 1:  # end of the sentence
-                    if start:
-                        start = False
-                        pairs.append((start_index, i + 1))
-                    else:
-                        start_index = i
-                        pairs.append((start_index,))
-                    continue
-
-                else:
-                    if y_true[i + 1] == "O":
-                        continue
-                    next_true_b_i, next_true_class = y_true[i + 1].split("-")
-                    if next_true_b_i == "B":  # this is not a sequence B-PER B-PER or B-PER B-LOC => append start_index
-                        start_index = i
-                        pairs.append((start_index,))
-                    elif next_true_class == true_class:  # sequence
-                        if start:
-                            continue
-                        else:
-                            start_index = i
-                            start = True
-                            total_seq += 1
-                    else:  # not a sequence
-                        if start:
-                            start = False
-                            pairs.append((start_index, i))
-                        else:
-                            start_index = i
-                            pairs.append((start_index,))
-    for pair in pairs:
-        if len(pair) == 1:
-            try:
-                y_true[pair[0]]
-            except:
-                print("Pair", pair)
-                print("Pair", len(pair))
-                print(y_true)
-                print(y_pred)
-
-            try:
-                y_pred[pair[0]]
-            except:
-                print("Pair", pair)
-                print("Pair", len(pair))
-                print(y_true)
-                print(y_pred)
-
-            if y_true[pair[0]] == y_pred[pair[0]]:
-                tp += 1
-            else:
-                fn += 1
-        if len(pair) == 2:
-            if y_true[pair[0]:pair[1]] == y_pred[pair[0]:pair[1]]:
-                tp += 1
-            else:
-                fn += 1
-    return tp, tn, fp, fn, total_seq
-
-
 def estimate_precision(tp, fp):
     if tp == 0: return 0
     return float(tp) / (tp + fp) * 100
@@ -290,19 +173,32 @@ def split_prediction_true_label(file_name):
     return true_sequence, pred_sequence
 
 
-def report_fscore_from_file(prediction_file, wikiner=False, quiet=True):
+def report_fscore_from_file(prediction_file, quiet=True, output_conll_file=None):
+    """
+    report the fscore for the given file
+    :param prediction_file: file containing the prediction with format:  TOKEN GOLD_LABEL PREDICTED_LABEL
+    :param quiet: False to activate the print
+    :param output_conll_file: file to save the result
+    :return: exact_score, inexact_score and conll_score where each one is a dict with recall, precision and f1-score
+    """
     print(prediction_file)
     true_label, pred_label = split_prediction_true_label(prediction_file)
     with open(prediction_file, encoding='utf-8') as f:
         counts = evaluate(f, None)
-    conllEval = report(counts)
+    conllEval = report(counts, output_conll_file)
     print(conllEval)
     exact_score, inexact_score = report_fscore(true_label, pred_label, wikiner, quiet)
 
     return exact_score, inexact_score, conllEval
 
-
-def report_fscore(true_label, pred_label, wikiner=False, quiet=True):
+def report_fscore(true_label, pred_label, quiet=True):
+    """
+    compute the exact and inexact score
+    :param true_label: gold label
+    :param pred_label: predicted label
+    :param quiet: False to print intermediate results
+    :return: return exact and inexact score with precision, recall and f1-score
+    """
     tp_exact = 0
     tn_exact = 0
     fp_exact = 0
@@ -322,27 +218,13 @@ def report_fscore(true_label, pred_label, wikiner=False, quiet=True):
         tn_inexact += tn
         fp_inexact += fp
         fn_inexact += fn
-        if wikiner:
-            tp, tn, fp, fn, seq = estimate_exact_fscore_wikiner(y_true, y_pred)
-        else:
-            tp, tn, fp, fn, seq = estimate_exact_fscore(y_true, y_pred)
+
+        tp, tn, fp, fn, seq = estimate_exact_fscore(y_true, y_pred)
         tp_exact += tp
         tn_exact += tn
         fp_exact += fp
         fn_exact += fn
         total_seq += seq
-
-    #print("TP exact: ", tp_exact)
-    #print("TN exact: ", tn_exact)
-    #print("FP exact: ", fp_exact)
-    #print("FN exact: ", fn_exact)
-    #print("seq: ", total_seq)
-    #print()
-    #print("TP inexact: ", tp_inexact)
-    #print("TN inexact: ", tn_inexact)
-    #print("FP inexact: ", fp_inexact)
-    #print("FN inexact: ", fn_inexact)
-    #print()
 
     exact_score = dict()
     precision = estimate_precision(tp_exact, fp_exact)
@@ -373,9 +255,3 @@ def report_fscore(true_label, pred_label, wikiner=False, quiet=True):
         print()
 
     return exact_score, inexact_score
-
-# if __name__ == "__main__":
-#     argparser = argparse.ArgumentParser()
-#     argparser.add_argument("--file_name", type=str, help="path to predictions", required=True)
-#     parsed_args = argparser.parse_args()
-#     main(parsed_args)

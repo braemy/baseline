@@ -41,11 +41,12 @@ class SequenceData(object):
         self.word_pos_count = {}
         # dictionary for counting: key = pos tag | value = number of occurrences for each pos tag
         self.pos_count = collections.Counter()
-
-        self.convert_to_id = False
-
+        #language of the experiment
         self.language = language
+        #set containing all the vocabulary, included the suffixes and prefixes
         self.vocabulary = set()
+        # set containing all the POS tags
+        self.part_of_speach_set = set()
 
         # check if given data is a path to file, i.e. a string
         if isinstance(given_data, str):
@@ -61,15 +62,14 @@ class SequenceData(object):
 
         self.__initialize_sequencedata_attributes()
 
-    # def get_token_id(self):# TODO HEEEEEERE !!!!!!!!!!!!!!!!!!
-
-
-    def merge_sequence(self, sequence_to_merge):
-        self.sequence_pairs = np.append(self.sequence_pairs, sequence_to_merge.sequence_pairs,
-                                        axis=0)  # TODO update all variable of self
-        return self
 
     def get_subsequence_pairs(self, start, end):
+        """
+        get a subsequence from start index to end index
+        :param start: first index
+        :param end: last index
+        :return: subsequence
+        """
         copy_sequence = copy.copy(self)
         if end is None:
             copy_sequence.sequence_pairs = copy_sequence.sequence_pairs[start:]
@@ -78,6 +78,14 @@ class SequenceData(object):
         return copy_sequence
 
     def split_in_2_sequences(self, start, end):
+        """
+        split in training and testing sequence
+        test is the data from start to end
+        train is the data outside of this interval
+        :param start: first index of the test set
+        :param end: last index of the test set
+        :return: train sequence, test sequence
+        """
         test = self.get_subsequence_pairs(start, end)
         train1 = self.get_subsequence_pairs(0, start)
         train2 = self.get_subsequence_pairs(end, None)
@@ -96,92 +104,12 @@ class SequenceData(object):
             length_sum += len(word_sequence)
         return float(length_sum) / len(self.sequence_pairs)
 
-    def get_labels(self):
-        labels = [""] * len(self.sequence_pairs)
-        total_o = 0
-        total_label = 0
-        for seq_num, sequence in enumerate(self.sequence_pairs):
-            labels[seq_num] = sequence[1]
-            total_label += len(sequence[1])
-            total_o += np.sum([s == 'O' for s in sequence[1]])
-        percentage_o = round(total_o / total_label * 100, 2) if total_label > 0 else 0
-        return labels, percentage_o
-
-    def split_train_validation(self, train_ratio):
-        """
-        randomize the sentences
-        and split the sentences according to the ratio ratio
-        :param train_ratio:
-        :type train_ratio:
-        :param dev_ratio:
-        :type dev_ratio:
-        :param test_ratio:
-        :type test_ratio:
-        :return:
-        :rtype:
-        """
-
-        assert train_ratio <= 1, " train ration should be less or equal to 1 " + train_ratio
-        validation_ratio = round(1 - train_ratio, 2)
-        combine_sequence = copy.copy(self)
-
-        # randomize the sequence_pairs
-        np.random.shuffle(combine_sequence.sequence_pairs)
-
-        total_sequence = len(combine_sequence.sequence_pairs)
-        train_sequence = combine_sequence.get_subsequence_pairs(start=0, end=int(train_ratio * total_sequence))
-        dev_sequence = combine_sequence.get_subsequence_pairs(start=int(train_ratio * total_sequence), end=None)
-
-        return train_sequence, dev_sequence
-
-    def convert_sequence_to_token(self, num_tokens=None):
-        """
-        Convert a Sequence to a list of token and a list of label
-        To create the features of one token, we still need the context of the word (position, word before and after),
-        the token list keep track of the sentence number and position in the sentence
-        :param data:
-        :type data:
-        :return:
-        :rtype:
-        """
-        sequence_pairs = []
-        if num_tokens is None:
-            token_list = []
-            labels_list = []
-            for i, d in enumerate(self.sequence_pairs):
-                sentence = d[0]
-                labels = d[1]
-                sentence_tokens = []
-
-                for position, (token, label) in enumerate(zip(sentence, labels)):
-                    token_list.append({'t': token, 'l': label, 'sent': i, 'position': position,
-                                       'sent_token': str(i) + "_" + str(position)})
-                    labels_list.append(label)
-
-                    sentence_tokens.append(
-                        {'t': token, 'l': label, 'sent': i, 'sent_token': str(i) + "_" + str(position)})
-                sequence_pairs.append([sentence_tokens, labels])
-            sequence_copy = copy.copy(self)
-            sequence_copy.sequence_pairs = sequence_pairs
-
-        else:
-            # token_list = []
-            # labels_list = []
-            token_list = np.empty([num_tokens], dtype="<U6")
-            labels_list = np.empty([num_tokens], dtype="<U6")
-            counter = 0
-            for i, d in enumerate(self.sequence_pairs):
-                sentence = d[0]
-                labels = d[1]
-                for position, (token, label) in enumerate(zip(sentence, labels)):
-                    # token_list.append({'t':token, 'l':label, 'sent':i, 'pos':position})
-                    # labels_list.append(label)
-                    token_list[counter] = token
-                    labels_list[counter] = label
-                    counter += 1
-        return token_list, labels_list, sequence_copy
-
     def split_token_label(self, num_of_sentences=50000):
+        """
+        split the sequence in a list of token, list of labels, list of part_of_speach
+        :param num_of_sentences:
+        :return:
+        """
         size = len(self.sequence_pairs) if len(self.sequence_pairs) < num_of_sentences else num_of_sentences
         list_tokens_sequence = [None] * size
         list_labels_sequence = [None] * size
@@ -257,16 +185,23 @@ class SequenceData(object):
 
                     # build sequence of words
                     word_sequence.append(word)
+                    #word_l = word.lower()
+                    self.vocabulary.add(word)
+                    for i in range(1,5):
+                        self.vocabulary.add(word[:i])
+                        self.vocabulary.add(word[-i:])
+
                     # build sequence of labels
                     label_sequence.append(label)
 
                     # build_sequence of pos tags
                     pos_sequence.append(pos_tag)
+                    self.part_of_speach_set.add(pos_tag)
                 # line is empty means that a new sentence if about to start
                 else:
                     # check if word_sequence is empty
                     if word_sequence:
-                        self.vocabulary.update(word_sequence)
+                        #self.vocabulary.update(map(lambda r:r.lower(), word_sequence))
                         # append word_sequence and label_sequence and pos_sequence to sequence_pairs
                         self.sequence_pairs.append([word_sequence, label_sequence, pos_sequence])
 
@@ -357,16 +292,16 @@ class SequenceData(object):
             self.word_pos_count[word] = sorted(self.word_pos_count[word].items(),
                                                key=lambda pair: pair[1], reverse=True)
 
-    def save_prediction_to_file(self, pred_labels, dir_output, id="", list_tokens=False):
+    def save_prediction_to_file(self, pred_labels, dir_output, list_tokens=False, file_name="predictions_"):
         # file to print all predictions
-        file_name = os.path.join(dir_output, "predictions" + str(id) + ".txt")
-        f1 = open(file_name, "w", encoding='utf-8')
+        file_path = os.path.join(dir_output, file_name + ".txt")
+        f1 = open(file_path, "w", encoding='utf-8')
         # file to print only sentences that contain at least one wrong label after classification
-        file_name = os.path.join(dir_output, "predictions_wrong" + str(id) + ".txt")
-        f2 = open(file_name, "w", encoding='utf-8')
+        file_path = os.path.join(dir_output, file_name + "_wrong" + ".txt")
+        f2 = open(file_path, "w", encoding='utf-8')
         # file to print only sentences whose labels are predicted 100% correctly
-        file_name = os.path.join(dir_output, "predictions_correct" + str(id) + ".txt")
-        f3 = open(file_name, "w", encoding='utf-8')
+        file_path = os.path.join(dir_output, file_name + "_correct" + ".txt")
+        f3 = open(file_path, "w", encoding='utf-8')
         # index for prediction label
         pred_idx = 0
         # list to store all true labels

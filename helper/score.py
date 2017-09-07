@@ -5,8 +5,16 @@ import pickle
 import numpy as np
 
 
+"""
+Class use to collect the score during experiments
+"""
+
 class Score(object):
     def __init__(self, name, infos):
+        """
+        :param name: name of the exeperiment
+        :param infos: parameters of the experiment
+        """
         self.infos = infos
         self.name = name
         self.fscore_conll = []
@@ -27,24 +35,41 @@ class Score(object):
         self.time_step = []
 
     def add_conll(self, score):
+        """
+        add a new conll score ()
+        :param score: conll score
+        """
         f, p, r = self.split_score(score)
         self.fscore_conll.append(f)
         self.precision_conll.append(p)
         self.recall_conll.append(r)
 
     def add_exact(self, score):
+        """
+        add a new exact score
+        :param score: exact score
+        """
         f, p, r = self.split_score(score)
         self.fscore_exact.append(f)
         self.precision_exact.append(p)
         self.recall_exact.append(r)
 
     def add_inexact(self, score):
+        """
+        add a new inexact score
+        :param score: inext score
+        """
         f, p, r = self.split_score(score)
         self.fscore_inexact.append(f)
         self.precision_inexact.append(p)
         self.recall_inexact.append(r)
 
     def add_iteration(self, iteration):
+        """
+        add a new iteration
+        :param iteration:
+        :return:
+        """
         self.iterations.append(iteration)
 
     def add_time_step(self, time):

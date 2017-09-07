@@ -97,8 +97,7 @@ class MinitaggerSVM(Minitagger):
             self.quiet = quiet_value
 
             self.data_test.save_prediction_to_file(pred_labels, self.prediction_path)
-            exact_score, inexact_score, conllEval = report_fscore_from_file(self.prediction_path + "/predictions.txt",
-                                                                            wikiner=self.wikiner)
+            exact_score, inexact_score, conllEval = report_fscore_from_file(self.prediction_path + "/predictions.txt")
             # create some files useful for debugging
             if self.debug:
                 self.__debug(self.data_test, pred_labels)
@@ -262,8 +261,7 @@ class MinitaggerSVM(Minitagger):
             self.__liblinear_model = liblinearutil.train(problem, liblinearutil.parameter("-q -p " + str(self.epsilon)))
             pred_labels, acc = self.predict()
             self.data_test.save_prediction_to_file(pred_labels, self.prediction_path)
-            exact_score, inexact_score, conllEval = report_fscore_from_file(self.prediction_path + "/predictions.txt",
-                                                                            wikiner=self.wikiner, quiet=True)
+            exact_score, inexact_score, conllEval = report_fscore_from_file(self.prediction_path + "/predictions.txt", quiet=True)
             score.add_new_iteration(i, time.time() - start_time, conllEval, exact_score, inexact_score, param)
             print("Iteration:", time.time() - start_time, "score: ", conllEval)
 

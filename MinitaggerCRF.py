@@ -32,7 +32,7 @@ class MinitaggerCRF(Minitagger):
         self.validation_ratio = 0.05
         print("CRF (sklearn)")
 
-    def extract_features(self, train_sequence, test_sequence, validation_sequence=None, data_to_use=10000):
+    def extract_features(self, train_sequence, test_sequence, validation_sequence=None, data_to_use=15000):
         #if not validation_sequence and train_sequence:
         #    train_sequence, validation_sequence = train_sequence.split_train_validation(
         #        train_ratio=1 - 0.05)
@@ -68,13 +68,13 @@ class MinitaggerCRF(Minitagger):
                                                                                          self.validation_labels_sequence,
                                                                                          valid_pos_sequence,
                                                                                          extract_all=True)
-            self.__save_features(self.validation_features, self.model_path, "validation_features")
+            #self.__save_features(self.validation_features, self.model_path, "validation_features")
         self.feature_extractor.is_training = False
         self.test_features, _, _ = self.feature_extractor.extract_features_crf(test_tokens_sequence,
                                                                                self.test_labels_sequence,
                                                                                test_pos_sequence,
                                                                                extract_all=True)
-        self.__save_features(test_tokens_sequence, self.model_path, "test_features")
+        #self.__save_features(test_tokens_sequence, self.model_path, "test_features")
 
     def train(self, max_iteration=100):
         """
@@ -119,8 +119,7 @@ class MinitaggerCRF(Minitagger):
         y_pred = crf.predict(self.test_features)
         self.test_sequence.save_prediction_to_file(y_pred, self.prediction_path)
         exact_score, inexact_score, conllEval = report_fscore_from_file(
-            self.prediction_path + "/predictions.txt",
-            wikiner=self.wikiner, quiet=True)
+            self.prediction_path + "/predictions.txt", quiet=True)
         if not self.quiet:
             self.display_results("Conll", conllEval)
             self.display_results("Exact", exact_score)
@@ -167,8 +166,7 @@ class MinitaggerCRF(Minitagger):
             y_pred = crf.predict(self.test_features)
             self.test_sequence.save_prediction_to_file(y_pred, self.prediction_path)
             exact_score, inexact_score, conllEval = report_fscore_from_file(
-                self.prediction_path + "/predictions.txt",
-                wikiner=self.wikiner, quiet=True)
+                self.prediction_path + "/predictions.txt", quiet=True)
             score.add_new_iteration(i, time.time() - start_time, conllEval, exact_score, inexact_score, param)
             print("Iteration:", i, "score: ", conllEval)
 

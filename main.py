@@ -36,7 +36,6 @@ def main(exp):
         model_name = experiments['models'][trained_model]
         train = False
         prediction_name = "{0}_on_{1}".format(trained_model, test)
-        wikiner = False
 
         if "SVM" in model_name:
             minitagger = MinitaggerSVM()
@@ -51,9 +50,6 @@ def main(exp):
         else:
             print(model_name)
             minitagger.set_prediction_path(model_name+"_"+prediction_name)
-
-        if wikiner:
-            minitagger.wikiner = True
 
         if train:
 
@@ -108,8 +104,7 @@ def main(exp):
                 pred_labels = minitagger.crf.predict(minitagger.test_features)
                 minitagger.test_sequence.save_prediction_to_file(pred_labels, minitagger.prediction_path)
                 exact_score, inexact_score, conllEval = report_fscore_from_file(
-                    os.path.join(minitagger.prediction_path, "predictions.txt"),
-                    wikiner=minitagger.wikiner, quiet=True)
+                    os.path.join(minitagger.prediction_path, "predictions.txt"), quiet=True)
 
                 with open(os.path.join(minitagger.prediction_path,"results.txt"), "w") as file:
                     file.write("CoNLL Eval\n")
